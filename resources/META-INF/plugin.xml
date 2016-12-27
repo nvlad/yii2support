@@ -1,0 +1,47 @@
+<idea-plugin version="2">
+    <id>com.nvlad.yii2-framework</id>
+    <name>Yii2 Framework</name>
+    <version>1.0</version>
+    <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
+
+    <description><![CDATA[
+      Enter short description for your plugin here.<br>
+      <em>most HTML tags may be used</em>
+    ]]></description>
+
+    <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="145.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+    <depends>com.jetbrains.php</depends>
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable groupId="tools"
+                             displayName="Yii2 Framework Plugin"
+                             id="yii2framework.settings"
+                             instance="com.yii2framework.settings.SearchableConfigurable"/>
+
+
+        <toolWindow id="Yii2Migrations" secondary="true" icon="/com/nvlad/migrations/images/migrations.jpg" anchor="bottom"
+                    conditionClass="com.yii2framework.migrations.Condition"
+                    factoryClass="com.yii2framework.migrations.ToolWindow"/>
+
+        <completion.contributor language="PHP" implementationClass="com.yii2framework.completion.views.CompletionContributor"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+</idea-plugin>
