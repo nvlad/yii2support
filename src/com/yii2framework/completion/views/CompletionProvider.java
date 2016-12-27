@@ -24,8 +24,10 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         if (psiElementName != null && psiElementName.startsWith("render")) {
             PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile());
 
-            for (Object view : getFileListForPath(viewsPath)) {
-                completionResultSet.addElement(LookupElementBuilder.create(view));
+            if (viewsPath != null) {
+                for (Object view : getFileListForPath(viewsPath)) {
+                    completionResultSet.addElement(LookupElementBuilder.create(view));
+                }
             }
         }
     }
