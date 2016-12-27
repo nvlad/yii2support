@@ -3,6 +3,7 @@ package com.yii2framework.completion.views;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.codeInsight.template.macro.SplitWordsMacro;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ProcessingContext;
@@ -42,7 +43,8 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
                 psiDirectory = psiDirectory.findSubdirectory("views");
 
                 if (psiDirectory != null) {
-                    String container = fileName.substring(0, fileName.length() - 10).toLowerCase();
+                    String container = fileName.substring(0, fileName.length() - 10);
+                    container = new SplitWordsMacro.LowercaseAndDash().convertString(container);
 
                     psiDirectory = psiDirectory.findSubdirectory(container);
                 }
