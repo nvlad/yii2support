@@ -24,7 +24,10 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
             PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile(), psiElement);
 
             if (viewsPath != null) {
-                String enteredText = psiElement.getText().replaceAll("IntellijIdeaRulezzz ", "");
+                String enteredText = psiElement.getText();
+                enteredText = enteredText.substring(0, enteredText.indexOf("IntellijIdeaRulezzz "));
+                enteredText = enteredText.contains("/") ? enteredText.substring(0, enteredText.lastIndexOf("/") + 1) : "";
+
                 for (PsiDirectory psiDirectory : viewsPath.getSubdirectories()) {
                     completionResultSet.addElement(new DirectoryLookupElement(psiDirectory, enteredText));
                 }
@@ -54,7 +57,8 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
             }
         }
 
-        String enteredText = psiElement.getText().replaceAll("IntellijIdeaRulezzz ", "");
+        String enteredText = psiElement.getText();
+        enteredText = enteredText.substring(0, enteredText.indexOf("IntellijIdeaRulezzz "));
         String enteredPath = enteredText;
         if (enteredText.startsWith("/")) {
             while (psiDirectory != null && !psiDirectory.getName().equals("views")) {
@@ -63,19 +67,23 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
             enteredPath = enteredPath.substring(1);
         }
 
-        String directory;
-        while (!enteredPath.equals("")) {
-            if (enteredPath.contains("/")) {
-                directory = enteredPath.substring(0, enteredPath.indexOf("/"));
-                enteredPath = enteredPath.substring(directory.length() + 1);
-                psiDirectory = psiDirectory.findSubdirectory(directory);
-            } else {
-                psiDirectory = psiDirectory.findSubdirectory(enteredPath);
+        if (!enteredPath.endsWith("/") && enteredPath.contains("/")) {
+            enteredPath = enteredPath.substring(0, enteredPath.lastIndexOf("/") + 1);
+            if (enteredPath.length() == 1) {
                 enteredPath = "";
             }
         }
 
-        System.out.println(enteredPath);
+        if (enteredPath.endsWith("/")) {
+            String directory;
+            while (!enteredPath.equals("")) {
+                directory = enteredPath.substring(0, enteredPath.indexOf("/"));
+                enteredPath = enteredPath.substring(directory.length() + 1);
+                if (psiDirectory != null) {
+                    psiDirectory = psiDirectory.findSubdirectory(directory);
+                }
+            }
+        }
 
         return psiDirectory;
     }
