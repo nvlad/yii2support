@@ -2,16 +2,12 @@ package com.yii2framework.completion.views;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.template.macro.SplitWordsMacro;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by NVlad on 27.12.2016.
@@ -26,8 +22,8 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
             PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile());
 
             if (viewsPath != null) {
-                for (Object view : getFileListForPath(viewsPath)) {
-                    completionResultSet.addElement(LookupElementBuilder.create(view));
+                for (PsiFile psiFile : viewsPath.getFiles()) {
+                    completionResultSet.addElement(new ExistLookupElement(psiFile));
                 }
             }
         }
@@ -52,21 +48,5 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         }
 
         return psiDirectory;
-    }
-
-    private Object[] getFileListForPath(PsiDirectory psiDirectory) {
-        List<String> files = new ArrayList<>();
-        String filename;
-
-        for (PsiFile psiFile : psiDirectory.getFiles()) {
-            filename = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
-            if (filename.contains(".")) {
-                files.add(psiFile.getName());
-            } else {
-                files.add(filename);
-            }
-        }
-
-        return files.toArray();
     }
 }
