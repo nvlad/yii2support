@@ -7,7 +7,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,8 +17,8 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         PsiElement psiElement = completionParameters.getPosition();
-        PhpPsiElement phpPsiElement = (PhpPsiElement) psiElement.getParent().getParent().getParent();
-        String psiElementName = phpPsiElement.getName();
+        MethodReference methodReference = (MethodReference) psiElement.getParent().getParent().getParent();
+        String methodName = methodReference.getName();
 
         if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
             String prefix = completionResultSet.getPrefixMatcher().getPrefix();
@@ -26,7 +26,7 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
             completionResultSet = completionResultSet.withPrefixMatcher(prefix);
         }
 
-        if (psiElementName != null && psiElementName.startsWith("render")) {
+        if (methodName != null && methodName.startsWith("render")) {
             PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile(), psiElement);
 
             if (viewsPath != null) {
