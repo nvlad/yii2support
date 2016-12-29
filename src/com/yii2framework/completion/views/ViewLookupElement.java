@@ -13,10 +13,9 @@ import javax.swing.*;
 public class ViewLookupElement extends LookupElement {
     private String name;
     private String tail;
-    private String prefix;
     private Icon icon;
 
-    ViewLookupElement(PsiFile psiFile, String searchPrefix) {
+    ViewLookupElement(PsiFile psiFile) {
         String filename = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
         if (filename.contains(".")) {
             name = psiFile.getName();
@@ -25,19 +24,12 @@ public class ViewLookupElement extends LookupElement {
             tail = psiFile.getName().substring(filename.length());
         }
         icon = psiFile.getIcon(0);
-        prefix = searchPrefix;
-        if (searchPrefix.startsWith("/")) {
-            prefix = prefix.substring(1);
-        }
-        if (prefix.length() > 0 && !prefix.endsWith("/")) {
-            prefix = prefix.concat("/");
-        }
     }
 
     @NotNull
     @Override
     public String getLookupString() {
-        return prefix.concat(name);
+        return name;
     }
 
     @Override

@@ -20,20 +20,22 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         PhpPsiElement phpPsiElement = (PhpPsiElement) psiElement.getParent().getParent().getParent();
         String psiElementName = phpPsiElement.getName();
 
+        if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
+            String prefix = completionResultSet.getPrefixMatcher().getPrefix();
+            prefix = prefix.substring(prefix.lastIndexOf("/") + 1);
+            completionResultSet = completionResultSet.withPrefixMatcher(prefix);
+        }
+
         if (psiElementName != null && psiElementName.startsWith("render")) {
             PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile(), psiElement);
 
             if (viewsPath != null) {
-                String enteredText = psiElement.getText();
-                enteredText = enteredText.substring(0, enteredText.indexOf("IntellijIdeaRulezzz "));
-                enteredText = enteredText.contains("/") ? enteredText.substring(0, enteredText.lastIndexOf("/") + 1) : "";
-
                 for (PsiDirectory psiDirectory : viewsPath.getSubdirectories()) {
-                    completionResultSet.addElement(new DirectoryLookupElement(psiDirectory, enteredText));
+                    completionResultSet.addElement(new DirectoryLookupElement(psiDirectory));
                 }
 
                 for (PsiFile psiFile : viewsPath.getFiles()) {
-                    completionResultSet.addElement(new ViewLookupElement(psiFile, enteredText));
+                    completionResultSet.addElement(new ViewLookupElement(psiFile));
                 }
             }
         }
