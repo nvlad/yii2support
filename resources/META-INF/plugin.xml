@@ -27,7 +27,7 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <completion.contributor language="PHP" implementationClass="com.yii2framework.completion.views.CompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.yii2framework.views.CompletionContributor"/>
     </extensions>
 
     <actions>
