@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
  * Created by NVlad on 02.01.2017.
  */
 public class PsiReference extends PsiReferenceBase<PsiElement> {
-    public PsiElement myTarget;
+    private PsiElement myTarget;
 
-    public PsiReference(@NotNull PsiElement element) {
+    PsiReference(@NotNull PsiElement element) {
         super(element);
     }
 

@@ -14,7 +14,7 @@ public class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider 
     @NotNull
     @Override
     public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-        List<PsiReference> references = new ArrayList<PsiReference>();
+        List<PsiReference> references = new ArrayList<>();
 
         PsiReference reference = new PsiReference(psiElement);
         references.add(reference);
