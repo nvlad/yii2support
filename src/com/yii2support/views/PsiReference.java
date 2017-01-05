@@ -1,4 +1,4 @@
-package com.yii2framework.views;
+package com.yii2support.views;
 
 import com.intellij.codeInsight.template.macro.SplitWordsMacro;
 import com.intellij.psi.PsiDirectory;
