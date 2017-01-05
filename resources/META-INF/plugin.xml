@@ -28,6 +28,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="PHP" implementationClass="com.yii2framework.views.CompletionContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.yii2framework.views.PsiReferenceContributor"/>
     </extensions>
 
     <actions>
