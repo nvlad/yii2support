@@ -51,9 +51,11 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
 
         PsiDirectory directory = getViewsPsiDirectory(psiFile, psiElement);
 
-        PsiFile findedFile = directory.findFile(filename);
+        if (directory == null) {
+            return null;
+        }
 
-        return findedFile;
+        return directory.findFile(filename);
     }
 
     private PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
