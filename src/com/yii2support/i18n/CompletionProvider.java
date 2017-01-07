@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpExpression;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -40,7 +41,7 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
                         case 1:
                             if (methodParameters[0] instanceof StringLiteralExpression) {
                                 String category = ((StringLiteralExpression) methodParameters[0]).getContents();
-                                fillMessageKeys(psiElement, category, result);
+                                fillMessages(psiElement, category, result);
                             }
                             break;
                     }
@@ -55,9 +56,9 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         }
     }
 
-    private void fillMessageKeys(StringLiteralExpression element, String category, CompletionResultSet result) {
-        for (String messageKey : Util.getMessageKeys(element, category)) {
-            result.addElement(new MessageKeyLookupElement(messageKey));
+    private void fillMessages(StringLiteralExpression element, String category, CompletionResultSet result) {
+        for (ArrayHashElement message : Util.getMessages(element, category)) {
+            result.addElement(new MessageLookupElement(element, message));
         }
     }
 }

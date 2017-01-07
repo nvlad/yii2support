@@ -4,6 +4,8 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +14,8 @@ import java.util.Collections;
 /**
  * Created by NVlad on 06.01.2017.
  */
-public class Util {
+class Util {
+    @NotNull
     static PsiElement[] getCategories(StringLiteralExpression element) {
         ArrayList<PsiElement> categories = new ArrayList<>();
 
@@ -24,24 +27,26 @@ public class Util {
         return categories.toArray(new PsiElement[categories.size()]);
     }
 
-    static String[] getMessageKeys(StringLiteralExpression element, String category) {
-        ArrayList<String> messageKeys = new ArrayList<>();
+    @NotNull
+    static ArrayHashElement[] getMessages(StringLiteralExpression element, String category) {
+        ArrayList<ArrayHashElement> messages = new ArrayList<>();
 
         PsiDirectory directory = getDirectory(element);
         if (directory != null) {
             PsiFile file = directory.findFile(category.concat(".php"));
             if (file != null) {
-                messageKeys.addAll(loadMessageKeysFromFile(file));
+                messages.addAll(loadMessagesFromFile(file));
             }
         }
 
-        return messageKeys.toArray(new String[messageKeys.size()]);
+        return messages.toArray(new ArrayHashElement[messages.size()]);
     }
+//
+//    public String[] getMessagePointers(String category, String message) {
+//        return new String[0];
+//    }
 
-    public String[] getMessagePointers(String category, String message) {
-        return new String[0];
-    }
-
+    @Nullable
     private static PsiDirectory getDirectory(PsiElement element) {
         PsiFile file = element.getContainingFile().getOriginalFile();
         String filename = file.getName();
@@ -74,18 +79,17 @@ public class Util {
         return null;
     }
 
-    private static Collection<String> loadMessageKeysFromFile(PsiFile file) {
-        ArrayList<String> result = new ArrayList<>();
+    private static Collection<ArrayHashElement> loadMessagesFromFile(PsiFile file) {
+        ArrayList<ArrayHashElement> result = new ArrayList<>();
 
         GroupStatement groupStatement = (GroupStatement) file.getFirstChild();
-        ArrayHashElement returnArray;
         for (PsiElement element : groupStatement.getChildren()) {
             if (element instanceof PhpReturn) {
                 if (((PhpReturn) element).getFirstPsiChild() instanceof ArrayCreationExpression) {
                     ArrayCreationExpression array = (ArrayCreationExpression) ((PhpReturn) element).getFirstPsiChild();
-                    for (ArrayHashElement hashElement : array.getHashElements()) {
-                        if (hashElement.getKey() instanceof StringLiteralExpression) {
-                            result.add(((StringLiteralExpression) hashElement.getKey()).getContents());
+                    if (array != null) {
+                        for (ArrayHashElement hashElement : array.getHashElements()) {
+                            result.add(hashElement);
                         }
                     }
                 }
