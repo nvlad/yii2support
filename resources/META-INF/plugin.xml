@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.1</version>
+    <version>0.2</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -30,6 +30,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="PHP" implementationClass="com.yii2support.views.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.yii2support.views.PsiReferenceContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.yii2support.i18n.CompletionContributor"/>
     </extensions>
 
     <actions>
