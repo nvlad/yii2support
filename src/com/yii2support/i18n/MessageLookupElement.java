@@ -3,6 +3,7 @@ package com.yii2support.i18n;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
+import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
@@ -39,8 +40,10 @@ public class MessageLookupElement extends LookupElement {
     public void renderElement(LookupElementPresentation presentation) {
         super.renderElement(presentation);
 
-        presentation.setItemText(((StringLiteralExpression) myMessage.getKey()).getContents());
-        presentation.setIcon(myMessage.getKey().getIcon(0));
+        if (myMessage.getKey() instanceof StringLiteralExpression) {
+            presentation.setItemText(((StringLiteralExpression) myMessage.getKey()).getContents());
+            presentation.setIcon(myMessage.getKey().getIcon(0));
+        }
 
         if (myMessage.getValue() instanceof StringLiteralExpression) {
             presentation.setTypeText(((StringLiteralExpression) myMessage.getValue()).getContents());
@@ -89,9 +92,22 @@ public class MessageLookupElement extends LookupElement {
 
                     context.getDocument().insertString(context.getSelectionEndOffset() + 1, params);
                 }
-                context.getDocument();
+            } else {
+                cleanParams(context);
             }
+        } else {
+            cleanParams(context);
         }
     }
 
+    private void cleanParams(InsertionContext context) {
+        ParameterList parameterList = (ParameterList) myElement.getParent();
+        if (parameterList.getParameters().length == 3) {
+            PsiElement[] parameters = parameterList.getParameters();
+            int blockStart = context.getSelectionEndOffset() + myElement.getText().length() - myElement.getText().lastIndexOf("IntellijIdeaRulezzz ") - 20;
+            int paramSpace = parameters[2].getTextRange().getStartOffset() - parameters[1].getTextRange().getEndOffset();
+            int blockLength = parameters[2].getTextLength() + paramSpace;
+            context.getDocument().deleteString(blockStart, blockStart + blockLength);
+        }
+    }
 }
