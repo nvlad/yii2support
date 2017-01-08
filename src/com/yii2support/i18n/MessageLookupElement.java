@@ -68,7 +68,7 @@ public class MessageLookupElement extends LookupElement {
 
             StringLiteralExpression value = (StringLiteralExpression) myMessage.getValue();
 
-            Pattern pointers = Pattern.compile("\\{([\\w\\d]+)[},]", Pattern.MULTILINE);
+            Pattern pointers = Pattern.compile("\\{([\\w\\d]+)[},]", Pattern.MULTILINE | Pattern.UNICODE_CASE);
             Matcher matcher = pointers.matcher(value.getContents());
             while (matcher.find()) {
                 String match = matcher.group(1);
