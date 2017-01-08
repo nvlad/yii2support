@@ -1,6 +1,7 @@
 package com.yii2support.i18n;
 
 import com.intellij.codeInsight.completion.InsertionContext;
+import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiElement;
@@ -58,6 +59,10 @@ public class MessageLookupElement extends LookupElement {
     public void handleInsert(InsertionContext context) {
         super.handleInsert(context);
 
+        int suffixLength = myElement.getText().length() - 21 - myElement.getText().lastIndexOf("IntellijIdeaRulezzz ");
+        int blockStart = context.getSelectionEndOffset();
+        context.getDocument().deleteString(blockStart, blockStart + suffixLength);
+
         if (myMessage.getValue() instanceof StringLiteralExpression) {
             ArrayList<String> matches = new ArrayList<>();
 
@@ -100,11 +105,16 @@ public class MessageLookupElement extends LookupElement {
         }
     }
 
+    @Override
+    public AutoCompletionPolicy getAutoCompletionPolicy() {
+        return AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE;
+    }
+
     private void cleanParams(InsertionContext context) {
         ParameterList parameterList = (ParameterList) myElement.getParent();
         if (parameterList.getParameters().length == 3) {
             PsiElement[] parameters = parameterList.getParameters();
-            int blockStart = context.getSelectionEndOffset() + myElement.getText().length() - myElement.getText().lastIndexOf("IntellijIdeaRulezzz ") - 20;
+            int blockStart = context.getSelectionEndOffset() + 1;
             int paramSpace = parameters[2].getTextRange().getStartOffset() - parameters[1].getTextRange().getEndOffset();
             int blockLength = parameters[2].getTextLength() + paramSpace;
             context.getDocument().deleteString(blockStart, blockStart + blockLength);
