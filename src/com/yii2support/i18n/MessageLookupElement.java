@@ -5,9 +5,9 @@ import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.jetbrains.php.lang.psi.elements.PhpExpression;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,11 +30,7 @@ public class MessageLookupElement extends LookupElement {
     @NotNull
     @Override
     public String getLookupString() {
-        StringLiteralExpression key = ((StringLiteralExpression) myMessage.getKey());
-        if (key != null) {
-            return key.getContents();
-        }
-        return "";
+        return Util.PhpExpressionValue((PhpExpression) myMessage.getKey());
     }
 
     @Override
@@ -46,12 +42,16 @@ public class MessageLookupElement extends LookupElement {
             presentation.setIcon(myMessage.getKey().getIcon(0));
         }
 
-        if (myMessage.getValue() instanceof StringLiteralExpression) {
-            presentation.setTypeText(((StringLiteralExpression) myMessage.getValue()).getContents());
+        PhpExpression value = (PhpExpression) myMessage.getValue();
+        if (value != null) {
+            String text = Util.PhpExpressionValue(value);
+
+            if (!text.isEmpty()) {
+                presentation.setTailText(" = " + text, true);
+            }
+
+            presentation.setTypeText(value.getType().toString());
             presentation.setTypeGrayed(true);
-        }
-        if (myMessage.getValue() instanceof ArrayCreationExpression) {
-            presentation.setTypeText("Array()");
         }
     }
 
