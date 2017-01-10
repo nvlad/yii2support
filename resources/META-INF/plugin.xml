@@ -5,8 +5,8 @@
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
-      Yii2 Support for PhpStorm
-
+      Yii2 Support for PhpStorm<br/>
+      <br/>
       <strong>Features</strong>
       <ul>
         <li>Views (autocomplete, jump to view)</li>
@@ -17,6 +17,7 @@
     <change-notes><![CDATA[
       <ul>
         <li>Change i18n message view in completion list</li>
+        <li>Resolve composite key & values for i18n</li>
       </ul>
     ]]>
     </change-notes>

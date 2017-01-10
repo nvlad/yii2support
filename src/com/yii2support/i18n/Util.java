@@ -46,6 +46,49 @@ class Util {
 //        return new String[0];
 //    }
 
+    @NotNull
+    static String PhpExpressionValue(PhpExpression expression) {
+        if (expression instanceof StringLiteralExpression) {
+            return ((StringLiteralExpression) expression).getContents();
+        }
+        if (expression instanceof ConstantReference) {
+            Constant constant = (Constant) ((ConstantReference) expression).resolve();
+            if (constant != null) {
+                return PhpExpressionValue((PhpExpression) constant.getValue());
+            }
+        }
+        if (expression instanceof ClassConstantReference) {
+            ClassReference classReference = (ClassReference) ((ClassConstantReference) expression).getClassReference();
+            if (classReference != null) {
+                PhpClass phpClass = (PhpClass) classReference.resolve();
+                if (phpClass != null) {
+                    Field field = phpClass.findFieldByName(expression.getName(), true);
+                    if (field != null) {
+                        return PhpExpressionValue((PhpExpression) field.getDefaultValue());
+                    }
+                }
+            }
+        }
+        if (expression instanceof Variable) {
+            PhpExpression variable = (PhpExpression) ((Variable) expression).resolve();
+
+            if (variable != null && variable.getContext() instanceof AssignmentExpression) {
+                AssignmentExpression assignmentExpression = (AssignmentExpression) variable.getContext();
+                return PhpExpressionValue((PhpExpression) assignmentExpression.getValue());
+            }
+        }
+        if (expression instanceof ConcatenationExpression) {
+            ConcatenationExpression concatenation = (ConcatenationExpression) expression;
+            return PhpExpressionValue((PhpExpression) concatenation.getLeftOperand()) + PhpExpressionValue((PhpExpression) concatenation.getRightOperand());
+        }
+        String expressionType = expression.getType().toString();
+        if (expressionType.equals("int") || expressionType.equals("float")) {
+            return expression.getText();
+        }
+
+        return "";
+    }
+
     @Nullable
     private static PsiDirectory getDirectory(PsiElement element) {
         PsiFile file = element.getContainingFile().getOriginalFile();

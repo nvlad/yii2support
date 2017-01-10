@@ -30,11 +30,7 @@ public class MessageLookupElement extends LookupElement {
     @NotNull
     @Override
     public String getLookupString() {
-        StringLiteralExpression key = ((StringLiteralExpression) myMessage.getKey());
-        if (key != null) {
-            return key.getContents();
-        }
-        return "";
+        return Util.PhpExpressionValue((PhpExpression) myMessage.getKey());
     }
 
     @Override
@@ -48,8 +44,10 @@ public class MessageLookupElement extends LookupElement {
 
         PhpExpression value = (PhpExpression) myMessage.getValue();
         if (value != null) {
-            if (value instanceof StringLiteralExpression) {
-                presentation.setTailText(" = " + ((StringLiteralExpression) value).getContents(), true);
+            String text = Util.PhpExpressionValue(value);
+
+            if (!text.isEmpty()) {
+                presentation.setTailText(" = " + text, true);
             }
 
             presentation.setTypeText(value.getType().toString());
