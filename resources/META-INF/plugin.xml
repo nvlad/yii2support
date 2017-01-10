@@ -1,11 +1,13 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2</version>
+    <version>0.2.1</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
       Yii2 Support for PhpStorm
+
+      <strong>Features</strong>
       <ul>
         <li>Views (autocomplete, jump to view)</li>
         <li>i18n (autocomplete, generate params array)</li>
@@ -13,7 +15,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      Add i18n support
+      <ul>
+        <li>Change i18n message view in completion list</li>
+      </ul>
     ]]>
     </change-notes>
 

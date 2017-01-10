@@ -5,9 +5,9 @@ import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.jetbrains.php.lang.psi.elements.PhpExpression;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,12 +46,14 @@ public class MessageLookupElement extends LookupElement {
             presentation.setIcon(myMessage.getKey().getIcon(0));
         }
 
-        if (myMessage.getValue() instanceof StringLiteralExpression) {
-            presentation.setTypeText(((StringLiteralExpression) myMessage.getValue()).getContents());
+        PhpExpression value = (PhpExpression) myMessage.getValue();
+        if (value != null) {
+            if (value instanceof StringLiteralExpression) {
+                presentation.setTailText(" = " + ((StringLiteralExpression) value).getContents(), true);
+            }
+
+            presentation.setTypeText(value.getType().toString());
             presentation.setTypeGrayed(true);
-        }
-        if (myMessage.getValue() instanceof ArrayCreationExpression) {
-            presentation.setTypeText("Array()");
         }
     }
 
