@@ -62,7 +62,10 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         }
 
         String enteredText = psiElement.getText();
-        enteredText = enteredText.substring(0, enteredText.indexOf("IntellijIdeaRulezzz "));
+        int iir = enteredText.indexOf("IntellijIdeaRulezzz ");
+        if (iir != -1) {
+            enteredText = enteredText.substring(0, iir);
+        }
         String enteredPath = enteredText;
         if (enteredText.startsWith("/")) {
             while (psiDirectory != null && !psiDirectory.getName().equals("views")) {
