@@ -15,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
  * Created by NVlad on 27.12.2016.
  */
 public class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
-    private static String[] renderMethods = new String[]{"render", "renderPartial", "renderAjax"};
-
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         PsiElement psiElement = completionParameters.getPosition();
@@ -24,7 +22,7 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         String methodName = methodReference.getName();
 
         if (ArrayUtil.indexOf(methodReference.getParameters(), psiElement.getParent()) == 0) {
-            if (methodName != null && ArrayUtil.indexOf(renderMethods, methodName) != -1) {
+            if (methodName != null) {
                 if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
                     String prefix = completionResultSet.getPrefixMatcher().getPrefix();
                     prefix = prefix.substring(prefix.lastIndexOf("/") + 1);

@@ -23,7 +23,7 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         if (classReference != null && classReference.getName() != null) {
             if (methodReference.isStatic() && classReference.getName().equals("Yii")) {
                 String methodName = methodReference.getName();
-                if (methodName != null && methodName.equals("t") && methodReference.getParameterList() != null) {
+                if (methodName != null && methodReference.getParameterList() != null) {
                     PsiElement[] methodParameters = methodReference.getParameterList().getParameters();
 
                     int parameterIndex = -1;

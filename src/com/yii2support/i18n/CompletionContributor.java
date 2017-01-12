@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.yii2support.common.Patterns;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -34,8 +34,6 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
 
     private static ElementPattern<PsiElement> ElementPattern() {
         return PlatformPatterns.psiElement(PsiElement.class)
-                .withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)
-                        .withParent(PlatformPatterns.psiElement(ParameterList.class)
-                                .withParent(PlatformPatterns.psiElement(MethodReference.class))));
+                .withSuperParent(3, Patterns.methodWithName("t"));
     }
 }
