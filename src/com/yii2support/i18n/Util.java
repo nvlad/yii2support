@@ -16,7 +16,7 @@ import java.util.Collections;
  */
 class Util {
     @NotNull
-    static PsiElement[] getCategories(StringLiteralExpression element) {
+    static PsiElement[] getCategories(PhpPsiElement element) {
         ArrayList<PsiElement> categories = new ArrayList<>();
 
         PsiDirectory directory = getDirectory(element);
@@ -28,7 +28,7 @@ class Util {
     }
 
     @NotNull
-    static ArrayHashElement[] getMessages(StringLiteralExpression element, String category) {
+    static ArrayHashElement[] getMessages(PhpPsiElement element, String category) {
         ArrayList<ArrayHashElement> messages = new ArrayList<>();
 
         PsiDirectory directory = getDirectory(element);
