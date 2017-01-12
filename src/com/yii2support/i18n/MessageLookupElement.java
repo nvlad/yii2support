@@ -5,10 +5,7 @@ import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
-import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.jetbrains.php.lang.psi.elements.PhpExpression;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -19,10 +16,10 @@ import java.util.regex.Pattern;
  * Created by NVlad on 06.01.2017.
  */
 public class MessageLookupElement extends LookupElement {
-    private StringLiteralExpression myElement;
+    private PhpPsiElement myElement;
     private ArrayHashElement myMessage;
 
-    MessageLookupElement(StringLiteralExpression element, ArrayHashElement message) {
+    MessageLookupElement(PhpPsiElement element, ArrayHashElement message) {
         myElement = element;
         myMessage = message;
     }

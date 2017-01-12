@@ -4,10 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpExpression;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,14 +13,14 @@ import org.jetbrains.annotations.NotNull;
 public class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-        StringLiteralExpression psiElement = (StringLiteralExpression) parameters.getPosition().getParent();
+        PhpPsiElement psiElement = (PhpPsiElement) parameters.getPosition().getParent();
 
         MethodReference methodReference = (MethodReference) psiElement.getParent().getParent();
         PhpExpression classReference = methodReference.getClassReference();
         if (classReference != null && classReference.getName() != null) {
             if (methodReference.isStatic() && classReference.getName().equals("Yii")) {
                 String methodName = methodReference.getName();
-                if (methodName != null && methodName.equals("t") && methodReference.getParameterList() != null) {
+                if (methodName != null && methodReference.getParameterList() != null) {
                     PsiElement[] methodParameters = methodReference.getParameterList().getParameters();
 
                     int parameterIndex = -1;
@@ -50,13 +47,13 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         }
     }
 
-    private void fillCategories(StringLiteralExpression element, CompletionResultSet result) {
+    private void fillCategories(PhpPsiElement element, CompletionResultSet result) {
         for (PsiElement category : Util.getCategories(element)) {
             result.addElement(new CategoryLookupElement(category));
         }
     }
 
-    private void fillMessages(StringLiteralExpression element, String category, CompletionResultSet result) {
+    private void fillMessages(PhpPsiElement element, String category, CompletionResultSet result) {
         for (ArrayHashElement message : Util.getMessages(element, category)) {
             result.addElement(new MessageLookupElement(element, message));
         }

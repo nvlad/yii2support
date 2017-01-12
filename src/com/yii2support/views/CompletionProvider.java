@@ -6,6 +6,7 @@ import com.intellij.codeInsight.template.macro.SplitWordsMacro;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import org.jetbrains.annotations.NotNull;
@@ -13,29 +14,30 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 27.12.2016.
  */
-public class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider {
+public class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         PsiElement psiElement = completionParameters.getPosition();
         MethodReference methodReference = (MethodReference) psiElement.getParent().getParent().getParent();
         String methodName = methodReference.getName();
 
-        if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
-            String prefix = completionResultSet.getPrefixMatcher().getPrefix();
-            prefix = prefix.substring(prefix.lastIndexOf("/") + 1);
-            completionResultSet = completionResultSet.withPrefixMatcher(prefix);
-        }
-
-        if (methodName != null && methodName.startsWith("render")) {
-            PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile(), psiElement);
-
-            if (viewsPath != null) {
-                for (PsiDirectory psiDirectory : viewsPath.getSubdirectories()) {
-                    completionResultSet.addElement(new DirectoryLookupElement(psiDirectory));
+        if (ArrayUtil.indexOf(methodReference.getParameters(), psiElement.getParent()) == 0) {
+            if (methodName != null) {
+                if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
+                    String prefix = completionResultSet.getPrefixMatcher().getPrefix();
+                    prefix = prefix.substring(prefix.lastIndexOf("/") + 1);
+                    completionResultSet = completionResultSet.withPrefixMatcher(prefix);
                 }
+                PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile(), psiElement);
 
-                for (PsiFile psiFile : viewsPath.getFiles()) {
-                    completionResultSet.addElement(new ViewLookupElement(psiFile));
+                if (viewsPath != null) {
+                    for (PsiDirectory psiDirectory : viewsPath.getSubdirectories()) {
+                        completionResultSet.addElement(new DirectoryLookupElement(psiDirectory));
+                    }
+
+                    for (PsiFile psiFile : viewsPath.getFiles()) {
+                        completionResultSet.addElement(new ViewLookupElement(psiFile));
+                    }
                 }
             }
         }
@@ -60,7 +62,10 @@ public class CompletionProvider extends com.intellij.codeInsight.completion.Comp
         }
 
         String enteredText = psiElement.getText();
-        enteredText = enteredText.substring(0, enteredText.indexOf("IntellijIdeaRulezzz "));
+        int iir = enteredText.indexOf("IntellijIdeaRulezzz ");
+        if (iir != -1) {
+            enteredText = enteredText.substring(0, iir);
+        }
         String enteredPath = enteredText;
         if (enteredText.startsWith("/")) {
             while (psiDirectory != null && !psiDirectory.getName().equals("views")) {

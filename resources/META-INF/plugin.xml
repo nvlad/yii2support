@@ -16,8 +16,7 @@
 
     <change-notes><![CDATA[
       <ul>
-        <li>Change i18n message view in completion list</li>
-        <li>Resolve composite key & values for i18n</li>
+        <li>Fix show autocompletion popup</li>
       </ul>
     ]]>
     </change-notes>
