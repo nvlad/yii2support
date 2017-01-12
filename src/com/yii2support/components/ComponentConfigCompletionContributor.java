@@ -5,7 +5,9 @@ import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.NewExpression;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.yii2support.common.Patterns;
 
 /**
  * Created by NVlad on 11.01.2017.
@@ -16,11 +18,13 @@ public class ComponentConfigCompletionContributor extends CompletionContributor 
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-        return PlatformPatterns.psiElement(PsiElement.class)
-                .withParent(PlatformPatterns.psiElement(PhpExpression.class)
-                        .withParent(PlatformPatterns.psiElement(PhpPsiElement.class)
-                                .withParent(PlatformPatterns.psiElement(ArrayCreationExpression.class)
-                                        .withParent(PlatformPatterns.psiElement(ParameterList.class)
-                                                .withParent(PlatformPatterns.psiElement(NewExpression.class))))));
+        //noinspection unchecked
+        return PlatformPatterns.psiElement()
+                .withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)
+                        .withParent(PlatformPatterns.or(
+                                PlatformPatterns.psiElement().withSuperParent(3, NewExpression.class),
+                                Patterns.withHashKey()
+                                        .withParent(PlatformPatterns.psiElement().withSuperParent(3, NewExpression.class))
+                        )));
     }
 }

@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.openapi.editor.Document;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocParamTag;
+import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ConstantReference;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpExpression;
@@ -59,14 +60,11 @@ public class ComponentFieldLookupElement extends LookupElement {
         Document document = context.getDocument();
         int insertPosition = context.getSelectionEndOffset();
 
-        if (myElement instanceof ConstantReference) {
-            document.insertString(insertPosition, " => ");
-            insertPosition += 4;
-        } else {
+        if (myElement.getParent().getParent() instanceof ArrayCreationExpression) {
             document.insertString(insertPosition + 1, " => ");
             insertPosition += 5;
-        }
 
-        context.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
+            context.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
+        }
     }
 }
