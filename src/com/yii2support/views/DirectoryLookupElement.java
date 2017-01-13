@@ -1,4 +1,4 @@
-package com.yii2framework.completion.views;
+package com.yii2support.views;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
@@ -13,26 +13,16 @@ import javax.swing.*;
 public class DirectoryLookupElement extends LookupElement {
     private Icon icon;
     private String name;
-    private String prefix;
-    private String lookup;
 
-    DirectoryLookupElement(PsiDirectory directory, String searchPrefix) {
+    DirectoryLookupElement(PsiDirectory directory) {
         icon = directory.getIcon(0);
         name = directory.getName();
-        prefix = searchPrefix;
-        if (searchPrefix.startsWith("/")) {
-            prefix = prefix.substring(1);
-        }
-        if (prefix.length() > 0 && !prefix.endsWith("/")) {
-            prefix = prefix.concat("/");
-        }
-        lookup = directory.getName().concat("/");
     }
 
     @NotNull
     @Override
     public String getLookupString() {
-        return prefix.concat(lookup);
+        return name.concat("/");
     }
 
     @Override
