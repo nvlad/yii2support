@@ -4,7 +4,8 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,11 +34,13 @@ public class ViewFileNotFoundPhpElementVisitor extends PhpElementVisitor {
         PsiElement[] parameters = reference.getParameters();
 
         if (parameters.length > 0 && parameters[0] instanceof StringLiteralExpression) {
-            PsiFile psiFile = ViewsUtil.getViewPsiFile(parameters[0]);
+            final PsiFile psiFile = ViewsUtil.getViewPsiFile(parameters[0]);
             if (psiFile == null) {
-                PsiElement str = parameters[0].findElementAt(1);
+                final PsiElement str = parameters[0].findElementAt(1);
                 if (str != null) {
-                    myHolder.registerProblem(str, errorMessageTemplate.replace("%name%", parameters[0].getText()), ProblemHighlightType.ERROR);
+                    final ViewFileNotFoundLocalQuickFix quickFix = new ViewFileNotFoundLocalQuickFix(str.getText());
+                    final String descriptionTemplate = errorMessageTemplate.replace("%name%", parameters[0].getText());
+                    myHolder.registerProblem(str, descriptionTemplate, ProblemHighlightType.ERROR, quickFix);
                 }
             }
         }
