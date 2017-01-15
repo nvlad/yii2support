@@ -40,7 +40,7 @@
                          displayName="View file not found"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
-                         implementationClass="com.yii2support.views.ViewFileNotFoundInspection"/>
+                         implementationClass="com.yii2support.views.RenderMethodInspection"/>
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.i18n.CompletionContributor"/>

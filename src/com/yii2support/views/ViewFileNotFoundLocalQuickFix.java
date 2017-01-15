@@ -27,11 +27,6 @@ public class ViewFileNotFoundLocalQuickFix implements LocalQuickFix {
         myName = name;
     }
 
-    @Override
-    public boolean startInWriteAction() {
-        return false;
-    }
-
     @Nls
     @NotNull
     @Override
@@ -48,7 +43,7 @@ public class ViewFileNotFoundLocalQuickFix implements LocalQuickFix {
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-        PsiElement psiElement = descriptor.getPsiElement().getParent();
+        final PsiElement psiElement = descriptor.getPsiElement().getParent();
         final PsiFile psiFile = psiElement.getContainingFile().getOriginalFile();
         final PsiDirectory psiDirectory = ViewsUtil.getViewsPsiDirectory(psiFile, psiElement);
         if (psiDirectory != null) {
@@ -61,8 +56,10 @@ public class ViewFileNotFoundLocalQuickFix implements LocalQuickFix {
             }
             String finalFilename = filename;
             ApplicationManager.getApplication().runWriteAction(() -> {
-                PsiFile viewPsiFile = psiDirectory.createFile(finalFilename);
-                FileTemplate[] templates = FileTemplateManager.getDefaultInstance().getTemplates(FileTemplateManager.DEFAULT_TEMPLATES_CATEGORY);
+                final PsiFile viewPsiFile = psiDirectory.createFile(finalFilename);
+                FileEditorManager.getInstance(project).openFile(viewPsiFile.getVirtualFile(), true);
+
+                final FileTemplate[] templates = FileTemplateManager.getDefaultInstance().getTemplates(FileTemplateManager.DEFAULT_TEMPLATES_CATEGORY);
                 FileTemplate template = null;
                 for (FileTemplate fileTemplate : templates) {
                     if (fileTemplate.getName().equals("PHP File")) {
@@ -70,10 +67,8 @@ public class ViewFileNotFoundLocalQuickFix implements LocalQuickFix {
                         break;
                     }
                 }
-
-                FileEditorManager.getInstance(project).openFile(viewPsiFile.getVirtualFile(), true);
-                Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
-                if (viewPsiFile.getViewProvider().getDocument() != null && template != null) {
+                if (template != null && viewPsiFile.getViewProvider().getDocument() != null) {
+                    final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
                     template.setLiveTemplateEnabled(true);
                     template.setReformatCode(true);
                     try {

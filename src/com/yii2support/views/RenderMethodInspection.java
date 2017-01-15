@@ -8,16 +8,16 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 15.01.2017.
  */
-final public class ViewFileNotFoundInspection extends PhpInspection {
+final public class RenderMethodInspection extends PhpInspection {
     @NotNull
     @Override
     public String getShortName() {
-        return "ViewFileNotFoundInspection";
+        return "RenderMethodInspection";
     }
 
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean isOnTheFly) {
-        return new ViewFileNotFoundPhpElementVisitor(problemsHolder, isOnTheFly);
+        return new RenderMethodPhpElementVisitor(problemsHolder);
     }
 }

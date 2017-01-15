@@ -12,15 +12,11 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 15.01.2017.
  */
-public class ViewFileNotFoundPhpElementVisitor extends PhpElementVisitor {
+public class RenderMethodPhpElementVisitor extends PhpElementVisitor {
     private ProblemsHolder myHolder;
-    private boolean myIsOnTheFly;
 
-    static private String errorMessageTemplate = "View file for %name% not found.";
-
-    ViewFileNotFoundPhpElementVisitor(@NotNull ProblemsHolder problemsHolder, boolean isOnTheFly) {
+    RenderMethodPhpElementVisitor(@NotNull ProblemsHolder problemsHolder) {
         myHolder = problemsHolder;
-        myIsOnTheFly = isOnTheFly;
     }
 
     @Override
@@ -38,6 +34,7 @@ public class ViewFileNotFoundPhpElementVisitor extends PhpElementVisitor {
             if (psiFile == null) {
                 final PsiElement str = parameters[0].findElementAt(1);
                 if (str != null) {
+                    final String errorMessageTemplate = "View file for %name% not found.";
                     final ViewFileNotFoundLocalQuickFix quickFix = new ViewFileNotFoundLocalQuickFix(str.getText());
                     final String descriptionTemplate = errorMessageTemplate.replace("%name%", parameters[0].getText());
                     myHolder.registerProblem(str, descriptionTemplate, ProblemHighlightType.ERROR, quickFix);
