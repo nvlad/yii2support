@@ -52,9 +52,12 @@ public class ViewFileNotFoundLocalQuickFix implements LocalQuickFix {
         final PsiFile psiFile = psiElement.getContainingFile().getOriginalFile();
         final PsiDirectory psiDirectory = ViewsUtil.getViewsPsiDirectory(psiFile, psiElement);
         if (psiDirectory != null) {
-            String filename = ((StringLiteralExpression) psiElement).getContents() + ".php";
+            String filename = ((StringLiteralExpression) psiElement).getContents();
             if (filename.contains("/")) {
                 filename = filename.substring(filename.lastIndexOf('/') + 1);
+            }
+            if (!filename.contains(".")) {
+                filename += ".php";
             }
             String finalFilename = filename;
             ApplicationManager.getApplication().runWriteAction(() -> {
