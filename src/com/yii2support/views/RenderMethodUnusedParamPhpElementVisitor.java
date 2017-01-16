@@ -73,24 +73,35 @@ public class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor 
                 }
             }
 
-            if (externalVariables.isEmpty()) {
-                if (parameters.length > 1 && parameters[1] instanceof ArrayCreationExpression) {
-                    String hintNotRequireParams = "This view not require params.";
-                    RenderMethodNotRequireParamsLocalQuickFix fix = new RenderMethodNotRequireParamsLocalQuickFix();
-                    myHolder.registerProblem(parameters[1], hintNotRequireParams, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
-                }
-            } else {
-                String hintUnusedParams = "View %view% not used params.";
-                if (parameters.length > 1 && parameters[1] instanceof ArrayCreationExpression) {
-                    for (ArrayHashElement item : ((ArrayCreationExpression) parameters[1]).getHashElements()) {
-                        if (item.getKey() instanceof StringLiteralExpression) {
-                            String key = ((StringLiteralExpression) item.getKey()).getContents();
+            ArrayList<String> renderParams = new ArrayList<>();
+            ArrayList<String> unusedParams = new ArrayList<>();
+            String hintUnusedParams = "View %view% not use \"%key%\" parameter";
+            if (parameters.length > 1 && parameters[1] instanceof ArrayCreationExpression) {
+                for (ArrayHashElement item : ((ArrayCreationExpression) parameters[1]).getHashElements()) {
+                    if (item.getKey() instanceof StringLiteralExpression) {
+                        String key = ((StringLiteralExpression) item.getKey()).getContents();
 
-                            if (!externalVariables.contains(key)) {
-                                RenderMethodUnusedParamLocalQuickFix fix = new RenderMethodUnusedParamLocalQuickFix(key);
-                                myHolder.registerProblem(item, hintUnusedParams.replace("%view%", parameters[0].getText()), ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
-                            }
+                        if (!externalVariables.contains(key)) {
+                            RenderMethodUnusedParamLocalQuickFix fix = new RenderMethodUnusedParamLocalQuickFix(key);
+                            String description = hintUnusedParams.replace("%view%", parameters[0].getText()).replace("%key%", key);
+                            myHolder.registerProblem(item, description, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
+                            unusedParams.add(key);
                         }
+
+                        renderParams.add(key);
+                    }
+                }
+            }
+
+            if (unusedParams.size() > 1) {
+                if (parameters.length > 1 && parameters[1] instanceof ArrayCreationExpression) {
+                    String hintNotRequireParams = "This View does not use parameters";
+                    if (unusedParams.size() != renderParams.size()) {
+                        RenderMethodNotRequireParamsLocalQuickFix fix = new RenderMethodNotRequireParamsLocalQuickFix(unusedParams);
+                        myHolder.registerProblem(parameters[1], hintNotRequireParams, ProblemHighlightType.INFORMATION, fix);
+                    } else {
+                        RenderMethodNotRequireParamsLocalQuickFix fix = new RenderMethodNotRequireParamsLocalQuickFix();
+                        myHolder.registerProblem(parameters[1], hintNotRequireParams, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
                     }
                 }
             }
