@@ -58,8 +58,10 @@ public class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor 
                             declaredVariables.add(variableName);
                         }
                     } else {
-                        if (!allVariables.contains(variableName)) {
-                            allVariables.add(variableName);
+                        if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
+                            if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
+                                allVariables.add(variableName);
+                            }
                         }
                     }
                 }
