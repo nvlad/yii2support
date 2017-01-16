@@ -24,14 +24,14 @@ public class RenderMethodUnusedParamLocalQuickFix implements LocalQuickFix {
     @NotNull
     @Override
     public String getName() {
-        return "Remove unused \"%param%\" param".replace("%param%", myParam);
+        return "Remove unused parameter \"%param%\"".replace("%param%", myParam);
     }
 
     @Nls
     @NotNull
     @Override
     public String getFamilyName() {
-        return "Unused view param";
+        return "Remove unused parameter";
     }
 
     @Override

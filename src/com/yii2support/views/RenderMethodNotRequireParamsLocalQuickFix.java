@@ -16,7 +16,7 @@ public class RenderMethodNotRequireParamsLocalQuickFix implements LocalQuickFix 
     @NotNull
     @Override
     public String getFamilyName() {
-        return "Remove view params.";
+        return "Remove all unused parameters";
     }
 
     @Override
