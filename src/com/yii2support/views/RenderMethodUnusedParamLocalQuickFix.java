@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.yii2support.common.PsiUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,28 +37,16 @@ public class RenderMethodUnusedParamLocalQuickFix implements LocalQuickFix {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
         PsiElement item = descriptor.getPsiElement();
-        PsiElement next = item.getNextSibling();
-        String endArray = ((ArrayCreationExpression) item.getParent()).isShortSyntax() ? "]" : ")";
+        ArrayCreationExpression params = (ArrayCreationExpression) item.getParent();
 
-        if (next instanceof PsiWhiteSpace && next.getNextSibling().getText() != null) {
-            if (next.getNextSibling().getText().equals(endArray)) {
-                next = next.getNextSibling();
+        PsiUtil.deleteArrayElement(item);
+
+        if (!params.getHashElements().iterator().hasNext()) {
+            if (params.getPrevSibling() instanceof PsiWhiteSpace) {
+                params.getPrevSibling().delete();
             }
+            params.getPrevSibling().delete();
+            params.delete();
         }
-        if (next.getText().equals(endArray)) {
-            if (item.getPrevSibling() instanceof PsiWhiteSpace) {
-                item.getPrevSibling().delete();
-            }
-            if (item.getPrevSibling().getText().equals(",")) {
-                item.getPrevSibling().delete();
-            }
-        }
-        if (next.getText().equals(",")) {
-            if (next.getNextSibling() instanceof PsiWhiteSpace) {
-                next.getNextSibling().delete();
-            }
-            next.delete();
-        }
-        item.delete();
     }
 }
