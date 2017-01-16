@@ -70,8 +70,8 @@ public class RenderMethodPhpElementVisitor extends PhpElementVisitor {
                 }
 
                 if (!externalVariables.isEmpty()) {
+                    String errorRequiredParams = "View %view% required params.";
                     if (parameters.length == 1) {
-                        final String errorRequiredParams = "View %view% required params.";
                         RenderMethodRequiredParamsLocalQuickFix fix = new RenderMethodRequiredParamsLocalQuickFix(externalVariables);
                         myHolder.registerProblem(reference, errorRequiredParams.replace("%view%", parameters[0].getText()), fix);
                     } else {
@@ -86,7 +86,6 @@ public class RenderMethodPhpElementVisitor extends PhpElementVisitor {
                         }
 
                         if (!externalVariables.isEmpty()) {
-                            final String errorRequiredParams = "View %view% required params.";
                             RenderMethodRequiredParamsLocalQuickFix fix = new RenderMethodRequiredParamsLocalQuickFix(externalVariables);
                             myHolder.registerProblem(reference, errorRequiredParams.replace("%view%", parameters[0].getText()), fix);
                         }
@@ -95,6 +94,4 @@ public class RenderMethodPhpElementVisitor extends PhpElementVisitor {
             }
         }
     }
-
-
 }
