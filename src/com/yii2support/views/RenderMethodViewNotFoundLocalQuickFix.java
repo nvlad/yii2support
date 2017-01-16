@@ -4,7 +4,6 @@ import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -20,10 +19,10 @@ import java.util.Properties;
 /**
  * Created by NVlad on 15.01.2017.
  */
-public class ViewFileNotFoundLocalQuickFix implements LocalQuickFix {
+public class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
     private String myName;
 
-    ViewFileNotFoundLocalQuickFix(String name) {
+    RenderMethodViewNotFoundLocalQuickFix(String name) {
         myName = name;
     }
 
@@ -54,30 +53,27 @@ public class ViewFileNotFoundLocalQuickFix implements LocalQuickFix {
             if (!filename.contains(".")) {
                 filename += ".php";
             }
-            String finalFilename = filename;
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                final PsiFile viewPsiFile = psiDirectory.createFile(finalFilename);
-                FileEditorManager.getInstance(project).openFile(viewPsiFile.getVirtualFile(), true);
+            final PsiFile viewPsiFile = psiDirectory.createFile(filename);
+            FileEditorManager.getInstance(project).openFile(viewPsiFile.getVirtualFile(), true);
 
-                final FileTemplate[] templates = FileTemplateManager.getDefaultInstance().getTemplates(FileTemplateManager.DEFAULT_TEMPLATES_CATEGORY);
-                FileTemplate template = null;
-                for (FileTemplate fileTemplate : templates) {
-                    if (fileTemplate.getName().equals("PHP File")) {
-                        template = fileTemplate;
-                        break;
-                    }
+            final FileTemplate[] templates = FileTemplateManager.getDefaultInstance().getTemplates(FileTemplateManager.DEFAULT_TEMPLATES_CATEGORY);
+            FileTemplate template = null;
+            for (FileTemplate fileTemplate : templates) {
+                if (fileTemplate.getName().equals("PHP File")) {
+                    template = fileTemplate;
+                    break;
                 }
-                if (template != null && viewPsiFile.getViewProvider().getDocument() != null) {
-                    final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
-                    template.setLiveTemplateEnabled(true);
-                    template.setReformatCode(true);
-                    try {
-                        viewPsiFile.getViewProvider().getDocument().insertString(0, template.getText(properties));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            }
+            if (template != null && viewPsiFile.getViewProvider().getDocument() != null) {
+                final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
+                template.setLiveTemplateEnabled(true);
+                template.setReformatCode(true);
+                try {
+                    viewPsiFile.getViewProvider().getDocument().insertString(0, template.getText(properties));
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            });
+            }
         }
     }
 }

@@ -36,8 +36,8 @@
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.views.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.yii2support.views.PsiReferenceContributor"/>
-        <localInspection language="PHP" shortName="ViewFileNotFoundInspection"
-                         displayName="View file not found"
+        <localInspection language="PHP" shortName="RenderMethodInspection"
+                         displayName="Render method"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.yii2support.views.RenderMethodInspection"/>
