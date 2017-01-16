@@ -57,8 +57,10 @@ public class RenderMethodPhpElementVisitor extends PhpElementVisitor {
                             declaredVariables.add(variableName);
                         }
                     } else {
-                        if (!allVariables.contains(variableName)) {
-                            allVariables.add(variableName);
+                        if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
+                            if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
+                                allVariables.add(variableName);
+                            }
                         }
                     }
                 }
@@ -74,7 +76,7 @@ public class RenderMethodPhpElementVisitor extends PhpElementVisitor {
                     if (parameters.length == 1) {
                         RenderMethodRequiredParamsLocalQuickFix fix = new RenderMethodRequiredParamsLocalQuickFix(externalVariables);
                         myHolder.registerProblem(reference, errorRequiredParams.replace("%view%", parameters[0].getText()), fix);
-                    } else {
+                    } else if (parameters[1] instanceof ArrayCreationExpression) {
                         for (ArrayHashElement item : ((ArrayCreationExpression) parameters[1]).getHashElements()) {
                             if (item.getKey() instanceof StringLiteralExpression) {
                                 String key = ((StringLiteralExpression) item.getKey()).getContents();
