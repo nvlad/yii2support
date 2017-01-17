@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.6</version>
+    <version>0.2.7</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -12,6 +12,7 @@
         <li>
             Views<br/>
             - View files completion<br/>
+            - Add View parameters after completion<br/>
             - Inspection missed View files<br/>
             - QuickFix for missed files<br/>
             - Jump to View file (go to declaration)<br/>
@@ -24,6 +25,7 @@
 
     <change-notes><![CDATA[
       <ul>
+        <li>Add View parameters after completion</li>
         <li>Inspection missed View files</li>
         <li>QuickFix for missed files</li>
         <li>Inspection by required & unused parameters for View render</li>
