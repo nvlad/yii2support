@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.2</version>
+    <version>0.2.6</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -9,14 +9,25 @@
       <br/>
       <strong>Features</strong>
       <ul>
-        <li>Views (autocomplete, jump to view)</li>
-        <li>i18n (autocomplete, generate params array)</li>
+        <li>
+            Views<br/>
+            - View files completion<br/>
+            - Inspection missed View files<br/>
+            - QuickFix for missed files<br/>
+            - Jump to View file (go to declaration)<br/>
+            - Inspection by required & unused parameters for View render<br/>
+            - QuickFix for required & unused parameters<br/>
+        </li>
+        <li>i18n (completion, generate params array)</li>
       </ul>
     ]]></description>
 
     <change-notes><![CDATA[
       <ul>
-        <li>Fix show autocompletion popup</li>
+        <li>Inspection missed View files</li>
+        <li>QuickFix for missed files</li>
+        <li>Inspection by required & unused parameters for View render</li>
+        <li>QuickFix for required & unused parameters</li>
       </ul>
     ]]>
     </change-notes>
@@ -42,7 +53,7 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.yii2support.views.RenderMethodInspection"/>
         <localInspection language="PHP" shortName="RenderMethodUnusedParamInspection"
-                         displayName="Render method unused param"
+                         displayName="Render unused parameters"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.yii2support.views.RenderMethodUnusedParamInspection"/>
