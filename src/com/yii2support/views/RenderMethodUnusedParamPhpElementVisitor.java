@@ -72,7 +72,7 @@ public class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor 
                 }
             }
 
-            if (unusedParams.size() > 1) {
+            if (unusedParams.size() > 0) {
                 if (parameters.length > 1 && parameters[1] instanceof ArrayCreationExpression) {
                     String hintNotRequireParams = "This View does not use parameters";
                     if (unusedParams.size() != renderParams.size()) {
