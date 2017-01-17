@@ -1,15 +1,27 @@
 package com.yii2support.views;
 
 import com.intellij.codeInsight.template.macro.SplitWordsMacro;
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.Variable;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by NVlad on 15.01.2017.
  */
-public class ViewsUtil {
+class ViewsUtil {
+    static final Key<String> RENDER_VIEW = Key.create("com.yii2support.views.render.view");
+    static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
+    static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
+    static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
+
+
     static PsiFile getViewPsiFile(PsiElement psiElement) {
         PsiFile psiFile = psiElement.getContainingFile();
         StringLiteralExpression expression = (StringLiteralExpression) psiElement;
@@ -76,5 +88,35 @@ public class ViewsUtil {
         }
 
         return psiDirectory;
+    }
+
+    static ArrayList<String> getViewVariables(PsiFile psiFile) {
+        final ArrayList<String> externalVariables = new ArrayList<>();
+        final ArrayList<String> allVariables = new ArrayList<>();
+        final ArrayList<String> declaredVariables = new ArrayList<>();
+        final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
+
+        for (Variable variable : viewVariables) {
+            String variableName = variable.getName();
+            if (variable.isDeclaration()) {
+                if (!declaredVariables.contains(variableName)) {
+                    declaredVariables.add(variableName);
+                }
+            } else {
+                if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
+                    if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
+                        allVariables.add(variableName);
+                    }
+                }
+            }
+        }
+
+        for (String variable : allVariables) {
+            if (!declaredVariables.contains(variable)) {
+                externalVariables.add(variable);
+            }
+        }
+
+        return externalVariables;
     }
 }

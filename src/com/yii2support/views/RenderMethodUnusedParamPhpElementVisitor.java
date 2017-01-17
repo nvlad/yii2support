@@ -4,13 +4,14 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by NVlad on 16.01.2017.
@@ -33,37 +34,33 @@ public class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor 
         PsiElement[] parameters = reference.getParameters();
 
         if (parameters.length > 0 && parameters[0] instanceof StringLiteralExpression) {
-            final PsiFile psiFile = ViewsUtil.getViewPsiFile(parameters[0]);
+            String renderView = ((StringLiteralExpression) parameters[0]).getContents();
+            if (!renderView.equals(reference.getUserData(ViewsUtil.RENDER_VIEW))) {
+                reference.putUserData(ViewsUtil.RENDER_VIEW, renderView);
+                reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, null);
+                reference.putUserData(ViewsUtil.VIEW_VARIABLES, null);
+                reference.putUserData(ViewsUtil.VIEW_FILE_MODIFIED, null);
+            }
+
+            PsiFile psiFile = reference.getUserData(ViewsUtil.RENDER_VIEW_FILE);
+            if (psiFile == null || !psiFile.isValid()) {
+                psiFile = ViewsUtil.getViewPsiFile(parameters[0]);
+                reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, psiFile);
+            }
             if (psiFile == null) {
                 return;
             }
 
-            final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
-            ArrayList<String> externalVariables = new ArrayList<>();
-            if (viewVariables.size() > 0) {
-                ArrayList<String> allVariables = new ArrayList<>();
-                ArrayList<String> declaredVariables = new ArrayList<>();
+            ArrayList<String> externalVariables = null;
+            Long viewModified = psiFile.getUserData(ViewsUtil.VIEW_FILE_MODIFIED);
+            if (viewModified != null && psiFile.getModificationStamp() == viewModified) {
+                externalVariables = psiFile.getUserData(ViewsUtil.VIEW_VARIABLES);
+            }
+            if (externalVariables == null) {
+                externalVariables = ViewsUtil.getViewVariables(psiFile);
 
-                for (Variable variable : viewVariables) {
-                    String variableName = variable.getName();
-                    if (variable.isDeclaration()) {
-                        if (!declaredVariables.contains(variableName)) {
-                            declaredVariables.add(variableName);
-                        }
-                    } else {
-                        if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
-                            if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
-                                allVariables.add(variableName);
-                            }
-                        }
-                    }
-                }
-
-                for (String variable : allVariables) {
-                    if (!declaredVariables.contains(variable)) {
-                        externalVariables.add(variable);
-                    }
-                }
+                psiFile.putUserData(ViewsUtil.VIEW_VARIABLES, externalVariables);
+                psiFile.putUserData(ViewsUtil.VIEW_FILE_MODIFIED, psiFile.getModificationStamp());
             }
 
             ArrayList<String> renderParams = new ArrayList<>();
