@@ -35,13 +35,6 @@ public class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor 
         if (parameters.length > 0 && parameters[0] instanceof StringLiteralExpression) {
             final PsiFile psiFile = ViewsUtil.getViewPsiFile(parameters[0]);
             if (psiFile == null) {
-                final PsiElement str = parameters[0].findElementAt(1);
-                if (str != null) {
-                    final String errorViewNotFoundTemplate = "View file for %name% not found.";
-                    final RenderMethodViewNotFoundLocalQuickFix quickFix = new RenderMethodViewNotFoundLocalQuickFix(str.getText());
-                    final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", parameters[0].getText());
-                    myHolder.registerProblem(str, descriptionTemplate, quickFix);
-                }
                 return;
             }
 
