@@ -51,18 +51,7 @@ public class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor 
                 return;
             }
 
-            ArrayList<String> externalVariables = null;
-            Long viewModified = psiFile.getUserData(ViewsUtil.VIEW_FILE_MODIFIED);
-            if (viewModified != null && psiFile.getModificationStamp() == viewModified) {
-                externalVariables = psiFile.getUserData(ViewsUtil.VIEW_VARIABLES);
-            }
-            if (externalVariables == null) {
-                externalVariables = ViewsUtil.getViewVariables(psiFile);
-
-                psiFile.putUserData(ViewsUtil.VIEW_VARIABLES, externalVariables);
-                psiFile.putUserData(ViewsUtil.VIEW_FILE_MODIFIED, psiFile.getModificationStamp());
-            }
-
+            ArrayList<String> externalVariables = ViewsUtil.getViewVariables(psiFile);
             ArrayList<String> renderParams = new ArrayList<>();
             ArrayList<String> unusedParams = new ArrayList<>();
             String hintUnusedParams = "View %view% not use \"%key%\" parameter";

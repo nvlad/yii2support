@@ -8,6 +8,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.Variable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +23,7 @@ class ViewsUtil {
     static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
     static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
 
-
+    @Nullable
     static PsiFile getViewPsiFile(PsiElement psiElement) {
         PsiFile psiFile = psiElement.getContainingFile();
         StringLiteralExpression expression = (StringLiteralExpression) psiElement;
@@ -42,6 +44,7 @@ class ViewsUtil {
         return directory.findFile(filename);
     }
 
+    @Nullable
     static PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
         String fileName = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
         PsiDirectory psiDirectory = psiFile.getContainingDirectory();
@@ -90,33 +93,46 @@ class ViewsUtil {
         return psiDirectory;
     }
 
+    @NotNull
     static ArrayList<String> getViewVariables(PsiFile psiFile) {
-        final ArrayList<String> externalVariables = new ArrayList<>();
-        final ArrayList<String> allVariables = new ArrayList<>();
-        final ArrayList<String> declaredVariables = new ArrayList<>();
-        final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
+        ArrayList<String> result = null;
 
-        for (Variable variable : viewVariables) {
-            String variableName = variable.getName();
-            if (variable.isDeclaration()) {
-                if (!declaredVariables.contains(variableName)) {
-                    declaredVariables.add(variableName);
-                }
-            } else {
-                if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
-                    if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
-                        allVariables.add(variableName);
+        Long viewModified = psiFile.getUserData(VIEW_FILE_MODIFIED);
+        if (viewModified != null && psiFile.getModificationStamp() == viewModified) {
+            result = psiFile.getUserData(VIEW_VARIABLES);
+        }
+
+        if (result == null) {
+            result = new ArrayList<>();
+            final ArrayList<String> allVariables = new ArrayList<>();
+            final ArrayList<String> declaredVariables = new ArrayList<>();
+            final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
+
+            for (Variable variable : viewVariables) {
+                String variableName = variable.getName();
+                if (variable.isDeclaration()) {
+                    if (!declaredVariables.contains(variableName)) {
+                        declaredVariables.add(variableName);
+                    }
+                } else {
+                    if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
+                        if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
+                            allVariables.add(variableName);
+                        }
                     }
                 }
             }
-        }
 
-        for (String variable : allVariables) {
-            if (!declaredVariables.contains(variable)) {
-                externalVariables.add(variable);
+            for (String variable : allVariables) {
+                if (!declaredVariables.contains(variable)) {
+                    result.add(variable);
+                }
             }
+
+            psiFile.putUserData(VIEW_VARIABLES, result);
+            psiFile.putUserData(VIEW_FILE_MODIFIED, psiFile.getModificationStamp());
         }
 
-        return externalVariables;
+        return new ArrayList<>(result);
     }
 }
