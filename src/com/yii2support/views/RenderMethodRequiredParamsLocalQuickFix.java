@@ -101,7 +101,7 @@ class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
             template.addVariableSegment(templateVariable);
             addComma = true;
         }
-        template.addTextSegment(newLined?",":" ");
+        template.addTextSegment(newLined ? "," : " ");
 
         editor.getCaretModel().moveToOffset(psiElement.getTextRange().getEndOffset());
         PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
