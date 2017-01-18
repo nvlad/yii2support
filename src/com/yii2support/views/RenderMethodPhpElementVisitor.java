@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Created by NVlad on 15.01.2017.
  */
 public class RenderMethodPhpElementVisitor extends PhpElementVisitor {
-    private ProblemsHolder myHolder;
+    final private ProblemsHolder myHolder;
 
     RenderMethodPhpElementVisitor(@NotNull ProblemsHolder problemsHolder) {
         myHolder = problemsHolder;

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by NVlad on 16.01.2017.
  */
 public class RenderMethodUnusedParamLocalQuickFix implements LocalQuickFix {
-    private String myParam;
+    final private String myParam;
 
     RenderMethodUnusedParamLocalQuickFix(String param) {
         myParam = param;

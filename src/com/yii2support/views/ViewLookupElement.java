@@ -19,15 +19,16 @@ import java.util.ArrayList;
  * Created by NVlad on 28.12.2016.
  */
 public class ViewLookupElement extends LookupElement {
-    private PsiFile myFile;
-    private String name;
-    private String tail;
+    final private PsiFile myFile;
+    final private String name;
+    final private String tail;
 
     ViewLookupElement(PsiFile psiFile) {
         myFile = psiFile;
         String filename = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
         if (filename.contains(".")) {
             name = psiFile.getName();
+            tail = null;
         } else {
             name = filename;
             tail = psiFile.getName().substring(filename.length());
