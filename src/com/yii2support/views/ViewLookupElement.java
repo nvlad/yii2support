@@ -18,7 +18,7 @@ import java.util.ArrayList;
 /**
  * Created by NVlad on 28.12.2016.
  */
-public class ViewLookupElement extends LookupElement {
+class ViewLookupElement extends LookupElement {
     final private PsiFile myFile;
     final private String name;
     final private String tail;

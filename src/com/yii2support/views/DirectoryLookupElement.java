@@ -10,7 +10,7 @@ import javax.swing.*;
 /**
  * Created by NVlad on 28.12.2016.
  */
-public class DirectoryLookupElement extends LookupElement {
+class DirectoryLookupElement extends LookupElement {
     final private Icon icon;
     final private String name;
 

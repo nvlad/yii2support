@@ -19,7 +19,7 @@ import java.util.Properties;
 /**
  * Created by NVlad on 15.01.2017.
  */
-public class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
+class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
     final private String myName;
 
     RenderMethodViewNotFoundLocalQuickFix(String name) {

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 06.01.2017.
  */
-public class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
+class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
         PhpPsiElement psiElement = (PhpPsiElement) parameters.getPosition().getParent();

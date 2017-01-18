@@ -18,7 +18,7 @@ import java.util.Iterator;
 /**
  * Created by NVlad on 16.01.2017.
  */
-public class RenderMethodNotRequireParamsLocalQuickFix implements LocalQuickFix {
+class RenderMethodNotRequireParamsLocalQuickFix implements LocalQuickFix {
     private ArrayList<String> myUnusedParams;
 
     RenderMethodNotRequireParamsLocalQuickFix() {
