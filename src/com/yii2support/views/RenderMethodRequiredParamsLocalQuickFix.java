@@ -23,10 +23,6 @@ import java.util.Collection;
  * Created by NVlad on 15.01.2017.
  */
 public class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
-
-    RenderMethodRequiredParamsLocalQuickFix(String... variables) {
-        myVariables = variables;
-    }
     final private String[] myVariables;
 
     RenderMethodRequiredParamsLocalQuickFix(Collection<String> variables) {
