@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Created by NVlad on 16.01.2017.
