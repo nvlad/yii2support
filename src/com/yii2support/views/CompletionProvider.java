@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 27.12.2016.
  */
-public class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
+class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         PsiElement psiElement = completionParameters.getPosition();

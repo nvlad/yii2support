@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by NVlad on 02.01.2017.
  */
-public class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider {
+class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider {
     @NotNull
     @Override
     public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {

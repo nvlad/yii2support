@@ -15,9 +15,9 @@ import java.util.regex.Pattern;
 /**
  * Created by NVlad on 06.01.2017.
  */
-public class MessageLookupElement extends LookupElement {
-    private PhpPsiElement myElement;
-    private ArrayHashElement myMessage;
+class MessageLookupElement extends LookupElement {
+    final private PhpPsiElement myElement;
+    final private ArrayHashElement myMessage;
 
     MessageLookupElement(PhpPsiElement element, ArrayHashElement message) {
         myElement = element;

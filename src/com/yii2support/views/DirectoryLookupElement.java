@@ -10,9 +10,9 @@ import javax.swing.*;
 /**
  * Created by NVlad on 28.12.2016.
  */
-public class DirectoryLookupElement extends LookupElement {
-    private Icon icon;
-    private String name;
+class DirectoryLookupElement extends LookupElement {
+    final private Icon icon;
+    final private String name;
 
     DirectoryLookupElement(PsiDirectory directory) {
         icon = directory.getIcon(0);
