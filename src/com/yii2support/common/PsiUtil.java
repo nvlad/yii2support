@@ -8,7 +8,7 @@ import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
  * Created by NVlad on 17.01.2017.
  */
 public class PsiUtil {
-    static public void deleteArrayElement(PsiElement element) {
+    public static void deleteArrayElement(PsiElement element) {
         PsiElement next = element.getNextSibling();
         String endArray = ((ArrayCreationExpression) element.getParent()).isShortSyntax() ? "]" : ")";
 
@@ -32,6 +32,23 @@ public class PsiUtil {
                 next.getNextSibling().delete();
             }
             next.delete();
+        }
+        element.delete();
+    }
+
+    public static void deleteFunctionParam(PsiElement element) {
+        PsiElement next = element.getNextSibling();
+        if (next != null && next.getText().equals(",")) {
+            next.delete();
+        } else {
+            PsiElement prev = element.getPrevSibling();
+            if (prev != null && prev instanceof PsiWhiteSpace) {
+                prev.delete();
+                prev = element.getPrevSibling();
+            }
+            if (prev != null && prev.getText().equals(",")) {
+                prev.delete();
+            }
         }
         element.delete();
     }

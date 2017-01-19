@@ -5,7 +5,10 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.jetbrains.php.lang.psi.elements.FunctionReference;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.yii2support.common.PsiUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -37,16 +40,30 @@ class RenderMethodUnusedParamLocalQuickFix implements LocalQuickFix {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
         PsiElement item = descriptor.getPsiElement();
-        ArrayCreationExpression params = (ArrayCreationExpression) item.getParent();
 
-        PsiUtil.deleteArrayElement(item);
+        PsiElement context = item.getContext();
+        if (context instanceof ArrayCreationExpression) {
+            ArrayCreationExpression params = (ArrayCreationExpression) item.getParent();
 
-        if (!params.getHashElements().iterator().hasNext()) {
-            if (params.getPrevSibling() instanceof PsiWhiteSpace) {
+            PsiUtil.deleteArrayElement(item);
+
+            if (!params.getHashElements().iterator().hasNext()) {
+                if (params.getPrevSibling() instanceof PsiWhiteSpace) {
+                    params.getPrevSibling().delete();
+                }
                 params.getPrevSibling().delete();
+                params.delete();
             }
-            params.getPrevSibling().delete();
-            params.delete();
+        }
+        if (context instanceof ParameterList && context.getParent().getNode().getElementType() == PhpElementTypes.FUNCTION_CALL) {
+            FunctionReference functionReference = (FunctionReference) context.getParent();
+            if (functionReference.getName() != null && functionReference.getName().equals("compact")) {
+                PsiUtil.deleteFunctionParam(item);
+
+                if (functionReference.getParameters().length == 0) {
+                    PsiUtil.deleteFunctionParam(functionReference);
+                }
+            }
         }
     }
 }

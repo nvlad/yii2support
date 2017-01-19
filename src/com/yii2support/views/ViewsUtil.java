@@ -6,6 +6,8 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -107,6 +109,18 @@ class ViewsUtil {
             final ArrayList<String> allVariables = new ArrayList<>();
             final ArrayList<String> declaredVariables = new ArrayList<>();
             final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
+
+            for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
+                if (reference.getNode().getElementType() == PhpElementTypes.FUNCTION_CALL && psiFile.getUseScope().equals(reference.getUseScope())) {
+                    if (reference.getName() != null && reference.getName().equals("compact")) {
+                        for (PsiElement element : reference.getParameters()) {
+                            if (element instanceof StringLiteralExpression) {
+                                allVariables.add(((StringLiteralExpression) element).getContents());
+                            }
+                        }
+                    }
+                }
+            }
 
             for (Variable variable : viewVariables) {
                 String variableName = variable.getName();

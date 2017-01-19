@@ -4,10 +4,8 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,32 +53,50 @@ class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor {
             ArrayList<String> renderParams = new ArrayList<>();
             ArrayList<String> unusedParams = new ArrayList<>();
             String hintUnusedParams = "View %view% not use \"%key%\" parameter";
-            if (parameters.length > 1 && parameters[1] instanceof ArrayCreationExpression) {
-                for (ArrayHashElement item : ((ArrayCreationExpression) parameters[1]).getHashElements()) {
-                    if (item.getKey() instanceof StringLiteralExpression) {
-                        String key = ((StringLiteralExpression) item.getKey()).getContents();
+            if (parameters.length > 1) {
+                if (parameters[1] instanceof ArrayCreationExpression) {
+                    for (ArrayHashElement item : ((ArrayCreationExpression) parameters[1]).getHashElements()) {
+                        if (item.getKey() instanceof StringLiteralExpression) {
+                            String key = ((StringLiteralExpression) item.getKey()).getContents();
 
-                        if (!externalVariables.contains(key)) {
-                            RenderMethodUnusedParamLocalQuickFix fix = new RenderMethodUnusedParamLocalQuickFix(key);
-                            String description = hintUnusedParams.replace("%view%", parameters[0].getText()).replace("%key%", key);
-                            myHolder.registerProblem(item, description, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
-                            unusedParams.add(key);
+                            if (!externalVariables.contains(key)) {
+                                RenderMethodUnusedParamLocalQuickFix fix = new RenderMethodUnusedParamLocalQuickFix(key);
+                                String description = hintUnusedParams.replace("%view%", parameters[0].getText()).replace("%key%", key);
+                                myHolder.registerProblem(item, description, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
+                                unusedParams.add(key);
+                            }
+
+                            renderParams.add(key);
                         }
-
-                        renderParams.add(key);
+                    }
+                }
+                if (parameters[1].getNode().getElementType() == PhpElementTypes.FUNCTION_CALL) {
+                    FunctionReference functionReference = (FunctionReference) parameters[1];
+                    if (functionReference.getName() != null && functionReference.getName().equals("compact")) {
+                        for (PsiElement element : functionReference.getParameters()) {
+                            if (element instanceof StringLiteralExpression && !externalVariables.contains(((StringLiteralExpression) element).getContents())) {
+                                String key = ((StringLiteralExpression) element).getContents();
+                                RenderMethodUnusedParamLocalQuickFix fix = new RenderMethodUnusedParamLocalQuickFix(key);
+                                String description = hintUnusedParams.replace("%view%", parameters[0].getText()).replace("%key%", key);
+                                myHolder.registerProblem(element, description, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
+                                unusedParams.add(key);
+                            }
+                        }
                     }
                 }
             }
 
             if (unusedParams.size() > 0) {
-                if (parameters.length > 1 && parameters[1] instanceof ArrayCreationExpression) {
+                if (parameters.length > 1) {
                     String hintNotRequireParams = "This View does not use parameters";
-                    if (unusedParams.size() != renderParams.size()) {
-                        RenderMethodNotRequireParamsLocalQuickFix fix = new RenderMethodNotRequireParamsLocalQuickFix(unusedParams);
-                        myHolder.registerProblem(parameters[1], hintNotRequireParams, ProblemHighlightType.INFORMATION, fix);
-                    } else {
-                        RenderMethodNotRequireParamsLocalQuickFix fix = new RenderMethodNotRequireParamsLocalQuickFix();
-                        myHolder.registerProblem(parameters[1], hintNotRequireParams, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
+                    if (parameters[1] instanceof ArrayCreationExpression) {
+                        if (unusedParams.size() != renderParams.size()) {
+                            RenderMethodNotRequireParamsLocalQuickFix fix = new RenderMethodNotRequireParamsLocalQuickFix(unusedParams);
+                            myHolder.registerProblem(parameters[1], hintNotRequireParams, ProblemHighlightType.INFORMATION, fix);
+                        } else {
+                            RenderMethodNotRequireParamsLocalQuickFix fix = new RenderMethodNotRequireParamsLocalQuickFix();
+                            myHolder.registerProblem(parameters[1], hintNotRequireParams, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
+                        }
                     }
                 }
             }
