@@ -27,6 +27,10 @@ class ViewsUtil {
 
     @Nullable
     static PsiFile getViewPsiFile(PsiElement psiElement) {
+        if (!(psiElement instanceof StringLiteralExpression)) {
+            return null;
+        }
+
         PsiFile psiFile = psiElement.getContainingFile();
         StringLiteralExpression expression = (StringLiteralExpression) psiElement;
         String filename = expression.getContents();
