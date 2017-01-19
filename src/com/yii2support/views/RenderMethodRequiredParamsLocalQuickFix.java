@@ -10,8 +10,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import org.jetbrains.annotations.Nls;
@@ -64,16 +66,43 @@ class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
             parameters = parameterList.getParameters();
         }
 
-        if (!(parameters[1] instanceof ArrayCreationExpression)) {
-            return;
-        }
-        ArrayCreationExpression params = (ArrayCreationExpression) parameters[1];
-
         TemplateManager templateManager = TemplateManager.getInstance(project);
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
         if (editor == null) {
             return;
         }
+
+        if (parameters[1].getNode().getElementType() == PhpElementTypes.FUNCTION_CALL) {
+            FunctionReference functionReference = (FunctionReference) parameters[1];
+            Template template = templateManager.createTemplate("", "");
+            template.setToReformat(true);
+
+            Boolean firstElement = functionReference.getParameters().length == 0;
+
+            for (String variable : myVariables) {
+                template.addTextSegment(firstElement ? "'" : ", '");
+                String var = "$" + variable.toUpperCase() + "$";
+                template.addVariable(var, "", "\"" + variable + "\"", true);
+                template.addVariableSegment(var);
+                template.addTextSegment("'");
+                firstElement = false;
+            }
+
+            PsiElement psiElement = functionReference.getParameterList();
+            if (psiElement != null) {
+                editor.getCaretModel().moveToOffset(psiElement.getTextRange().getEndOffset());
+                PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
+                templateManager.startTemplate(editor, template);
+            }
+
+            return;
+        }
+
+        if (!(parameters[1] instanceof ArrayCreationExpression)) {
+            return;
+        }
+        ArrayCreationExpression params = (ArrayCreationExpression) parameters[1];
+
         Template template = templateManager.createTemplate("", "");
         template.setToReformat(true);
         Boolean addComma = params.getHashElements().iterator().hasNext();

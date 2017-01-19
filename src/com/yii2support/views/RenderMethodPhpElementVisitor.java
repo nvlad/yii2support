@@ -3,10 +3,8 @@ package com.yii2support.views;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,13 +61,29 @@ class RenderMethodPhpElementVisitor extends PhpElementVisitor {
                 if (parameters.length == 1) {
                     RenderMethodRequiredParamsLocalQuickFix fix = new RenderMethodRequiredParamsLocalQuickFix(externalVariables);
                     myHolder.registerProblem(reference, errorRequiredParams.replace("%view%", parameters[0].getText()), fix);
-                } else if (parameters[1] instanceof ArrayCreationExpression) {
-                    for (ArrayHashElement item : ((ArrayCreationExpression) parameters[1]).getHashElements()) {
-                        if (item.getKey() instanceof StringLiteralExpression) {
-                            String key = ((StringLiteralExpression) item.getKey()).getContents();
+                } else {
+                    if (parameters[1] instanceof ArrayCreationExpression) {
+                        for (ArrayHashElement item : ((ArrayCreationExpression) parameters[1]).getHashElements()) {
+                            if (item.getKey() instanceof StringLiteralExpression) {
+                                String key = ((StringLiteralExpression) item.getKey()).getContents();
 
-                            if (externalVariables.contains(key)) {
-                                externalVariables.remove(key);
+                                if (externalVariables.contains(key)) {
+                                    externalVariables.remove(key);
+                                }
+                            }
+                        }
+                    }
+
+                    if (parameters[1].getNode().getElementType() == PhpElementTypes.FUNCTION_CALL) {
+                        FunctionReference functionReference = (FunctionReference) parameters[1];
+                        if (functionReference.getName() != null && functionReference.getName().equals("compact")) {
+                            for (PsiElement psiElement : functionReference.getParameters()) {
+                                if (psiElement instanceof StringLiteralExpression) {
+                                    String key = ((StringLiteralExpression) psiElement).getContents();
+                                    if (externalVariables.contains(key)) {
+                                        externalVariables.remove(key);
+                                    }
+                                }
                             }
                         }
                     }
