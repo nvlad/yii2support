@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.7.2</version>
+    <version>0.2.7.4</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -25,8 +25,8 @@
 
     <change-notes><![CDATA[
       <ul>
-        <li>Fix Exception on false-positive references for function call inline comments</li>
-        <li>Missed & unused parameters inspections work with `compact` function</li>
+        <li>Fixed false-positive .twig & .tpl View files as missed</li>
+        <li>Fixed adding SUPERGLOBAL variables in render parameters</li>
       </ul>
     ]]>
     </change-notes>
