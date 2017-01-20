@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.Variable;
@@ -28,7 +29,7 @@ class ViewsUtil {
     static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
     static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
 
-    static final Set<String> ignoredVariables = getIgnoredVariables();
+    private static final Set<String> ignoredVariables = getIgnoredVariables();
 
     private static Set<String> getIgnoredVariables() {
         final Set<String> set = new THashSet<>(Arrays.asList("this", "_file_", "_params_"));
@@ -43,22 +44,32 @@ class ViewsUtil {
         }
 
         PsiFile psiFile = psiElement.getContainingFile();
+
+        PsiDirectory directory = getViewsPsiDirectory(psiFile, psiElement);
+        if (directory == null) {
+            return null;
+        }
+
         StringLiteralExpression expression = (StringLiteralExpression) psiElement;
         String filename = expression.getContents();
         if (filename.contains("/")) {
             filename = filename.substring(filename.lastIndexOf("/") + 1);
         }
-        if (!filename.contains(".")) {
-            filename = filename.concat(".php");
+
+        PsiFile viewFile;
+        if (filename.contains(".")) {
+            return directory.findFile(filename);
+        }
+        viewFile = directory.findFile(filename + ".php");
+        if (viewFile == null) {
+            viewFile = directory.findFile(filename + ".tpl");
+        }
+        if (viewFile == null) {
+            viewFile = directory.findFile(filename + ".twig");
         }
 
-        PsiDirectory directory = getViewsPsiDirectory(psiFile, psiElement);
+        return viewFile;
 
-        if (directory == null) {
-            return null;
-        }
-
-        return directory.findFile(filename);
     }
 
     @Nullable
@@ -111,6 +122,49 @@ class ViewsUtil {
     }
 
     @NotNull
+    private static ArrayList<String> getPhpViewVariables(PsiFile psiFile) {
+        final ArrayList<String> result = new ArrayList<>();
+        final ArrayList<String> allVariables = new ArrayList<>();
+        final ArrayList<String> declaredVariables = new ArrayList<>();
+        final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
+
+        for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
+            if (reference.getNode().getElementType() == PhpElementTypes.FUNCTION_CALL && psiFile.getUseScope().equals(reference.getUseScope())) {
+                if (reference.getName() != null && reference.getName().equals("compact")) {
+                    for (PsiElement element : reference.getParameters()) {
+                        if (element instanceof StringLiteralExpression) {
+                            allVariables.add(((StringLiteralExpression) element).getContents());
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Variable variable : viewVariables) {
+            String variableName = variable.getName();
+            if (variable.isDeclaration()) {
+                if (!declaredVariables.contains(variableName)) {
+                    declaredVariables.add(variableName);
+                }
+            } else {
+                if (!ignoredVariables.contains(variableName)) {
+                    if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
+                        allVariables.add(variableName);
+                    }
+                }
+            }
+        }
+
+        for (String variable : allVariables) {
+            if (!declaredVariables.contains(variable)) {
+                result.add(variable);
+            }
+        }
+
+        return result;
+    }
+
+    @NotNull
     static ArrayList<String> getViewVariables(PsiFile psiFile) {
         ArrayList<String> result = null;
 
@@ -120,42 +174,12 @@ class ViewsUtil {
         }
 
         if (result == null) {
-            result = new ArrayList<>();
-            final ArrayList<String> allVariables = new ArrayList<>();
-            final ArrayList<String> declaredVariables = new ArrayList<>();
-            final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
-
-            for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
-                if (reference.getNode().getElementType() == PhpElementTypes.FUNCTION_CALL && psiFile.getUseScope().equals(reference.getUseScope())) {
-                    if (reference.getName() != null && reference.getName().equals("compact")) {
-                        for (PsiElement element : reference.getParameters()) {
-                            if (element instanceof StringLiteralExpression) {
-                                allVariables.add(((StringLiteralExpression) element).getContents());
-                            }
-                        }
-                    }
-                }
+            if (psiFile instanceof PhpFile) {
+                result = getPhpViewVariables(psiFile);
             }
 
-            for (Variable variable : viewVariables) {
-                String variableName = variable.getName();
-                if (variable.isDeclaration()) {
-                    if (!declaredVariables.contains(variableName)) {
-                        declaredVariables.add(variableName);
-                    }
-                } else {
-                    if (!ignoredVariables.contains(variableName)) {
-                        if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
-                            allVariables.add(variableName);
-                        }
-                    }
-                }
-            }
-
-            for (String variable : allVariables) {
-                if (!declaredVariables.contains(variable)) {
-                    result.add(variable);
-                }
+            if (result == null) {
+                result = new ArrayList<>();
             }
 
             psiFile.putUserData(VIEW_VARIABLES, result);
