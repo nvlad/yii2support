@@ -32,22 +32,32 @@ class ViewsUtil {
         }
 
         PsiFile psiFile = psiElement.getContainingFile();
+
+        PsiDirectory directory = getViewsPsiDirectory(psiFile, psiElement);
+        if (directory == null) {
+            return null;
+        }
+
         StringLiteralExpression expression = (StringLiteralExpression) psiElement;
         String filename = expression.getContents();
         if (filename.contains("/")) {
             filename = filename.substring(filename.lastIndexOf("/") + 1);
         }
-        if (!filename.contains(".")) {
-            filename = filename.concat(".php");
+
+        PsiFile viewFile;
+        if (filename.contains(".")) {
+            return directory.findFile(filename);
+        }
+        viewFile = directory.findFile(filename + ".php");
+        if (viewFile == null) {
+            viewFile = directory.findFile(filename + ".tpl");
+        }
+        if (viewFile == null) {
+            viewFile = directory.findFile(filename + ".twig");
         }
 
-        PsiDirectory directory = getViewsPsiDirectory(psiFile, psiElement);
+        return viewFile;
 
-        if (directory == null) {
-            return null;
-        }
-
-        return directory.findFile(filename);
     }
 
     @Nullable
