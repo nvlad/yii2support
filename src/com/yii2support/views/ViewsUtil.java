@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Created by NVlad on 15.01.2017.
  */
-class ViewsUtil {
+public class ViewsUtil {
     static final Key<String> RENDER_VIEW = Key.create("com.yii2support.views.render.view");
     static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
     static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
@@ -165,7 +165,7 @@ class ViewsUtil {
     }
 
     @NotNull
-    static ArrayList<String> getViewVariables(PsiFile psiFile) {
+    public static ArrayList<String> getViewVariables(PsiFile psiFile) {
         ArrayList<String> result = null;
 
         Long viewModified = psiFile.getUserData(VIEW_FILE_MODIFIED);

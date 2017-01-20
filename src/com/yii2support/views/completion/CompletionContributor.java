@@ -1,4 +1,4 @@
-package com.yii2support.views;
+package com.yii2support.views.completion;
 
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.ElementPattern;
