@@ -24,10 +24,10 @@ import java.util.Set;
  * Created by NVlad on 15.01.2017.
  */
 public class ViewsUtil {
-    static final Key<String> RENDER_VIEW = Key.create("com.yii2support.views.render.view");
-    static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
-    static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
-    static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
+    public static final Key<String> RENDER_VIEW = Key.create("com.yii2support.views.render.view");
+    public static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
+    public static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
+    public static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
 
     private static final Set<String> ignoredVariables = getIgnoredVariables();
 
@@ -73,7 +73,7 @@ public class ViewsUtil {
     }
 
     @Nullable
-    static PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
+    public static PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
         String fileName = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
         PsiDirectory psiDirectory = psiFile.getContainingDirectory();
 

@@ -50,12 +50,12 @@
                          displayName="Render method"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
-                         implementationClass="com.yii2support.views.RenderMethodInspection"/>
+                         implementationClass="com.yii2support.views.inspections.RenderMethodInspection"/>
         <localInspection language="PHP" shortName="RenderMethodUnusedParamInspection"
                          displayName="Render unused parameters"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="WARNING"
-                         implementationClass="com.yii2support.views.RenderMethodUnusedParamInspection"/>
+                         implementationClass="com.yii2support.views.inspections.RenderMethodUnusedParamInspection"/>
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.i18n.CompletionContributor"/>

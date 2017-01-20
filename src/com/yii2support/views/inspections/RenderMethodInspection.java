@@ -1,4 +1,4 @@
-package com.yii2support.views;
+package com.yii2support.views.inspections;
 
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElementVisitor;
@@ -8,16 +8,16 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 15.01.2017.
  */
-final public class RenderMethodUnusedParamInspection extends PhpInspection {
+final public class RenderMethodInspection extends PhpInspection {
     @NotNull
     @Override
     public String getShortName() {
-        return "RenderMethodUnusedParamInspection";
+        return "RenderMethodInspection";
     }
 
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean isOnTheFly) {
-        return new RenderMethodUnusedParamPhpElementVisitor(problemsHolder);
+        return new RenderMethodPhpElementVisitor(problemsHolder);
     }
 }

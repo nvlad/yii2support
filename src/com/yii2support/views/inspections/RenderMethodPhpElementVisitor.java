@@ -1,4 +1,4 @@
-package com.yii2support.views;
+package com.yii2support.views.inspections;
 
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
@@ -7,6 +7,7 @@ import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
