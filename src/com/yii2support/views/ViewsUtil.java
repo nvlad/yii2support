@@ -10,11 +10,14 @@ import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.Variable;
+import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by NVlad on 15.01.2017.
@@ -24,6 +27,14 @@ class ViewsUtil {
     static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
     static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
     static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
+
+    static final Set<String> ignoredVariables = getIgnoredVariables();
+
+    private static Set<String> getIgnoredVariables() {
+        final Set<String> set = new THashSet<>(Arrays.asList("this", "_file_", "_params_"));
+        set.addAll(Variable.SUPERGLOBALS);
+        return set;
+    }
 
     @Nullable
     static PsiFile getViewPsiFile(PsiElement psiElement) {
@@ -133,7 +144,7 @@ class ViewsUtil {
                         declaredVariables.add(variableName);
                     }
                 } else {
-                    if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
+                    if (!ignoredVariables.contains(variableName)) {
                         if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
                             allVariables.add(variableName);
                         }
