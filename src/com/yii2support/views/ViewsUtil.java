@@ -7,9 +7,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.Variable;
+import com.jetbrains.smarty.SmartyFile;
+import com.jetbrains.twig.TwigFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -110,6 +113,61 @@ class ViewsUtil {
     }
 
     @NotNull
+    private static ArrayList<String> getPhpViewVariables(PsiFile psiFile) {
+        final ArrayList<String> result = new ArrayList<>();
+        final ArrayList<String> allVariables = new ArrayList<>();
+        final ArrayList<String> declaredVariables = new ArrayList<>();
+        final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
+
+        for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
+            if (reference.getNode().getElementType() == PhpElementTypes.FUNCTION_CALL && psiFile.getUseScope().equals(reference.getUseScope())) {
+                if (reference.getName() != null && reference.getName().equals("compact")) {
+                    for (PsiElement element : reference.getParameters()) {
+                        if (element instanceof StringLiteralExpression) {
+                            allVariables.add(((StringLiteralExpression) element).getContents());
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Variable variable : viewVariables) {
+            String variableName = variable.getName();
+            if (variable.isDeclaration()) {
+                if (!declaredVariables.contains(variableName)) {
+                    declaredVariables.add(variableName);
+                }
+            } else {
+                if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
+                    if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
+                        allVariables.add(variableName);
+                    }
+                }
+            }
+        }
+
+        for (String variable : allVariables) {
+            if (!declaredVariables.contains(variable)) {
+                result.add(variable);
+            }
+        }
+
+        return result;
+    }
+
+    @NotNull
+    private static ArrayList<String> getTwigViewVariables(PsiFile psiFile) {
+        final ArrayList<String> result = new ArrayList<>();
+        return result;
+    }
+
+    @NotNull
+    private static ArrayList<String> getSmartyViewVariables(PsiFile psiFile) {
+        final ArrayList<String> result = new ArrayList<>();
+        return result;
+    }
+
+    @NotNull
     static ArrayList<String> getViewVariables(PsiFile psiFile) {
         ArrayList<String> result = null;
 
@@ -119,42 +177,23 @@ class ViewsUtil {
         }
 
         if (result == null) {
-            result = new ArrayList<>();
-            final ArrayList<String> allVariables = new ArrayList<>();
-            final ArrayList<String> declaredVariables = new ArrayList<>();
-            final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
-
-            for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
-                if (reference.getNode().getElementType() == PhpElementTypes.FUNCTION_CALL && psiFile.getUseScope().equals(reference.getUseScope())) {
-                    if (reference.getName() != null && reference.getName().equals("compact")) {
-                        for (PsiElement element : reference.getParameters()) {
-                            if (element instanceof StringLiteralExpression) {
-                                allVariables.add(((StringLiteralExpression) element).getContents());
-                            }
-                        }
-                    }
-                }
+            if (psiFile instanceof PhpFile) {
+                result = getPhpViewVariables(psiFile);
             }
 
-            for (Variable variable : viewVariables) {
-                String variableName = variable.getName();
-                if (variable.isDeclaration()) {
-                    if (!declaredVariables.contains(variableName)) {
-                        declaredVariables.add(variableName);
-                    }
-                } else {
-                    if (!(variableName.equals("this") || variableName.equals("_file_") || variableName.equals("_params_"))) {
-                        if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
-                            allVariables.add(variableName);
-                        }
-                    }
+            if (psiFile instanceof SmartyFile) {
+                result = getSmartyViewVariables(psiFile);
+            }
+            try {
+                Class.forName("com.jetbrains.twig.TwigFile");
+                if (psiFile instanceof TwigFile) {
+                    result = getTwigViewVariables(psiFile);
                 }
+            } catch (ClassNotFoundException ignored) {
             }
 
-            for (String variable : allVariables) {
-                if (!declaredVariables.contains(variable)) {
-                    result.add(variable);
-                }
+            if (result == null) {
+                result = new ArrayList<>();
             }
 
             psiFile.putUserData(VIEW_VARIABLES, result);
