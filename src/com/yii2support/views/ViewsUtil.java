@@ -38,7 +38,7 @@ public class ViewsUtil {
     }
 
     @Nullable
-    static PsiFile getViewPsiFile(PsiElement psiElement) {
+    public static PsiFile getViewPsiFile(PsiElement psiElement) {
         if (!(psiElement instanceof StringLiteralExpression)) {
             return null;
         }

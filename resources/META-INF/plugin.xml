@@ -45,7 +45,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.views.completion.CompletionContributor"/>
-        <psi.referenceContributor language="PHP" implementation="com.yii2support.views.PsiReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.yii2support.views.references.PsiReferenceContributor"/>
         <localInspection language="PHP" shortName="RenderMethodInspection"
                          displayName="Render method"
                          groupName="Views" groupPath="PHP,Framework,Yii2"

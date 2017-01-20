@@ -1,8 +1,9 @@
-package com.yii2support.views;
+package com.yii2support.views.references;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
+import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

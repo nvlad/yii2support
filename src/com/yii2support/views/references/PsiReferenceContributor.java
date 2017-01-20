@@ -1,4 +1,4 @@
-package com.yii2support.views;
+package com.yii2support.views.references;
 
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
