@@ -11,8 +11,6 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.Variable;
-import com.jetbrains.smarty.SmartyFile;
-import com.jetbrains.twig.TwigFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -156,18 +154,6 @@ class ViewsUtil {
     }
 
     @NotNull
-    private static ArrayList<String> getTwigViewVariables(PsiFile psiFile) {
-        final ArrayList<String> result = new ArrayList<>();
-        return result;
-    }
-
-    @NotNull
-    private static ArrayList<String> getSmartyViewVariables(PsiFile psiFile) {
-        final ArrayList<String> result = new ArrayList<>();
-        return result;
-    }
-
-    @NotNull
     static ArrayList<String> getViewVariables(PsiFile psiFile) {
         ArrayList<String> result = null;
 
@@ -179,17 +165,6 @@ class ViewsUtil {
         if (result == null) {
             if (psiFile instanceof PhpFile) {
                 result = getPhpViewVariables(psiFile);
-            }
-
-            if (psiFile instanceof SmartyFile) {
-                result = getSmartyViewVariables(psiFile);
-            }
-            try {
-                Class.forName("com.jetbrains.twig.TwigFile");
-                if (psiFile instanceof TwigFile) {
-                    result = getTwigViewVariables(psiFile);
-                }
-            } catch (ClassNotFoundException ignored) {
             }
 
             if (result == null) {

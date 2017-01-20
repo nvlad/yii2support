@@ -5,6 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +47,10 @@ class RenderMethodUnusedParamPhpElementVisitor extends PhpElementVisitor {
                 reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, psiFile);
             }
             if (psiFile == null) {
+                return;
+            }
+
+            if (!(psiFile instanceof PhpFile)) {
                 return;
             }
 

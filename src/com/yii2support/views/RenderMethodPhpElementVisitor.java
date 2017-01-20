@@ -4,6 +4,7 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +53,10 @@ class RenderMethodPhpElementVisitor extends PhpElementVisitor {
                     final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", parameters[0].getText());
                     myHolder.registerProblem(str, descriptionTemplate, quickFix);
                 }
+                return;
+            }
+
+            if (!(psiFile instanceof PhpFile)) {
                 return;
             }
 
