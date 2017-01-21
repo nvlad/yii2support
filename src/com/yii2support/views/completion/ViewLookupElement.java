@@ -65,6 +65,17 @@ class ViewLookupElement extends LookupElement {
             return;
         }
 
+        String value = ((StringLiteralExpression) element).getContents();
+        if (value.contains("/")) {
+            value = value.substring(value.lastIndexOf('/') + 1);
+        }
+        if (!myName.equals(value)) {
+            String filename = myFile.getName();
+            if (!filename.equals(value)) {
+                return;
+            }
+        }
+
         ArrayList<String> params = ViewsUtil.getViewVariables(myFile);
         if (params.size() > 0) {
             ParameterList parameterList = (ParameterList) element.getParent();
