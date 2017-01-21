@@ -6,9 +6,11 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.yii2support.views.ViewsUtil;
@@ -21,34 +23,35 @@ import java.util.ArrayList;
  */
 class ViewLookupElement extends LookupElement {
     final private PsiFile myFile;
-    final private String name;
-    final private String tail;
+    final private String myName;
+    final private String myTail;
 
     ViewLookupElement(PsiFile psiFile) {
         myFile = psiFile;
-        String filename = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
-        if (filename.contains(".")) {
-            name = psiFile.getName();
-            tail = null;
+        VirtualFile file = psiFile.getVirtualFile();
+
+        if (file.getNameWithoutExtension().contains(".")) {
+            myName = file.getName();
+            myTail = null;
         } else {
-            name = filename;
-            tail = psiFile.getName().substring(filename.length());
+            myName = file.getNameWithoutExtension();
+            myTail = "." + file.getExtension();
         }
     }
 
     @NotNull
     @Override
     public String getLookupString() {
-        return name;
+        return myName;
     }
 
     @Override
     public void renderElement(LookupElementPresentation presentation) {
         presentation.setIcon(myFile.getIcon(0));
-        presentation.setItemText(name);
+        presentation.setItemText(myName);
         presentation.setItemTextBold(true);
-        if (tail != null) {
-            presentation.setTailText(tail, true);
+        if (myTail != null) {
+            presentation.setTailText(myTail, true);
         }
         presentation.setTypeText("View");
         presentation.setTypeGrayed(true);
@@ -56,27 +59,29 @@ class ViewLookupElement extends LookupElement {
 
     @Override
     public void handleInsert(InsertionContext context) {
+        PsiElement element = context.getFile().getViewProvider().findElementAt(context.getSelectionEndOffset());
+        element = PsiTreeUtil.getParentOfType(element, StringLiteralExpression.class);
+        if (element == null) {
+            return;
+        }
+
         ArrayList<String> params = ViewsUtil.getViewVariables(myFile);
         if (params.size() > 0) {
-            PsiElement element = context.getFile().getViewProvider().findElementAt(context.getSelectionEndOffset());
-            element = PsiTreeUtil.getParentOfType(element, StringLiteralExpression.class);
-            if (element != null) {
-                ParameterList parameterList = (ParameterList) element.getParent();
-                if (parameterList.getParameters().length == 1) {
-                    Project project = context.getProject();
-                    Template template = TemplateManager.getInstance(project).createTemplate("", "");
-                    template.addTextSegment(", [");
-                    for (String param : params) {
-                        String variableName = "$" + param.toUpperCase() + "$";
-                        template.addVariable(variableName, "", "\"$" + param + "\"", true);
-                        template.addTextSegment("'" + param + "' => ");
-                        template.addVariableSegment(variableName);
-                    }
-                    template.addTextSegment("]");
-                    int offset = parameterList.getParameters()[0].getTextRange().getEndOffset();
-                    context.getEditor().getCaretModel().moveToOffset(offset);
-                    TemplateManager.getInstance(project).startTemplate(context.getEditor(), template);
+            ParameterList parameterList = (ParameterList) element.getParent();
+            if (parameterList.getParameters().length == 1) {
+                Project project = context.getProject();
+                Template template = TemplateManager.getInstance(project).createTemplate("", "");
+                template.addTextSegment(", [");
+                for (String param : params) {
+                    String variableName = "$" + param.toUpperCase() + "$";
+                    template.addVariable(variableName, "", "\"$" + param + "\"", true);
+                    template.addTextSegment("'" + param + "' => ");
+                    template.addVariableSegment(variableName);
                 }
+                template.addTextSegment("]");
+                int offset = parameterList.getParameters()[0].getTextRange().getEndOffset();
+                context.getEditor().getCaretModel().moveToOffset(offset);
+                TemplateManager.getInstance(project).startTemplate(context.getEditor(), template);
             }
         }
     }
