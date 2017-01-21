@@ -23,12 +23,13 @@ public class ViewsUtil {
     public static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
     public static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
     public static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
-
     private static final Key<PsiDirectory> VIEWS_DIRECTORY = Key.create("views.directory");
     private static final Key<Long> VIEWS_DIRECTORY_MODIFIED = Key.create("views.directory.modified");
     private static final Key<PsiDirectory> VIEWS_CONTEXT_DIRECTORY = Key.create("views.context.directory");
 
     private static final Set<String> ignoredVariables = getIgnoredVariables();
+
+    public static final String[] renderMethods = {"render", "renderAjax", "renderPartial"};
 
     private static Set<String> getIgnoredVariables() {
         final Set<String> set = new THashSet<>(Arrays.asList("this", "_file_", "_params_"));

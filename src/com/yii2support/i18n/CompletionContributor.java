@@ -22,7 +22,6 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
 
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-
         MethodReference reference = PsiTreeUtil.getParentOfType(position, MethodReference.class);
         if (reference != null && reference.getName() != null && reference.getName().equals("t")) {
             ClassReference classReference = (ClassReference) reference.getClassReference();
