@@ -2,13 +2,14 @@ package com.yii2support.views.completion;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.template.macro.SplitWordsMacro;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.ArrayUtil;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,81 +18,55 @@ import org.jetbrains.annotations.NotNull;
 class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-        PsiElement psiElement = completionParameters.getPosition();
-        MethodReference methodReference = (MethodReference) psiElement.getParent().getParent().getParent();
-        String methodName = methodReference.getName();
+        final PsiElement psiElement = completionParameters.getPosition();
+        final MethodReference method = PsiTreeUtil.getParentOfType(psiElement, MethodReference.class);
 
-        if (ArrayUtil.indexOf(methodReference.getParameters(), psiElement.getParent()) == 0) {
-            if (methodName != null) {
-                if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
-                    String prefix = completionResultSet.getPrefixMatcher().getPrefix();
-                    prefix = prefix.substring(prefix.lastIndexOf("/") + 1);
-                    completionResultSet = completionResultSet.withPrefixMatcher(prefix);
-                }
-                PsiDirectory viewsPath = getViewsPsiDirectory(completionParameters.getOriginalFile(), psiElement);
+        if (method == null || method.getParameters().length == 0) {
+            return;
+        }
 
-                if (viewsPath != null) {
-                    for (PsiDirectory psiDirectory : viewsPath.getSubdirectories()) {
-                        completionResultSet.addElement(new DirectoryLookupElement(psiDirectory));
-                    }
+        String input = getValue(method.getParameters()[0]);
+        PsiDirectory directory;
+        if (input.startsWith("/")) {
+            input = input.substring(1);
+            directory = ViewsUtil.getRootDirectory(psiElement);
+        } else {
+            directory = ViewsUtil.getContextDirectory(psiElement);
+        }
+        if (input.contains("/")) {
+            input = input.substring(0, input.lastIndexOf('/') + 1);
+        }
 
-                    for (PsiFile psiFile : viewsPath.getFiles()) {
-                        completionResultSet.addElement(new ViewLookupElement(psiFile));
-                    }
-                }
+        while (input.contains("/") && directory != null) {
+            String subdirectory = input.substring(0, input.indexOf('/'));
+            input = input.substring(input.indexOf('/') + 1);
+            directory = directory.findSubdirectory(subdirectory);
+        }
+
+        if (directory != null) {
+            if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
+                String prefix = completionResultSet.getPrefixMatcher().getPrefix();
+                prefix = prefix.substring(prefix.lastIndexOf("/") + 1);
+                completionResultSet = completionResultSet.withPrefixMatcher(prefix);
+            }
+
+            for (PsiDirectory psiDirectory : directory.getSubdirectories()) {
+                completionResultSet.addElement(new DirectoryLookupElement(psiDirectory));
+            }
+
+            for (PsiFile psiFile : directory.getFiles()) {
+                completionResultSet.addElement(new ViewLookupElement(psiFile));
             }
         }
     }
 
-    private PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
-        String fileName = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
-        PsiDirectory psiDirectory = psiFile.getContainingDirectory();
-
-        if (fileName.endsWith("Controller")) {
-            psiDirectory = psiFile.getContainingDirectory().getParentDirectory();
-            if (psiDirectory != null) {
-                psiDirectory = psiDirectory.findSubdirectory("views");
-
-                if (psiDirectory != null) {
-                    String container = fileName.substring(0, fileName.length() - 10);
-                    container = new SplitWordsMacro.LowercaseAndDash().convertString(container);
-
-                    psiDirectory = psiDirectory.findSubdirectory(container);
-                }
-            }
+    @NotNull
+    private String getValue(PsiElement expression) {
+        if (expression instanceof StringLiteralExpression) {
+            String value = ((StringLiteralExpression) expression).getContents();
+            return value.substring(0, value.indexOf("IntellijIdeaRulezzz "));
         }
 
-        String enteredText = psiElement.getText();
-        int iir = enteredText.indexOf("IntellijIdeaRulezzz ");
-        if (iir != -1) {
-            enteredText = enteredText.substring(0, iir);
-        }
-        String enteredPath = enteredText;
-        if (enteredText.startsWith("/")) {
-            while (psiDirectory != null && !psiDirectory.getName().equals("views")) {
-                psiDirectory = psiDirectory.getParentDirectory();
-            }
-            enteredPath = enteredPath.substring(1);
-        }
-
-        if (!enteredPath.endsWith("/") && enteredPath.contains("/")) {
-            enteredPath = enteredPath.substring(0, enteredPath.lastIndexOf("/") + 1);
-            if (enteredPath.length() == 1) {
-                enteredPath = "";
-            }
-        }
-
-        if (enteredPath.endsWith("/")) {
-            String directory;
-            while (!enteredPath.equals("")) {
-                directory = enteredPath.substring(0, enteredPath.indexOf("/"));
-                enteredPath = enteredPath.substring(directory.length() + 1);
-                if (psiDirectory != null) {
-                    psiDirectory = psiDirectory.findSubdirectory(directory);
-                }
-            }
-        }
-
-        return psiDirectory;
+        return "";
     }
 }
