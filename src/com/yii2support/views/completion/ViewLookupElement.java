@@ -76,6 +76,12 @@ class ViewLookupElement extends LookupElement {
             }
         }
 
+        MethodReference reference = PsiTreeUtil.getParentOfType(element, MethodReference.class);
+        if (reference != null) {
+            reference.putUserData(ViewsUtil.RENDER_VIEW, ((StringLiteralExpression) element).getContents());
+            reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, myFile);
+        }
+
         ArrayList<String> params = ViewsUtil.getViewVariables(myFile);
         if (params.size() > 0) {
             ParameterList parameterList = (ParameterList) element.getParent();
