@@ -43,18 +43,42 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-        final PsiElement psiElement = descriptor.getPsiElement().getParent();
-        final PsiFile psiFile = psiElement.getContainingFile().getOriginalFile();
-        final PsiDirectory psiDirectory = ViewsUtil.getViewsPsiDirectory(psiFile, psiElement);
-        if (psiDirectory != null) {
-            String filename = ((StringLiteralExpression) psiElement).getContents();
-            if (filename.contains("/")) {
-                filename = filename.substring(filename.lastIndexOf('/') + 1);
+        final PsiElement element = descriptor.getPsiElement().getParent();
+        PsiDirectory directory;
+        String path = null;
+
+        if (element instanceof StringLiteralExpression) {
+            path = ((StringLiteralExpression) element).getContents();
+        }
+
+        if (path == null) {
+            return;
+        }
+
+        if (path.startsWith("/")) {
+            directory = ViewsUtil.getRootDirectory(element);
+            path = path.substring(1);
+        } else {
+            directory = ViewsUtil.getContextDirectory(element);
+        }
+
+        if (directory == null) {
+            return;
+        }
+
+        while (directory != null && path.contains("/")) {
+            final String subdirectory = path.substring(0, path.indexOf('/'));
+            path = path.substring(path.indexOf('/') + 1);
+
+            directory = directory.findSubdirectory(subdirectory);
+        }
+
+        if (directory != null) {
+            if (!path.contains(".")) {
+                path = path + ".php";
             }
-            if (!filename.contains(".")) {
-                filename += ".php";
-            }
-            final PsiFile viewPsiFile = psiDirectory.createFile(filename);
+
+            final PsiFile viewPsiFile = directory.createFile(path);
             FileEditorManager.getInstance(project).openFile(viewPsiFile.getVirtualFile(), true);
 
             final FileTemplate[] templates = FileTemplateManager.getDefaultInstance().getTemplates(FileTemplateManager.DEFAULT_TEMPLATES_CATEGORY);
@@ -65,6 +89,7 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
                     break;
                 }
             }
+
             if (template != null && viewPsiFile.getViewProvider().getDocument() != null) {
                 final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
                 template.setLiveTemplateEnabled(true);
