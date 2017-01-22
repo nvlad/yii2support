@@ -20,10 +20,10 @@ import java.util.Properties;
 /**
  * Created by NVlad on 15.01.2017.
  */
-class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
+class MissedViewLocalQuickFix implements LocalQuickFix {
     final private String myName;
 
-    RenderMethodViewNotFoundLocalQuickFix(String name) {
+    MissedViewLocalQuickFix(String name) {
         myName = name;
     }
 

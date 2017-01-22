@@ -46,11 +46,11 @@
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.yii2support.views.references.PsiReferenceContributor"/>
-        <localInspection language="PHP" shortName="RenderMethodInspection"
-                         displayName="Render method"
+        <localInspection language="PHP" shortName="MissedViewInspection"
+                         displayName="Missing View file"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
-                         implementationClass="com.yii2support.views.inspections.RenderMethodInspection"/>
+                         implementationClass="com.yii2support.views.inspections.MissedViewInspection"/>
         <localInspection language="PHP" shortName="RenderMethodUnusedParamInspection"
                          displayName="Render unused parameters"
                          groupName="Views" groupPath="PHP,Framework,Yii2"

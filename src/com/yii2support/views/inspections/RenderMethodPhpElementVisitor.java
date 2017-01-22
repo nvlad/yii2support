@@ -50,7 +50,7 @@ class RenderMethodPhpElementVisitor extends PhpElementVisitor {
                 final PsiElement str = parameters[0].findElementAt(1);
                 if (str != null) {
                     final String errorViewNotFoundTemplate = "View file for %name% not found.";
-                    final RenderMethodViewNotFoundLocalQuickFix quickFix = new RenderMethodViewNotFoundLocalQuickFix(str.getText());
+                    final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(str.getText());
                     final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", parameters[0].getText());
                     myHolder.registerProblem(str, descriptionTemplate, quickFix);
                 }
