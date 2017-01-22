@@ -188,6 +188,66 @@ public class ViewsUtil {
         return new ArrayList<>(result);
     }
 
+    public static PsiFile getViewFile(PsiElement element) {
+        final MethodReference reference = PsiTreeUtil.getParentOfType(element, MethodReference.class);
+        if (reference == null) {
+            return null;
+        }
+
+        PsiFile file = reference.getUserData(RENDER_VIEW_FILE);
+        if (file == null) {
+            if (reference.getParameters().length > 0 && reference.getParameters()[0] instanceof StringLiteralExpression) {
+                PsiDirectory directory;
+
+                final String param = ((StringLiteralExpression) reference.getParameters()[0]).getContents();
+                String path = param;
+                if (path.startsWith("/")) {
+                    directory = ViewsUtil.getRootDirectory(element);
+                    path = path.substring(1);
+                } else {
+                    directory = ViewsUtil.getContextDirectory(element);
+                }
+
+                String filename;
+                if (path.contains("/")) {
+                    filename = path.substring(path.lastIndexOf('/') + 1);
+                    path = path.substring(0, path.lastIndexOf('/'));
+                } else {
+                    filename = path;
+                    path = "";
+                }
+
+                while (path.contains("/") && directory != null) {
+                    directory = directory.findSubdirectory(path.substring(0, path.indexOf('/') - 1));
+                    path = path.substring(path.indexOf('/') + 1);
+                }
+
+                if (directory == null) {
+                    return null;
+                }
+
+                if (filename.contains(".")) {
+                    file = directory.findFile(filename);
+                } else {
+                    file = directory.findFile(filename + ".php");
+                    if (file == null) {
+                        file = directory.findFile(filename + ".twig");
+                    }
+                    if (file == null) {
+                        file = directory.findFile(filename + ".tpl");
+                    }
+                }
+
+                if (file != null) {
+                    reference.putUserData(RENDER_VIEW, param);
+                    reference.putUserData(RENDER_VIEW_FILE, file);
+                }
+            }
+        }
+
+        return file;
+    }
+
     public static PsiDirectory getRootDirectory(PsiElement element) {
         final PsiFile file = element.getContainingFile();
 
