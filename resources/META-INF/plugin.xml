@@ -25,6 +25,8 @@
 
     <change-notes><![CDATA[
       <ul>
+        <li>Refactor work with Views</li>
+        <li>Split missed view file & missed parameters inspections</li>
         <li>Fixed false-positive .twig & .tpl View files as missed</li>
         <li>Fixed adding SUPERGLOBAL variables in render parameters</li>
       </ul>
