@@ -5,7 +5,6 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
-import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
@@ -16,10 +15,10 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 16.01.2017.
  */
-class RenderMethodUnusedParamLocalQuickFix implements LocalQuickFix {
+class UnusedParameterLocalQuickFix implements LocalQuickFix {
     final private String myParam;
 
-    RenderMethodUnusedParamLocalQuickFix(String param) {
+    UnusedParameterLocalQuickFix(String param) {
         myParam = param;
     }
 
@@ -55,7 +54,7 @@ class RenderMethodUnusedParamLocalQuickFix implements LocalQuickFix {
                 params.delete();
             }
         }
-        if (context instanceof ParameterList && context.getParent().getNode().getElementType() == PhpElementTypes.FUNCTION_CALL) {
+        if (context instanceof ParameterList && context.getParent() instanceof FunctionReference) {
             FunctionReference functionReference = (FunctionReference) context.getParent();
             if (functionReference.getName() != null && functionReference.getName().equals("compact")) {
                 PsiUtil.deleteFunctionParam(item);

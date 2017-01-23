@@ -62,7 +62,7 @@
                          displayName="Unused parameters"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="WARNING"
-                         implementationClass="com.yii2support.views.inspections.RenderMethodUnusedParamInspection"/>
+                         implementationClass="com.yii2support.views.inspections.UnusedParameterInspection"/>
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.i18n.CompletionContributor"/>

@@ -11,7 +11,6 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -21,8 +20,8 @@ import java.util.*;
 public class ViewsUtil {
     public static final Key<String> RENDER_VIEW = Key.create("com.yii2support.views.render.view");
     public static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
-    public static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
-    public static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
+    private static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
+    private static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
     private static final Key<PsiDirectory> VIEWS_DIRECTORY = Key.create("views.directory");
     private static final Key<Long> VIEWS_DIRECTORY_MODIFIED = Key.create("views.directory.modified");
     private static final Key<PsiDirectory> VIEWS_CONTEXT_DIRECTORY = Key.create("views.context.directory");
@@ -35,89 +34,6 @@ public class ViewsUtil {
         final Set<String> set = new THashSet<>(Arrays.asList("this", "_file_", "_params_"));
         set.addAll(Variable.SUPERGLOBALS);
         return set;
-    }
-
-    @Nullable
-    public static PsiFile getViewPsiFile(PsiElement psiElement) {
-        if (!(psiElement instanceof StringLiteralExpression)) {
-            return null;
-        }
-
-        PsiFile psiFile = psiElement.getContainingFile();
-
-        PsiDirectory directory = getViewsPsiDirectory(psiFile, psiElement);
-        if (directory == null) {
-            return null;
-        }
-
-        StringLiteralExpression expression = (StringLiteralExpression) psiElement;
-        String filename = expression.getContents();
-        if (filename.contains("/")) {
-            filename = filename.substring(filename.lastIndexOf("/") + 1);
-        }
-
-        PsiFile viewFile;
-        if (filename.contains(".")) {
-            return directory.findFile(filename);
-        }
-        viewFile = directory.findFile(filename + ".php");
-        if (viewFile == null) {
-            viewFile = directory.findFile(filename + ".tpl");
-        }
-        if (viewFile == null) {
-            viewFile = directory.findFile(filename + ".twig");
-        }
-
-        return viewFile;
-    }
-
-    @Nullable
-    private static PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
-        String fileName = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
-        PsiDirectory psiDirectory = psiFile.getContainingDirectory();
-
-        if (fileName.endsWith("Controller")) {
-            psiDirectory = psiFile.getContainingDirectory().getParentDirectory();
-            if (psiDirectory != null) {
-                psiDirectory = psiDirectory.findSubdirectory("views");
-
-                if (psiDirectory != null) {
-                    String container = fileName.substring(0, fileName.length() - 10);
-                    container = new SplitWordsMacro.LowercaseAndDash().convertString(container);
-
-                    psiDirectory = psiDirectory.findSubdirectory(container);
-                }
-            }
-        }
-
-        String enteredText = ((StringLiteralExpression) psiElement).getContents();
-        String enteredPath = enteredText;
-        if (enteredText.startsWith("/")) {
-            while (psiDirectory != null && !psiDirectory.getName().equals("views")) {
-                psiDirectory = psiDirectory.getParentDirectory();
-            }
-            enteredPath = enteredPath.substring(1);
-        }
-
-        if (!enteredPath.endsWith("/") && enteredPath.contains("/")) {
-            enteredPath = enteredPath.substring(0, enteredPath.lastIndexOf("/") + 1);
-            if (enteredPath.length() == 1) {
-                enteredPath = "";
-            }
-        }
-
-        if (enteredPath.endsWith("/")) {
-            String directory;
-            while (!enteredPath.equals("")) {
-                directory = enteredPath.substring(0, enteredPath.indexOf("/"));
-                enteredPath = enteredPath.substring(directory.length() + 1);
-                if (psiDirectory != null) {
-                    psiDirectory = psiDirectory.findSubdirectory(directory);
-                }
-            }
-        }
-
-        return psiDirectory;
     }
 
     @NotNull
@@ -194,9 +110,24 @@ public class ViewsUtil {
             return null;
         }
 
+        final PsiElement[] parameters = reference.getParameters();
+        if (parameters.length == 0 || !(parameters[0] instanceof StringLiteralExpression)) {
+            return null;
+        }
+
+        String view = reference.getUserData(RENDER_VIEW);
+        if (!((StringLiteralExpression) parameters[0]).getContents().equals(view)) {
+            view = ((StringLiteralExpression) parameters[0]).getContents();
+            reference.putUserData(RENDER_VIEW, view);
+            reference.putUserData(RENDER_VIEW_FILE, null);
+            reference.putUserData(VIEW_VARIABLES, null);
+            reference.putUserData(VIEW_FILE_MODIFIED, null);
+            return null;
+        }
+
         PsiFile file = reference.getUserData(RENDER_VIEW_FILE);
         if (file == null) {
-            if (reference.getParameters().length > 0 && reference.getParameters()[0] instanceof StringLiteralExpression) {
+            if (reference.getParameters()[0] instanceof StringLiteralExpression) {
                 PsiDirectory directory;
 
                 final String param = ((StringLiteralExpression) reference.getParameters()[0]).getContents();
