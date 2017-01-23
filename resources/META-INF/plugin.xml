@@ -51,6 +51,11 @@
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.yii2support.views.inspections.MissedViewInspection"/>
+        <localInspection language="PHP" shortName="RequireParameterInspection"
+                         displayName="Require parameters"
+                         groupName="Views" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.yii2support.views.inspections.RequireParameterInspection"/>
         <localInspection language="PHP" shortName="RenderMethodUnusedParamInspection"
                          displayName="Render unused parameters"
                          groupName="Views" groupPath="PHP,Framework,Yii2"

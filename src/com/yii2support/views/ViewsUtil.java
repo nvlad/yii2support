@@ -72,7 +72,7 @@ public class ViewsUtil {
     }
 
     @Nullable
-    public static PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
+    private static PsiDirectory getViewsPsiDirectory(PsiFile psiFile, PsiElement psiElement) {
         String fileName = psiFile.getName().substring(0, psiFile.getName().lastIndexOf("."));
         PsiDirectory psiDirectory = psiFile.getContainingDirectory();
 
