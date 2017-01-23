@@ -24,10 +24,10 @@ import java.util.Collection;
 /**
  * Created by NVlad on 15.01.2017.
  */
-class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
+class RequireParameterLocalQuickFix implements LocalQuickFix {
     final private String[] myVariables;
 
-    RenderMethodRequiredParamsLocalQuickFix(Collection<String> variables) {
+    RequireParameterLocalQuickFix(Collection<String> variables) {
         myVariables = variables.toArray(new String[variables.size()]);
     }
 
@@ -36,17 +36,17 @@ class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
     @Override
     public String getName() {
         if (myVariables.length == 1) {
-            return "Add \"%param%\" param".replace("%param%", myVariables[0]);
+            return "Add \"%param%\" parameter".replace("%param%", myVariables[0]);
         }
 
-        return "Add view param(s)";
+        return "Add View parameter(s)";
     }
 
     @Nls
     @NotNull
     @Override
     public String getFamilyName() {
-        return "Add view param";
+        return "Add View parameter";
     }
 
     @Override
