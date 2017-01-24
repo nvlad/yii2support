@@ -8,6 +8,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,14 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         final MethodReference method = PsiTreeUtil.getParentOfType(psiElement, MethodReference.class);
 
         if (method == null || method.getParameters().length == 0) {
+            return;
+        }
+
+        PsiElement parameter = psiElement;
+        while (!(parameter.getParent() instanceof ParameterList)) {
+            parameter = parameter.getParent();
+        }
+        if (!parameter.equals(method.getParameters()[0])) {
             return;
         }
 
