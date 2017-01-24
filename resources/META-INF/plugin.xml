@@ -27,6 +27,7 @@
       <ul>
         <li>Refactor work with Views</li>
         <li>Split missed view file & missed parameters inspections</li>
+        <li>Support View in Widgets</li>
         <li>Fixed false-positive .twig & .tpl View files as missed</li>
         <li>Fixed adding SUPERGLOBAL variables in render parameters</li>
       </ul>
