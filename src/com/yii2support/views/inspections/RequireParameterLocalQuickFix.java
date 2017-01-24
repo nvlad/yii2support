@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
-import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
@@ -55,6 +54,7 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
         if (parameterList == null) {
             return;
         }
+
         PsiElement[] parameters = parameterList.getParameters();
         if (parameters.length == 1) {
             ArrayCreationExpression params = PhpPsiElementFactory.createFromText(project, ArrayCreationExpression.class, "[]");
@@ -72,13 +72,16 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
             return;
         }
 
-        if (parameters[1].getNode().getElementType() == PhpElementTypes.FUNCTION_CALL) {
+        if (parameters[1] instanceof FunctionReference) {
             FunctionReference functionReference = (FunctionReference) parameters[1];
+            if (functionReference.getName() == null || !functionReference.getName().equals("compact")) {
+                return;
+            }
+
             Template template = templateManager.createTemplate("", "");
             template.setToReformat(true);
 
             Boolean firstElement = functionReference.getParameters().length == 0;
-
             for (String variable : myVariables) {
                 template.addTextSegment(firstElement ? "'" : ", '");
                 String var = "$" + variable.toUpperCase() + "$";
