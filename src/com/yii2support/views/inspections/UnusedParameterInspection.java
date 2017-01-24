@@ -89,7 +89,7 @@ final public class UnusedParameterInspection extends PhpInspection {
                         }
                     }
 
-                    if (unusedParameters.size() > 0) {
+                    if (unusedParameters.size() > 0 && isOnTheFly) {
                         if (viewParameters.containsAll(unusedParameters)) {
                             String errorUnusedParameters = "This View does not use parameters";
                             UnusedParametersLocalQuickFix fix = new UnusedParametersLocalQuickFix();
@@ -107,7 +107,9 @@ final public class UnusedParameterInspection extends PhpInspection {
                         String errorUnusedParameters = "This View does not use parameters";
                         UnusedParametersLocalQuickFix fix = new UnusedParametersLocalQuickFix();
                         problemsHolder.registerProblem(parameters[1], errorUnusedParameters, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
-                        problemsHolder.registerProblem(reference, errorUnusedParameters, ProblemHighlightType.INFORMATION, fix);
+                        if (isOnTheFly) {
+                            problemsHolder.registerProblem(reference, errorUnusedParameters, ProblemHighlightType.INFORMATION, fix);
+                        }
                     }
                 }
             }

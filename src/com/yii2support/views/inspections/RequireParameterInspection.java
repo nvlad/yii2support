@@ -31,7 +31,7 @@ public class RequireParameterInspection extends PhpInspection {
 
     @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
+    public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean isOnTheFly) {
         return new PhpElementVisitor() {
             @Override
             public void visitPhpMethodReference(MethodReference reference) {
@@ -73,7 +73,7 @@ public class RequireParameterInspection extends PhpInspection {
                         existKeys = new HashSet<>();
                     }
 
-                    if (existKeys.size() == 0) {
+                    if (existKeys.size() == 0 && isOnTheFly) {
                         String errorRequireParameters = "View %view% require parameters.";
                         RequireParameterLocalQuickFix fix = new RequireParameterLocalQuickFix(viewParameters);
                         problemsHolder.registerProblem(reference, errorRequireParameters.replace("%view%", parameters[0].getText()), fix);
