@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.7.4</version>
+    <version>0.2.9.5</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -26,10 +26,11 @@
     <change-notes><![CDATA[
       <ul>
         <li>Refactor work with Views</li>
-        <li>Split missed view file & missed parameters inspections</li>
         <li>Support View in Widgets</li>
+        <li>Split missed view file & missed parameters inspections</li>
         <li>Fixed false-positive .twig & .tpl View files as missed</li>
         <li>Fixed adding SUPERGLOBAL variables in render parameters</li>
+        <li>Fixed variables in strings return empty name</li>
       </ul>
     ]]>
     </change-notes>
