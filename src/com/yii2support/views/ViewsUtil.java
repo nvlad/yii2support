@@ -148,14 +148,14 @@ public class ViewsUtil {
                 String filename;
                 if (path.contains("/")) {
                     filename = path.substring(path.lastIndexOf('/') + 1);
-                    path = path.substring(0, path.lastIndexOf('/'));
+                    path = path.substring(0, path.lastIndexOf('/') + 1);
                 } else {
                     filename = path;
                     path = "";
                 }
 
                 while (path.contains("/") && directory != null) {
-                    directory = directory.findSubdirectory(path.substring(0, path.indexOf('/') - 1));
+                    directory = directory.findSubdirectory(path.substring(0, path.indexOf('/')));
                     path = path.substring(path.indexOf('/') + 1);
                 }
 
