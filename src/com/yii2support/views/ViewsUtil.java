@@ -20,6 +20,7 @@ import java.util.*;
 public class ViewsUtil {
     public static final Key<String> RENDER_VIEW = Key.create("com.yii2support.views.render.view");
     public static final Key<PsiFile> RENDER_VIEW_FILE = Key.create("com.yii2support.views.viewFile");
+    private static final Key<String> RENDER_VIEW_PATH = Key.create("views.viewPath");
     private static final Key<Long> VIEW_FILE_MODIFIED = Key.create("com.yii2support.views.viewFileModified");
     private static final Key<ArrayList<String>> VIEW_VARIABLES = Key.create("com.yii2support.views.viewVariables");
     private static final Key<PsiDirectory> VIEWS_DIRECTORY = Key.create("views.directory");
@@ -120,17 +121,23 @@ public class ViewsUtil {
             view = ((StringLiteralExpression) parameters[0]).getContents();
             reference.putUserData(RENDER_VIEW, view);
             reference.putUserData(RENDER_VIEW_FILE, null);
-            reference.putUserData(VIEW_VARIABLES, null);
-            reference.putUserData(VIEW_FILE_MODIFIED, null);
+            reference.putUserData(RENDER_VIEW_PATH, null);
         }
 
         PsiFile file = reference.getUserData(RENDER_VIEW_FILE);
-        if (file == null) {
+        if (file != null && file.isValid()) {
+            if (!file.getVirtualFile().getPath().equals(reference.getUserData(RENDER_VIEW_PATH))) {
+                reference.putUserData(RENDER_VIEW_FILE, null);
+                reference.putUserData(RENDER_VIEW_PATH, null);
+                file = null;
+            }
+        }
+
+        if (file == null || !file.isValid()) {
             if (reference.getParameters()[0] instanceof StringLiteralExpression) {
                 PsiDirectory directory;
 
-                final String param = ((StringLiteralExpression) reference.getParameters()[0]).getContents();
-                String path = param;
+                String path = ((StringLiteralExpression) reference.getParameters()[0]).getContents();
                 if (path.startsWith("/")) {
                     directory = ViewsUtil.getRootDirectory(element);
                     path = path.substring(1);
@@ -169,8 +176,8 @@ public class ViewsUtil {
                 }
 
                 if (file != null) {
-                    reference.putUserData(RENDER_VIEW, param);
                     reference.putUserData(RENDER_VIEW_FILE, file);
+                    reference.putUserData(RENDER_VIEW_PATH, file.getVirtualFile().getPath());
                 }
             }
         }
