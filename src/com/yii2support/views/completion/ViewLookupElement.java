@@ -89,11 +89,16 @@ class ViewLookupElement extends LookupElement {
                 Project project = context.getProject();
                 Template template = TemplateManager.getInstance(project).createTemplate("", "");
                 template.addTextSegment(", [");
+                boolean addComma = false;
                 for (String param : params) {
                     String variableName = "$" + param.toUpperCase() + "$";
-                    template.addVariable(variableName, "", "\"$" + param + "\"", true);
+                    if (addComma) {
+                        template.addTextSegment(", ");
+                    }
                     template.addTextSegment("'" + param + "' => ");
+                    template.addVariable(variableName, "", "\"$" + param + "\"", true);
                     template.addVariableSegment(variableName);
+                    addComma = true;
                 }
                 template.addTextSegment("]");
                 int offset = parameterList.getParameters()[0].getTextRange().getEndOffset();
