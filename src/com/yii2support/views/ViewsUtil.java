@@ -59,13 +59,18 @@ public class ViewsUtil {
         for (Variable variable : viewVariables) {
             String variableName = variable.getName();
             if (variable.isDeclaration()) {
-                if (!declaredVariables.contains(variableName)) {
-                    declaredVariables.add(variableName);
-                }
+                declaredVariables.add(variableName);
             } else {
                 if (!ignoredVariables.contains(variableName)) {
-                    if (!allVariables.contains(variableName) && psiFile.getUseScope().equals(variable.getUseScope())) {
-                        allVariables.add(variableName);
+                    if (psiFile.getUseScope().equals(variable.getUseScope())) {
+                        if (variable.getParent() instanceof StringLiteralExpression) {
+                            Variable inlineVariable = PsiTreeUtil.findChildOfType(variable, Variable.class);
+                            if (inlineVariable != null) {
+                                allVariables.add(inlineVariable.getName());
+                            }
+                        } else {
+                            allVariables.add(variableName);
+                        }
                     }
                 }
             }
