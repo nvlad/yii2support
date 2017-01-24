@@ -104,11 +104,13 @@ final public class UnusedParameterInspection extends PhpInspection {
                     }
                 } else {
                     if (parameters.length > 1) {
-                        String errorUnusedParameters = "This View does not use parameters";
-                        UnusedParametersLocalQuickFix fix = new UnusedParametersLocalQuickFix();
-                        problemsHolder.registerProblem(parameters[1], errorUnusedParameters, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
-                        if (isOnTheFly) {
-                            problemsHolder.registerProblem(reference, errorUnusedParameters, ProblemHighlightType.INFORMATION, fix);
+                        if (parameters[1] instanceof ArrayCreationExpression || parameters[1] instanceof FunctionReference) {
+                            String errorUnusedParameters = "This View does not use parameters";
+                            UnusedParametersLocalQuickFix fix = new UnusedParametersLocalQuickFix();
+                            problemsHolder.registerProblem(parameters[1], errorUnusedParameters, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);
+                            if (isOnTheFly) {
+                                problemsHolder.registerProblem(reference, errorUnusedParameters, ProblemHighlightType.INFORMATION, fix);
+                            }
                         }
                     }
                 }
