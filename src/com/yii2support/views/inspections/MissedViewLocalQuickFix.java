@@ -31,7 +31,7 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
     @NotNull
     @Override
     public String getName() {
-        return "Create view for '%name%'".replace("%name%", myName);
+        return "Create view for \"%name%\"".replace("%name%", myName);
     }
 
     @Nls

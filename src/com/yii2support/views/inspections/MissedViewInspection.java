@@ -34,8 +34,8 @@ final public class MissedViewInspection extends PhpInspection {
                         if (ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
                             PsiFile file = ViewsUtil.getViewFile(pathParameter);
                             if (file == null || !file.isValid()) {
-                                String path = pathParameter.getText();
-                                final String errorViewNotFoundTemplate = "View file for %name% not found.";
+                                String path = ((StringLiteralExpression) pathParameter).getContents();
+                                final String errorViewNotFoundTemplate = "View file for \"%name%\" not found.";
                                 final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(path);
                                 final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", path);
                                 final PsiElement stringPart = pathParameter.findElementAt(1);
