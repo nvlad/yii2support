@@ -40,8 +40,8 @@ public class ViewsUtil {
     @NotNull
     private static ArrayList<String> getPhpViewVariables(PsiFile psiFile) {
         final ArrayList<String> result = new ArrayList<>();
-        final ArrayList<String> allVariables = new ArrayList<>();
-        final ArrayList<String> declaredVariables = new ArrayList<>();
+        final HashSet<String> allVariables = new HashSet<>();
+        final HashSet<String> declaredVariables = new HashSet<>();
         final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
 
         for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
