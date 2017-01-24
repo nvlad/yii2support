@@ -122,7 +122,6 @@ public class ViewsUtil {
             reference.putUserData(RENDER_VIEW_FILE, null);
             reference.putUserData(VIEW_VARIABLES, null);
             reference.putUserData(VIEW_FILE_MODIFIED, null);
-            return null;
         }
 
         PsiFile file = reference.getUserData(RENDER_VIEW_FILE);
