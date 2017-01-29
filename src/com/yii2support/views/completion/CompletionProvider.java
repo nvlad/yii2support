@@ -49,7 +49,7 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         while (input.contains("/") && directory != null) {
             String subdirectory = input.substring(0, input.indexOf('/'));
             input = input.substring(input.indexOf('/') + 1);
-            directory = directory.findSubdirectory(subdirectory);
+            directory = subdirectory.equals("..") ? directory.getParent() : directory.findSubdirectory(subdirectory);
         }
 
         if (directory != null) {

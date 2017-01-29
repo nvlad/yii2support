@@ -160,7 +160,8 @@ public class ViewsUtil {
                 }
 
                 while (path.contains("/") && directory != null) {
-                    directory = directory.findSubdirectory(path.substring(0, path.indexOf('/')));
+                    final String dirName = path.substring(0, path.indexOf('/'));
+                    directory = dirName.equals("..") ? directory.getParent() : directory.findSubdirectory(dirName);
                     path = path.substring(path.indexOf('/') + 1);
                 }
 
