@@ -39,7 +39,6 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-
         return PlatformPatterns.psiElement()
                 .withSuperParent(3, Patterns.methodWithName(ViewsUtil.renderMethods));
     }
