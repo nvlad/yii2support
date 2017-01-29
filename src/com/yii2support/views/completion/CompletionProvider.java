@@ -34,21 +34,21 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             return;
         }
 
-        String input = getValue(method.getParameters()[0]);
+        String path = getValue(method.getParameters()[0]);
         PsiDirectory directory;
-        if (input.startsWith("/")) {
-            input = input.substring(1);
+        if (path.startsWith("/")) {
+            path = path.substring(1);
             directory = ViewsUtil.getRootDirectory(psiElement);
         } else {
             directory = ViewsUtil.getContextDirectory(psiElement);
         }
-        if (input.contains("/")) {
-            input = input.substring(0, input.lastIndexOf('/') + 1);
+        if (path.contains("/")) {
+            path = path.substring(0, path.lastIndexOf('/') + 1);
         }
 
-        while (input.contains("/") && directory != null) {
-            String subdirectory = input.substring(0, input.indexOf('/'));
-            input = input.substring(input.indexOf('/') + 1);
+        while (path.contains("/") && directory != null) {
+            String subdirectory = path.substring(0, path.indexOf('/'));
+            path = path.substring(path.indexOf('/') + 1);
             directory = subdirectory.equals("..") ? directory.getParent() : directory.findSubdirectory(subdirectory);
         }
 
