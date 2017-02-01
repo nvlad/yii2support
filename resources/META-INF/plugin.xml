@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.3</version>
+    <version>0.3.9.7</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -9,14 +9,29 @@
       <br/>
       <strong>Features</strong>
       <ul>
-        <li>Views (autocomplete, jump to view)</li>
-        <li>i18n (autocomplete, generate params array)</li>
+        <li>
+            Views<br/>
+            - View files completion<br/>
+            - Add View parameters after completion<br/>
+            - Inspection missed View files<br/>
+            - QuickFix for missed files<br/>
+            - Jump to View file (go to declaration)<br/>
+            - Inspection by required & unused parameters for View render<br/>
+            - QuickFix for required & unused parameters<br/>
+        </li>
+        <li>i18n (completion, generate params array)</li>
       </ul>
     ]]></description>
 
     <change-notes><![CDATA[
       <ul>
-        <li>Fix show autocompletion popup</li>
+        <li>Refactor work with Views</li>
+        <li>Support View in Widgets</li>
+        <li>Split missed view file & missed parameters inspections</li>
+        <li>Fixed false-positive .twig & .tpl View files as missed</li>
+        <li>Fixed adding SUPERGLOBAL variables in render parameters</li>
+        <li>Fixed variables in strings return empty name</li>
+        <li>Fix using ".." in View path</li>
       </ul>
     ]]>
     </change-notes>
@@ -33,9 +48,29 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <completion.contributor language="PHP" implementationClass="com.yii2support.views.CompletionContributor"/>
-        <psi.referenceContributor language="PHP" implementation="com.yii2support.views.PsiReferenceContributor"/>
+        <!-- Views -->
+        <completion.contributor language="PHP" implementationClass="com.yii2support.views.completion.CompletionContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.yii2support.views.references.PsiReferenceContributor"/>
+        <localInspection language="PHP" shortName="MissedViewInspection"
+                         displayName="Missing View file"
+                         groupName="Views" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.yii2support.views.inspections.MissedViewInspection"/>
+        <localInspection language="PHP" shortName="RequireParameterInspection"
+                         displayName="Require parameters"
+                         groupName="Views" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.yii2support.views.inspections.RequireParameterInspection"/>
+        <localInspection language="PHP" shortName="UnusedParameterInspection"
+                         displayName="Unused parameters"
+                         groupName="Views" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.yii2support.views.inspections.UnusedParameterInspection"/>
+
+        <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.i18n.CompletionContributor"/>
+
+        <!-- Component -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.components.ComponentConfigCompletionContributor"/>
     </extensions>
 

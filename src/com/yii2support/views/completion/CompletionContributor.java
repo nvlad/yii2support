@@ -1,12 +1,16 @@
-package com.yii2support.views;
+package com.yii2support.views.completion;
 
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.ArrayUtil;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.yii2support.common.Patterns;
+import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,12 +23,15 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
 
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-        if (typeChar == '\'' || typeChar == '"') {
-            if (position instanceof LeafPsiElement && position.getText().equals("$view")) {
-                return true;
-            }
-            if (position.getNextSibling() instanceof ParameterList) {
-                return true;
+        MethodReference reference = PsiTreeUtil.getParentOfType(position, MethodReference.class);
+        if (reference != null && ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
+            if (typeChar == '\'' || typeChar == '"') {
+                if (position instanceof LeafPsiElement && position.getText().equals("$view")) {
+                    return true;
+                }
+                if (position.getNextSibling() instanceof ParameterList) {
+                    return true;
+                }
             }
         }
 
@@ -32,8 +39,7 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-
         return PlatformPatterns.psiElement()
-                .withSuperParent(3, Patterns.methodWithName("render", "renderAjax", "renderPartial"));
+                .withSuperParent(3, Patterns.methodWithName(ViewsUtil.renderMethods));
     }
 }

@@ -1,4 +1,4 @@
-package com.yii2support.views;
+package com.yii2support.views.completion;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
@@ -10,9 +10,9 @@ import javax.swing.*;
 /**
  * Created by NVlad on 28.12.2016.
  */
-public class DirectoryLookupElement extends LookupElement {
-    private Icon icon;
-    private String name;
+class DirectoryLookupElement extends LookupElement {
+    final private Icon icon;
+    final private String name;
 
     DirectoryLookupElement(PsiDirectory directory) {
         icon = directory.getIcon(0);
