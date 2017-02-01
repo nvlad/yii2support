@@ -63,7 +63,7 @@ public class ViewsUtil {
             } else {
                 if (!ignoredVariables.contains(variableName)) {
                     if (psiFile.getUseScope().equals(variable.getUseScope())) {
-                        if (variable.getParent() instanceof StringLiteralExpression) {
+                        if (variable.getName().equals("") && variable.getParent() instanceof StringLiteralExpression) {
                             Variable inlineVariable = PsiTreeUtil.findChildOfType(variable, Variable.class);
                             if (inlineVariable != null) {
                                 allVariables.add(inlineVariable.getName());
