@@ -1,4 +1,4 @@
-package com.yii2support.views;
+package com.yii2support.views.inspections;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -10,6 +10,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,10 +20,10 @@ import java.util.Properties;
 /**
  * Created by NVlad on 15.01.2017.
  */
-class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
+class MissedViewLocalQuickFix implements LocalQuickFix {
     final private String myName;
 
-    RenderMethodViewNotFoundLocalQuickFix(String name) {
+    MissedViewLocalQuickFix(String name) {
         myName = name;
     }
 
@@ -30,7 +31,7 @@ class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
     @NotNull
     @Override
     public String getName() {
-        return "Create view for '%name%'".replace("%name%", myName);
+        return "Create view for \"%name%\"".replace("%name%", myName);
     }
 
     @Nls
@@ -42,18 +43,42 @@ class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-        final PsiElement psiElement = descriptor.getPsiElement().getParent();
-        final PsiFile psiFile = psiElement.getContainingFile().getOriginalFile();
-        final PsiDirectory psiDirectory = ViewsUtil.getViewsPsiDirectory(psiFile, psiElement);
-        if (psiDirectory != null) {
-            String filename = ((StringLiteralExpression) psiElement).getContents();
-            if (filename.contains("/")) {
-                filename = filename.substring(filename.lastIndexOf('/') + 1);
+        final PsiElement element = descriptor.getPsiElement().getParent();
+        PsiDirectory directory;
+        String path = null;
+
+        if (element instanceof StringLiteralExpression) {
+            path = ((StringLiteralExpression) element).getContents();
+        }
+
+        if (path == null) {
+            return;
+        }
+
+        if (path.startsWith("/")) {
+            directory = ViewsUtil.getRootDirectory(element);
+            path = path.substring(1);
+        } else {
+            directory = ViewsUtil.getContextDirectory(element);
+        }
+
+        if (directory == null) {
+            return;
+        }
+
+        while (directory != null && path.contains("/")) {
+            final String subdirectory = path.substring(0, path.indexOf('/'));
+            path = path.substring(path.indexOf('/') + 1);
+
+            directory = directory.findSubdirectory(subdirectory);
+        }
+
+        if (directory != null) {
+            if (!path.contains(".")) {
+                path = path + ".php";
             }
-            if (!filename.contains(".")) {
-                filename += ".php";
-            }
-            final PsiFile viewPsiFile = psiDirectory.createFile(filename);
+
+            final PsiFile viewPsiFile = directory.createFile(path);
             FileEditorManager.getInstance(project).openFile(viewPsiFile.getVirtualFile(), true);
 
             final FileTemplate[] templates = FileTemplateManager.getDefaultInstance().getTemplates(FileTemplateManager.DEFAULT_TEMPLATES_CATEGORY);
@@ -64,6 +89,7 @@ class RenderMethodViewNotFoundLocalQuickFix implements LocalQuickFix {
                     break;
                 }
             }
+
             if (template != null && viewPsiFile.getViewProvider().getDocument() != null) {
                 final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
                 template.setLiveTemplateEnabled(true);

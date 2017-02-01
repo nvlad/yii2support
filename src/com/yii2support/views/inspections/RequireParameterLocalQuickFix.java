@@ -1,4 +1,4 @@
-package com.yii2support.views;
+package com.yii2support.views.inspections;
 
 import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
-import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
@@ -24,10 +23,10 @@ import java.util.Collection;
 /**
  * Created by NVlad on 15.01.2017.
  */
-class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
+class RequireParameterLocalQuickFix implements LocalQuickFix {
     final private String[] myVariables;
 
-    RenderMethodRequiredParamsLocalQuickFix(Collection<String> variables) {
+    RequireParameterLocalQuickFix(Collection<String> variables) {
         myVariables = variables.toArray(new String[variables.size()]);
     }
 
@@ -36,17 +35,17 @@ class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
     @Override
     public String getName() {
         if (myVariables.length == 1) {
-            return "Add \"%param%\" param".replace("%param%", myVariables[0]);
+            return "Add \"%param%\" parameter".replace("%param%", myVariables[0]);
         }
 
-        return "Add view param(s)";
+        return "Add View parameter(s)";
     }
 
     @Nls
     @NotNull
     @Override
     public String getFamilyName() {
-        return "Add view param";
+        return "Add View parameter";
     }
 
     @Override
@@ -55,6 +54,7 @@ class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
         if (parameterList == null) {
             return;
         }
+
         PsiElement[] parameters = parameterList.getParameters();
         if (parameters.length == 1) {
             ArrayCreationExpression params = PhpPsiElementFactory.createFromText(project, ArrayCreationExpression.class, "[]");
@@ -72,13 +72,16 @@ class RenderMethodRequiredParamsLocalQuickFix implements LocalQuickFix {
             return;
         }
 
-        if (parameters[1].getNode().getElementType() == PhpElementTypes.FUNCTION_CALL) {
+        if (parameters[1] instanceof FunctionReference) {
             FunctionReference functionReference = (FunctionReference) parameters[1];
+            if (functionReference.getName() == null || !functionReference.getName().equals("compact")) {
+                return;
+            }
+
             Template template = templateManager.createTemplate("", "");
             template.setToReformat(true);
 
             Boolean firstElement = functionReference.getParameters().length == 0;
-
             for (String variable : myVariables) {
                 template.addTextSegment(firstElement ? "'" : ", '");
                 String var = "$" + variable.toUpperCase() + "$";
