@@ -4,8 +4,11 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +52,7 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
             }
 
             PsiDirectory dir = file.getContainingDirectory();
-            while (dir != null && !dir.equals(root)) {
+            while (dir != null && !(dir.equals(root) || dir.equals(context))) {
                 fileName = dir.getName() + "/" + fileName;
                 dir = dir.getParent();
             }
@@ -64,6 +67,13 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
         if (newValue != null) {
             string.replace(newValue);
         }
+
+        for (MethodReference reference : PsiTreeUtil.findChildrenOfType(file, MethodReference.class)) {
+            if (reference.getName() != null && ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
+                reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, null);
+            }
+        }
+
         return newValue;
     }
 }
