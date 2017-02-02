@@ -32,9 +32,13 @@ final public class MissedViewInspection extends PhpInspection {
                     if (reference.getParameters().length > 0) {
                         PsiElement pathParameter = reference.getParameters()[0];
                         if (pathParameter instanceof StringLiteralExpression) {
+                            String path = ((StringLiteralExpression) pathParameter).getContents();
+                            if (path.startsWith("//") || path.startsWith("@")) {
+                                return;
+                            }
+
                             PsiFile file = ViewsUtil.getViewFile(pathParameter);
                             if (file == null || !file.isValid()) {
-                                String path = ((StringLiteralExpression) pathParameter).getContents();
                                 final String errorViewNotFoundTemplate = "View file for \"%name%\" not found.";
                                 final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(path);
                                 final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", path);
