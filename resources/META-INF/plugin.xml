@@ -51,6 +51,7 @@
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.yii2support.views.references.PsiReferenceContributor"/>
+        <renamePsiElementProcessor implementation="com.yii2support.views.refactor.RenameViewProcessor"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
