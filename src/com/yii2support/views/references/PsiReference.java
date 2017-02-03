@@ -57,7 +57,11 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
                 dir = dir.getParent();
             }
 
-            if (dir != null && dir.equals(root)) {
+            if (dir == null) {
+                return null;
+            }
+
+            if (dir.equals(root)) {
                 fileName = "/" + fileName;
             }
         }
