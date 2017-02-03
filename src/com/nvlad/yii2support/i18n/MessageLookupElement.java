@@ -1,4 +1,4 @@
-package com.yii2support.i18n;
+package com.nvlad.yii2support.i18n;
 
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.AutoCompletionPolicy;

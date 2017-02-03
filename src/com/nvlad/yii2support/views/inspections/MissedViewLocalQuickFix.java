@@ -1,4 +1,4 @@
-package com.yii2support.views.inspections;
+package com.nvlad.yii2support.views.inspections;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -10,7 +10,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 

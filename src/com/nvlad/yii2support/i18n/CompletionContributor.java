@@ -1,4 +1,4 @@
-package com.yii2support.i18n;
+package com.nvlad.yii2support.i18n;
 
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.ElementPattern;
@@ -9,7 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.yii2support.common.Patterns;
+import com.nvlad.yii2support.common.Patterns;
 import org.jetbrains.annotations.NotNull;
 
 /**

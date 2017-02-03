@@ -1,4 +1,4 @@
-package com.yii2support.common;
+package com.nvlad.yii2support.common;
 
 import com.intellij.patterns.InitialPatternCondition;
 import com.intellij.patterns.PlatformPatterns;

@@ -1,11 +1,11 @@
-package com.yii2support.views.references;
+package com.nvlad.yii2support.views.references;
 
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceRegistrar;
-import com.yii2support.common.Patterns;
-import com.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.common.Patterns;
+import com.nvlad.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**

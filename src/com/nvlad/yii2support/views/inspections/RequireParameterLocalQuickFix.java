@@ -1,4 +1,4 @@
-package com.yii2support.views.inspections;
+package com.nvlad.yii2support.views.inspections;
 
 import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;

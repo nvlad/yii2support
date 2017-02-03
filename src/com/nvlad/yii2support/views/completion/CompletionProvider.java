@@ -1,4 +1,4 @@
-package com.yii2support.views.completion;
+package com.nvlad.yii2support.views.completion;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -10,7 +10,7 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**

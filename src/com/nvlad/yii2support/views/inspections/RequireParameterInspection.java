@@ -1,4 +1,4 @@
-package com.yii2support.views.inspections;
+package com.nvlad.yii2support.views.inspections;
 
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
@@ -11,8 +11,8 @@ import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.yii2support.common.PhpUtil;
-import com.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.common.PhpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

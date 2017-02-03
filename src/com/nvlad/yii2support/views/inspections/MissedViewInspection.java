@@ -1,4 +1,4 @@
-package com.yii2support.views.inspections;
+package com.nvlad.yii2support.views.inspections;
 
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
@@ -9,7 +9,7 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,13 +28,17 @@ final public class MissedViewInspection extends PhpInspection {
         return new PhpElementVisitor() {
             @Override
             public void visitPhpMethodReference(MethodReference reference) {
-                if (reference.getParameters().length > 0) {
-                    PsiElement pathParameter = reference.getParameters()[0];
-                    if (pathParameter instanceof StringLiteralExpression) {
-                        if (ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
+                if (ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
+                    if (reference.getParameters().length > 0) {
+                        PsiElement pathParameter = reference.getParameters()[0];
+                        if (pathParameter instanceof StringLiteralExpression) {
+                            String path = ((StringLiteralExpression) pathParameter).getContents();
+                            if (path.startsWith("//") || path.startsWith("@")) {
+                                return;
+                            }
+
                             PsiFile file = ViewsUtil.getViewFile(pathParameter);
                             if (file == null || !file.isValid()) {
-                                String path = ((StringLiteralExpression) pathParameter).getContents();
                                 final String errorViewNotFoundTemplate = "View file for \"%name%\" not found.";
                                 final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(path);
                                 final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", path);

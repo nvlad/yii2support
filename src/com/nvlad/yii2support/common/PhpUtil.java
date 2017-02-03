@@ -1,4 +1,4 @@
-package com.yii2support.common;
+package com.nvlad.yii2support.common;
 
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;

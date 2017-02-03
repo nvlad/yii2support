@@ -1,4 +1,4 @@
-package com.yii2support.views.completion;
+package com.nvlad.yii2support.views.completion;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;

@@ -1,4 +1,4 @@
-package com.yii2support.common;
+package com.nvlad.yii2support.common;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
