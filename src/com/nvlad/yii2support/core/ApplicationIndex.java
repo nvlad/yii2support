@@ -1,11 +1,10 @@
-package com.yii2support.core;
+package com.nvlad.yii2support.core;
 
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
-import com.jetbrains.php.lang.psi.PhpFile;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +27,7 @@ public class ApplicationIndex extends FileBasedIndexExtension {
     public FileBasedIndex.InputFilter getInputFilter() {
         return file -> {
 
-            if ( file.getFileType() == PhpFileType.INSTANCE) {
+            if (file.getFileType() == PhpFileType.INSTANCE) {
                 return file.getPath().endsWith("/web/index.php");
             }
 

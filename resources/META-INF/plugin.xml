@@ -46,7 +46,7 @@
 
     <project-components>
         <component>
-            <implementation-class>com.yii2support.YiiProject</implementation-class>
+            <implementation-class>com.nvlad.yii2support.YiiProject</implementation-class>
             <option name="workspace" value="true" />
             <loadForDefaultProject/>
         </component>

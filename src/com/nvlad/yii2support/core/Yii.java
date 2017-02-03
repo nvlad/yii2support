@@ -1,20 +1,14 @@
-package com.yii2support.core;
+package com.nvlad.yii2support.core;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.PhpPsiUtil;
-import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpReference;
-import com.jetbrains.php.lang.psi.stubs.PhpClassStub;
-import com.yii2support.common.PhpUtil;
+import com.nvlad.yii2support.common.PhpUtil;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,6 +20,7 @@ import java.util.Set;
  */
 public class Yii {
     static HashSet<Application> applications;
+
     public static Set<Application> applications(Project project) {
         if (applications == null) {
             applications = new HashSet<>();

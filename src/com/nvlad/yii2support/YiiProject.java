@@ -1,9 +1,9 @@
-package com.yii2support;
+package com.nvlad.yii2support;
 
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.yii2support.core.Yii;
+import com.nvlad.yii2support.core.Yii;
 import org.jetbrains.annotations.NotNull;
 
 /**
