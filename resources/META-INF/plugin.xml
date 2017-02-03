@@ -44,7 +44,19 @@
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
 
+    <project-components>
+        <component>
+            <implementation-class>com.yii2support.YiiProject</implementation-class>
+            <option name="workspace" value="true" />
+            <loadForDefaultProject/>
+        </component>
+    </project-components>
+
     <extensions defaultExtensionNs="com.intellij">
+        <!-- Application
+        <fileBasedIndex implementation="com.yii2support.core.ApplicationIndex"/>
+         -->
+
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.yii2support.views.references.PsiReferenceContributor"/>

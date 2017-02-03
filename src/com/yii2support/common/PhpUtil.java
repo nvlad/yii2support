@@ -1,9 +1,8 @@
 package com.yii2support.common;
 
-import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,5 +24,27 @@ public class PhpUtil {
         }
 
         return result;
+    }
+
+    @Nullable
+    public static PhpClass getPhpClass(PhpPsiElement phpPsiElement) {
+        while (phpPsiElement != null) {
+            if (phpPsiElement instanceof ClassReference) {
+                return (PhpClass) ((ClassReference) phpPsiElement).resolve();
+            }
+            if (phpPsiElement instanceof NewExpression) {
+                ClassReference classReference = ((NewExpression) phpPsiElement).getClassReference();
+                if (classReference != null) {
+                    PhpPsiElement resolve = (PhpPsiElement) classReference.resolve();
+                    if (resolve instanceof PhpClass) {
+                        return (PhpClass) resolve;
+                    }
+                }
+            }
+
+            phpPsiElement = (PhpPsiElement) phpPsiElement.getParent();
+        }
+
+        return null;
     }
 }
