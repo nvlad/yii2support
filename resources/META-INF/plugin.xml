@@ -16,8 +16,8 @@
             - Inspection missed View files<br/>
             - QuickFix for missed files<br/>
             - Jump to View file (go to declaration)<br/>
-            - Inspection by required & unused parameters for View render<br/>
-            - QuickFix for required & unused parameters<br/>
+            - Inspection by required &amp; unused parameters for View render<br/>
+            - QuickFix for required &amp; unused parameters<br/>
             - Update path to View file on file move<br/>
         </li>
         <li>i18n (completion, generate params array)</li>
