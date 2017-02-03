@@ -1,11 +1,11 @@
-package com.yii2support.views;
+package com.yii2support.views.references;
 
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceRegistrar;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.yii2support.common.Patterns;
+import com.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,7 +19,6 @@ public class PsiReferenceContributor extends com.intellij.psi.PsiReferenceContri
 
     private static ElementPattern<PsiElement> ElementPattern() {
         return PlatformPatterns.psiElement(PsiElement.class)
-                .withParent(PlatformPatterns.psiElement(ParameterList.class)
-                        .withParent(PlatformPatterns.psiElement(MethodReference.class)));
+                .withSuperParent(2, Patterns.methodWithName(ViewsUtil.renderMethods));
     }
 }

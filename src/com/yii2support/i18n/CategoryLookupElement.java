@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by NVlad on 06.01.2017.
  */
-public class CategoryLookupElement extends LookupElement {
-    private PsiElement myCategory;
+class CategoryLookupElement extends LookupElement {
+    final private PsiElement myCategory;
 
     CategoryLookupElement(PsiElement category) {
         myCategory = category;
