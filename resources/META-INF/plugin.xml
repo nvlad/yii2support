@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.9.7</version>
+    <version>0.2.10.9</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -18,6 +18,7 @@
             - Jump to View file (go to declaration)<br/>
             - Inspection by required & unused parameters for View render<br/>
             - QuickFix for required & unused parameters<br/>
+            - Update path to View file on file move<br/>
         </li>
         <li>i18n (completion, generate params array)</li>
       </ul>
@@ -25,13 +26,9 @@
 
     <change-notes><![CDATA[
       <ul>
-        <li>Refactor work with Views</li>
-        <li>Support View in Widgets</li>
-        <li>Split missed view file & missed parameters inspections</li>
-        <li>Fixed false-positive .twig & .tpl View files as missed</li>
-        <li>Fixed adding SUPERGLOBAL variables in render parameters</li>
-        <li>Fixed variables in strings return empty name</li>
-        <li>Fix using ".." in View path</li>
+        <li>Update path to View file on file move</li>
+        <li>Fixed replace View path on file rename</li>
+        <li>Fix mark as error view paths started with "//" or "@" (references to files is not work)</li>
       </ul>
     ]]>
     </change-notes>
@@ -51,6 +48,7 @@
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.yii2support.views.references.PsiReferenceContributor"/>
+        <renamePsiElementProcessor implementation="com.yii2support.views.refactor.RenameViewProcessor"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
