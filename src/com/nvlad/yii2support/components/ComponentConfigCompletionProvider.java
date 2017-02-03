@@ -1,4 +1,4 @@
-package com.yii2support.components;
+package com.nvlad.yii2support.components;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;

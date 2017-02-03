@@ -69,7 +69,7 @@
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
 
         <!-- Component -->
-        <completion.contributor language="PHP" implementationClass="com.yii2support.components.ComponentConfigCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.components.ComponentConfigCompletionContributor"/>
     </extensions>
 
     <actions>

@@ -1,4 +1,4 @@
-package com.yii2support.components;
+package com.nvlad.yii2support.components;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.NewExpression;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.yii2support.common.Patterns;
+import com.nvlad.yii2support.common.Patterns;
 import org.jetbrains.annotations.NotNull;
 
 /**

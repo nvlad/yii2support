@@ -1,4 +1,4 @@
-package com.yii2support.components;
+package com.nvlad.yii2support.components;
 
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;

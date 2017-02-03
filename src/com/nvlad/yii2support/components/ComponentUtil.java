@@ -1,4 +1,4 @@
-package com.yii2support.components;
+package com.nvlad.yii2support.components;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
