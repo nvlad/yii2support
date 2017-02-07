@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.10.10</version>
+    <version>0.2.10.11</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -26,7 +26,8 @@
 
     <change-notes><![CDATA[
       <ul>
-        <li>Fix work with variables used in closures</li>
+        <li>Fix variables used in closures mark as unused</li>
+        <li>Fix parameter declared with name identical variable in function scope mark as unused</li>
       </ul>
     ]]>
     </change-notes>

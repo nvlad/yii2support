@@ -5,6 +5,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpFile;
@@ -56,13 +57,14 @@ public class ViewsUtil {
             }
         }
 
+        final SearchScope fileScope = psiFile.getUseScope();
         for (Variable variable : viewVariables) {
             String variableName = variable.getName();
-            if (variable.isDeclaration() && !(variable.getParent() instanceof PhpUseList)) {
+            if (variable.isDeclaration() && fileScope.equals(variable.getUseScope()) && !(variable.getParent() instanceof PhpUseList)) {
                 declaredVariables.add(variableName);
             } else {
                 if (!ignoredVariables.contains(variableName)) {
-                    if (psiFile.getUseScope().equals(variable.getUseScope()) || variable.getParent() instanceof PhpUseList) {
+                    if (fileScope.equals(variable.getUseScope()) || variable.getParent() instanceof PhpUseList) {
                         if (variable.getName().equals("") && variable.getParent() instanceof StringLiteralExpression) {
                             Variable inlineVariable = PsiTreeUtil.findChildOfType(variable, Variable.class);
                             if (inlineVariable != null) {
