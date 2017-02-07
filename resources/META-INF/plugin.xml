@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.10.9</version>
+    <version>0.2.10.10</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -26,9 +26,7 @@
 
     <change-notes><![CDATA[
       <ul>
-        <li>Update path to View file on file move</li>
-        <li>Fixed replace View path on file rename</li>
-        <li>Fix mark as error view paths started with "//" or "@" (references to files is not work)</li>
+        <li>Fix work with variables used in closures</li>
       </ul>
     ]]>
     </change-notes>

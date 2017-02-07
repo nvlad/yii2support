@@ -58,11 +58,11 @@ public class ViewsUtil {
 
         for (Variable variable : viewVariables) {
             String variableName = variable.getName();
-            if (variable.isDeclaration()) {
+            if (variable.isDeclaration() && !(variable.getParent() instanceof PhpUseList)) {
                 declaredVariables.add(variableName);
             } else {
                 if (!ignoredVariables.contains(variableName)) {
-                    if (psiFile.getUseScope().equals(variable.getUseScope())) {
+                    if (psiFile.getUseScope().equals(variable.getUseScope()) || variable.getParent() instanceof PhpUseList) {
                         if (variable.getName().equals("") && variable.getParent() instanceof StringLiteralExpression) {
                             Variable inlineVariable = PsiTreeUtil.findChildOfType(variable, Variable.class);
                             if (inlineVariable != null) {
