@@ -45,6 +45,12 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!-- Framework Support -->
+        <!--
+        <framework.type implementation="com.nvlad.yii2support.framework.Yii2FrameworkType"/>
+        -->
+        <framework.detector implementation="com.nvlad.yii2support.framework.Yii2FrameworkDetector"/>
+
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
