@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.objectfactory.completion;
+package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.util.ProcessingContext;
