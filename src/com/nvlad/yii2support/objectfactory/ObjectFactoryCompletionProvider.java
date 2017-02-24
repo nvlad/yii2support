@@ -28,28 +28,5 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
 
         }
 
-        /*
-        NewExpression newExpression = ObjectFactoryUtil.configForNewExpression(element);
-        if (newExpression != null) {
-            PhpClass phpClass = ObjectFactoryUtil.getPhpClass(newExpression);
-            if (phpClass != null) {
-                Method constructor = phpClass.getConstructor();
-                ParameterList parameterList = newExpression.getParameterList();
-                if (constructor != null && parameterList != null) {
-                    int paramIndex = ObjectFactoryUtil.paramIndexForElement(element);
-
-                    if (paramIndex != -1) {
-                        Parameter[] parameters = constructor.getParameters();
-
-                        if (paramIndex < parameters.length && parameters[paramIndex].getName().equals("config")) {
-                            for (Field field : ObjectFactoryUtil.getClassFields(phpClass)) {
-                                completionResultSet.addElement(new ObjectFactoryFieldLookupElement(element, field));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        */
     }
 }
