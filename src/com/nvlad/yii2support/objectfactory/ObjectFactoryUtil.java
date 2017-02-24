@@ -2,6 +2,7 @@ package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.patterns.PhpPatterns;
@@ -76,7 +77,9 @@ class ObjectFactoryUtil {
                     }
                     if (value instanceof StringLiteralExpression) {
                         StringLiteralExpression str = (StringLiteralExpression)value;
-                        className = str.getContents();
+                        PhpIndex phpIndex = PhpIndex.getInstance(child.getProject());
+                        PhpClass classRef = getClass(phpIndex, str.getContents());
+                        return classRef;
                     }
 
                 }
@@ -86,16 +89,22 @@ class ObjectFactoryUtil {
        return null;
     }
 
-    static PhpClass findClass(String str) {
-        return null;
+    @Nullable
+    static public PhpClass getClass(PhpIndex phpIndex, String className) {
+        Collection<PhpClass> classes = phpIndex.getClassesByFQN(className);
+        return classes.isEmpty() ? null : classes.iterator().next();
     }
 
-    @Nullable
+     @Nullable
     static PhpClass getPhpClass(PhpPsiElement phpPsiElement) {
         while (phpPsiElement != null) {
+            if (phpPsiElement instanceof ClassConstantReference) {
+                phpPsiElement = ((ClassConstantReference) phpPsiElement).getClassReference();
+            }
             if (phpPsiElement instanceof ClassReference) {
                 return (PhpClass) ((ClassReference) phpPsiElement).resolve();
             }
+
             if (phpPsiElement instanceof NewExpression) {
                 ClassReference classReference = ((NewExpression) phpPsiElement).getClassReference();
                 if (classReference != null) {
