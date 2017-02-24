@@ -19,32 +19,6 @@ import java.util.HashSet;
  * Created by NVlad on 11.01.2017.
  */
 class ObjectFactoryUtil {
-    @Nullable
-    static NewExpression configForNewExpression(PsiElement psiElement) {
-        if (psiElement instanceof NewExpression) {
-            return (NewExpression) psiElement;
-        }
-
-        PsiElement parent = psiElement.getParent();
-        if (parent != null) {
-            return configForNewExpression(parent);
-        }
-
-        return null;
-    }
-
-    static int paramIndexForElement(PsiElement psiElement) {
-        PsiElement parent = psiElement.getParent();
-        if (parent == null) {
-            return -1;
-        }
-
-        if (parent instanceof ParameterList) {
-            return ArrayUtil.indexOf(((ParameterList) parent).getParameters(), psiElement);
-        }
-
-        return paramIndexForElement(parent);
-    }
 
     @Nullable
     static public PhpClass findClassByArray(@NotNull ArrayCreationExpression arrayCreationExpression) {
