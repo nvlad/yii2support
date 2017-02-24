@@ -37,10 +37,10 @@ class ObjectFactoryUtil {
                     key = child.getText();
                 }
 
-                if (key.endsWith("class")) {
+                if (key.equals("class")) {
                     String className = "";
                     PhpPsiElement value = arrayHashElement.getValue();
-                    if (value instanceof MethodReference && value.getName().endsWith("className")) {
+                    if (value instanceof MethodReference && value.getName().equals("className")) {
                         MethodReference methodRef = (MethodReference) value;
                         return getPhpClass(methodRef.getClassReference());
 
