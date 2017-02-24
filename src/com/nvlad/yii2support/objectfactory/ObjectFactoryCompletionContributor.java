@@ -11,9 +11,6 @@ import com.jetbrains.php.lang.psi.elements.impl.ArrayCreationExpressionImpl;
 import com.nvlad.yii2support.common.Patterns;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Created by oleg on 16.02.2017.
- */
 public class ObjectFactoryCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     public ObjectFactoryCompletionContributor() {
         extend(CompletionType.BASIC, ElementPattern(), new ObjectFactoryCompletionProvider());
