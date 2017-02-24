@@ -29,7 +29,6 @@ public class ObjectFactoryCompletionContributor extends com.intellij.codeInsight
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-        return PlatformPatterns.psiElement()
-                .withSuperParent(3, Patterns.arrayCreation());
+        return PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class);
     }
 }

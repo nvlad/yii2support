@@ -3,16 +3,21 @@ package com.nvlad.yii2support.objectfactory;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.patterns.PhpPatterns;
 import com.jetbrains.php.lang.psi.elements.*;
+import org.apache.commons.lang.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by NVlad on 11.01.2017.
  */
-class ComponentUtil {
+class ObjectFactoryUtil {
     @Nullable
     static NewExpression configForNewExpression(PsiElement psiElement) {
         if (psiElement instanceof NewExpression) {
@@ -40,6 +45,50 @@ class ComponentUtil {
         return paramIndexForElement(parent);
     }
 
+    @Nullable
+    static public PhpClass findClassByArray(@NotNull ArrayCreationExpression arrayCreationExpression) {
+        HashMap<String, String> keys = new HashMap<>();
+
+        for(ArrayHashElement arrayHashElement: arrayCreationExpression.getHashElements()) {
+            PhpPsiElement child = arrayHashElement.getKey();
+            if(child != null && ((child instanceof StringLiteralExpression))) {
+
+
+
+                String key;
+                if(child instanceof StringLiteralExpression) {
+                    key = ((StringLiteralExpression) child).getContents();
+                } else {
+                    key = child.getText();
+                }
+
+                if (key.endsWith("class")) {
+                    String className = "";
+                    PhpPsiElement value = arrayHashElement.getValue();
+                    if (value instanceof MethodReference && value.getName().endsWith("className")) {
+                        MethodReference methodRef = (MethodReference) value;
+                        return getPhpClass(methodRef.getClassReference());
+
+                    }
+                    if (value instanceof ClassConstantReference) {
+                        ClassConstantReference classRef = (ClassConstantReference) value;
+                        return getPhpClass(classRef);
+                    }
+                    if (value instanceof StringLiteralExpression) {
+                        StringLiteralExpression str = (StringLiteralExpression)value;
+                        className = str.getContents();
+                    }
+
+                }
+            }
+        }
+
+       return null;
+    }
+
+    static PhpClass findClass(String str) {
+        return null;
+    }
 
     @Nullable
     static PhpClass getPhpClass(PhpPsiElement phpPsiElement) {
