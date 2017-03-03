@@ -58,7 +58,7 @@ public class ObjectFactoryFieldLookupElement extends LookupElement {
         Document document = context.getDocument();
         int insertPosition = context.getSelectionEndOffset();
 
-        if (myElement.getParent().getParent() instanceof ArrayCreationExpression) {
+        if (myElement instanceof ArrayCreationExpression) {
             document.insertString(insertPosition + 1, " => ");
             insertPosition += 5;
 

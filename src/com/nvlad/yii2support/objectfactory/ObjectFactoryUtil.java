@@ -7,6 +7,11 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.patterns.PhpPatterns;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.FieldImpl;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import com.jetbrains.php.lang.psi.stubs.PhpFieldElementType;
+import com.jetbrains.php.lang.psi.stubs.PhpFieldStub;
+import com.jetbrains.php.lang.psi.stubs.PhpFieldStubImpl;
 import org.apache.commons.lang.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +24,7 @@ import java.util.HashSet;
  * Created by NVlad on 11.01.2017.
  */
 class ObjectFactoryUtil {
+
 
     @Nullable
     static public PhpClass findClassByArray(@NotNull ArrayCreationExpression arrayCreationExpression) {
@@ -95,6 +101,24 @@ class ObjectFactoryUtil {
         return null;
     }
 
+    static Collection<Method> getClassSetMethods(PhpClass phpClass) {
+        final HashSet<Method> result = new HashSet<>();
+        final Collection<Method> methods = phpClass.getMethods();
+
+
+        for (Method method : methods) {
+            String methodName = method.getName();
+            int pCount =  method.getParameters().length;
+            if (methodName.length() > 3 && methodName.substring(0, 3).equals("set")  && pCount > 0 &&
+                    Character.isUpperCase(methodName.charAt(3))) {
+                result.add(method);
+            }
+        }
+
+        return result;
+
+    }
+
     static Collection<Field> getClassFields(PhpClass phpClass) {
         final HashSet<Field> result = new HashSet<>();
 
@@ -136,6 +160,7 @@ class ObjectFactoryUtil {
 
             result.add(field);
         }
+
 
         return result;
     }
