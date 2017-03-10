@@ -32,6 +32,7 @@ public class ObjectFactoryFieldLookupElement extends LookupElement {
         return myField.getName();
     }
 
+
     @Override
     public void renderElement(LookupElementPresentation presentation) {
         presentation.setIcon(myField.getIcon());

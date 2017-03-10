@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.objectfactory;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
@@ -33,9 +34,6 @@ class ObjectFactoryUtil {
         for(ArrayHashElement arrayHashElement: arrayCreationExpression.getHashElements()) {
             PhpPsiElement child = arrayHashElement.getKey();
             if(child != null && ((child instanceof StringLiteralExpression))) {
-
-
-
                 String key;
                 if(child instanceof StringLiteralExpression) {
                     key = ((StringLiteralExpression) child).getContents();
@@ -43,30 +41,38 @@ class ObjectFactoryUtil {
                     key = child.getText();
                 }
 
+                Project project = child.getProject();
+
                 if (key.equals("class")) {
                     String className = "";
                     PhpPsiElement value = arrayHashElement.getValue();
-                    if (value instanceof MethodReference && value.getName().equals("className")) {
-                        MethodReference methodRef = (MethodReference) value;
-                        return getPhpClass(methodRef.getClassReference());
-
-                    }
-                    if (value instanceof ClassConstantReference) {
-                        ClassConstantReference classRef = (ClassConstantReference) value;
-                        return getPhpClass(classRef);
-                    }
-                    if (value instanceof StringLiteralExpression) {
-                        StringLiteralExpression str = (StringLiteralExpression)value;
-                        PhpIndex phpIndex = PhpIndex.getInstance(child.getProject());
-                        PhpClass classRef = getClass(phpIndex, str.getContents());
-                        return classRef;
-                    }
-
+                    PhpClass methodRef = getPhpClassUniversal(project, value);
+                    if (methodRef != null) return methodRef;
                 }
             }
         }
 
        return null;
+    }
+
+    @Nullable
+    public static PhpClass getPhpClassUniversal(Project project, PhpPsiElement value) {
+        if (value instanceof MethodReference && value.getName().equals("className")) {
+            MethodReference methodRef = (MethodReference) value;
+            return getPhpClass(methodRef.getClassReference());
+
+        }
+        if (value instanceof ClassConstantReference) {
+            ClassConstantReference classRef = (ClassConstantReference) value;
+            return getPhpClass(classRef);
+        }
+        if (value instanceof StringLiteralExpression) {
+            StringLiteralExpression str = (StringLiteralExpression)value;
+            PhpIndex phpIndex = PhpIndex.getInstance(project);
+            PhpClass classRef = getClass(phpIndex, str.getContents());
+            return classRef;
+        }
+        return null;
     }
 
     @Nullable
@@ -94,7 +100,6 @@ class ObjectFactoryUtil {
                     }
                 }
             }
-
             phpPsiElement = (PhpPsiElement) phpPsiElement.getParent();
         }
 
@@ -163,5 +168,25 @@ class ObjectFactoryUtil {
 
 
         return result;
+    }
+
+    static PhpClass getStandardPhpClass(PhpIndex phpIndex, String shortName) {
+        switch (shortName){
+            // web/Application
+            case "request":  return getClass(phpIndex, "\\yii\\web\\Request");
+            case "response":  return getClass(phpIndex, "\\yii\\web\\Response");
+            case "session":  return getClass(phpIndex, "\\yii\\web\\Session");
+            case "user":  return getClass(phpIndex, "\\yii\\web\\User");
+            case "errorHandler":  return getClass(phpIndex, "\\yii\\web\\ErrorHandler");
+            // base/Application
+            case "log":  return getClass(phpIndex, "\\yii\\log\\Dispatcher");
+            case "view":  return getClass(phpIndex, "\\yii\\web\\View");
+            case "formatter":  return getClass(phpIndex, "\\yii\\i18n\\I18N");
+            case "mailer":  return getClass(phpIndex, "\\yii\\swiftmailer\\Mailer");
+            case "urlManager":  return getClass(phpIndex, "\\yii\\web\\UrlManager");
+            case "assetManager":  return getClass(phpIndex, "\\yii\\web\\AssetManager");
+            case "security":  return getClass(phpIndex, "\\yii\\base\\Security");
+        }
+        return null;
     }
 }

@@ -16,6 +16,8 @@ public class ObjectFactoryCompletionContributor extends com.intellij.codeInsight
         extend(CompletionType.BASIC, ElementPattern(), new ObjectFactoryCompletionProvider());
     }
 
+
+
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
         if ((typeChar == '\'' || typeChar == '"') && position.getParent() instanceof ArrayCreationExpression) {
