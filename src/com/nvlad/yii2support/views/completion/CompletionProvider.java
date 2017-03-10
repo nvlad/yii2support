@@ -51,7 +51,6 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             path = path.substring(path.indexOf('/') + 1);
             directory = subdirectory.equals("..") ? directory.getParent() : directory.findSubdirectory(subdirectory);
         }
-
         if (directory != null) {
             if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
                 String prefix = completionResultSet.getPrefixMatcher().getPrefix();
