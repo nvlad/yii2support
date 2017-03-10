@@ -109,7 +109,7 @@ class ObjectFactoryUtil {
         for (Method method : methods) {
             String methodName = method.getName();
             int pCount =  method.getParameters().length;
-            if (methodName.length() > 3 && methodName.substring(0, 3).equals("set")  && pCount > 0 &&
+            if (methodName.startsWith("set")  && pCount == 1 &&
                     Character.isUpperCase(methodName.charAt(3))) {
                 result.add(method);
             }
