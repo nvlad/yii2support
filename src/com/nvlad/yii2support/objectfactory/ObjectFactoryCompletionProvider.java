@@ -32,7 +32,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
                     PhpExpression methodClass = method.getClassReference();
                     if (methodClass != null && methodClass.getName() != null && methodClass.getName().equals("Yii")) {
                         PsiElement[] pList = method.getParameters();
-                        if (pList.length == 2) { //  \Yii::createObject takes 2 paramters
+                        if (pList.length == 2) { // \Yii::createObject takes 2 paramters
                            phpClass =  ObjectFactoryUtil.getPhpClassUniversal(method.getProject(), (PhpPsiElement) pList[0]);
                         }
                     }
