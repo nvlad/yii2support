@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.objectfactory;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
@@ -33,9 +34,6 @@ class ObjectFactoryUtil {
         for(ArrayHashElement arrayHashElement: arrayCreationExpression.getHashElements()) {
             PhpPsiElement child = arrayHashElement.getKey();
             if(child != null && ((child instanceof StringLiteralExpression))) {
-
-
-
                 String key;
                 if(child instanceof StringLiteralExpression) {
                     key = ((StringLiteralExpression) child).getContents();
@@ -43,30 +41,38 @@ class ObjectFactoryUtil {
                     key = child.getText();
                 }
 
+                Project project = child.getProject();
+
                 if (key.equals("class")) {
                     String className = "";
                     PhpPsiElement value = arrayHashElement.getValue();
-                    if (value instanceof MethodReference && value.getName().equals("className")) {
-                        MethodReference methodRef = (MethodReference) value;
-                        return getPhpClass(methodRef.getClassReference());
-
-                    }
-                    if (value instanceof ClassConstantReference) {
-                        ClassConstantReference classRef = (ClassConstantReference) value;
-                        return getPhpClass(classRef);
-                    }
-                    if (value instanceof StringLiteralExpression) {
-                        StringLiteralExpression str = (StringLiteralExpression)value;
-                        PhpIndex phpIndex = PhpIndex.getInstance(child.getProject());
-                        PhpClass classRef = getClass(phpIndex, str.getContents());
-                        return classRef;
-                    }
-
+                    PhpClass methodRef = getPhpClassUniversal(project, value);
+                    if (methodRef != null) return methodRef;
                 }
             }
         }
 
        return null;
+    }
+
+    @Nullable
+    public static PhpClass getPhpClassUniversal(Project project, PhpPsiElement value) {
+        if (value instanceof MethodReference && value.getName().equals("className")) {
+            MethodReference methodRef = (MethodReference) value;
+            return getPhpClass(methodRef.getClassReference());
+
+        }
+        if (value instanceof ClassConstantReference) {
+            ClassConstantReference classRef = (ClassConstantReference) value;
+            return getPhpClass(classRef);
+        }
+        if (value instanceof StringLiteralExpression) {
+            StringLiteralExpression str = (StringLiteralExpression)value;
+            PhpIndex phpIndex = PhpIndex.getInstance(project);
+            PhpClass classRef = getClass(phpIndex, str.getContents());
+            return classRef;
+        }
+        return null;
     }
 
     @Nullable
