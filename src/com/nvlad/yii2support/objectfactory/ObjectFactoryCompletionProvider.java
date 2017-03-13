@@ -22,11 +22,24 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
+        if (! (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
+                !(completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression)) {
+            return;
+        }
+        ArrayCreationExpression arrayCreation = null;
+
+        if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) {
+            arrayCreation = (ArrayCreationExpression) completionParameters.getPosition().getParent().getParent().getParent();
+        } else if (completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression &&
+                completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayHashElement &&
+                completionParameters.getPosition().getParent().getParent().toString() != "Array value") {
+            arrayCreation = (ArrayCreationExpression) completionParameters.getPosition().getParent().getParent().getParent().getParent();
+        } else {
+            return;
+        }
+
         Hashtable<String, Object> uniqTracker = new Hashtable<>();
 
-        PhpPsiElement arrayValue = (PhpPsiElement) completionParameters.getPosition().getParent().getParent();
-
-        ArrayCreationExpression arrayCreation = (ArrayCreationExpression) arrayValue.getParent();
         PhpClass phpClass = ObjectFactoryUtil.findClassByArray(arrayCreation);
         if (phpClass == null) {
             // Try to find if an array is a second parameter of \Yii::createObject
@@ -38,7 +51,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
                     if (methodClass != null && methodClass.getName() != null && methodClass.getName().equals("Yii")) {
                         PsiElement[] pList = method.getParameters();
                         if (pList.length == 2) { // \Yii::createObject takes 2 paramters
-                           phpClass =  ObjectFactoryUtil.getPhpClassUniversal(method.getProject(), (PhpPsiElement) pList[0]);
+                            phpClass =  ObjectFactoryUtil.getPhpClassUniversal(method.getProject(), (PhpPsiElement) pList[0]);
                         }
                     }
                 }
@@ -64,12 +77,12 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
         if (phpClass != null) {
             for (Field field : ObjectFactoryUtil.getClassFields(phpClass)) {
                 uniqTracker.put(field.getName(), field);
-                completionResultSet.addElement(new ObjectFactoryFieldLookupElement(arrayCreation, field));
+                completionResultSet.addElement(new ObjectFactoryFieldLookupElement((PhpExpression) completionParameters.getPosition().getParent(), field));
             }
 
 
             for (Method method : ObjectFactoryUtil.getClassSetMethods(phpClass)) {
-                ObjectFactoryMethodLookupElement lookupElem = new ObjectFactoryMethodLookupElement(arrayCreation, method);
+                ObjectFactoryMethodLookupElement lookupElem = new ObjectFactoryMethodLookupElement((PhpExpression) completionParameters.getPosition().getParent(), method);
                 if (uniqTracker.get(lookupElem.getAsPropertyName()) == null) {
                     completionResultSet.addElement(lookupElem);
                 }
