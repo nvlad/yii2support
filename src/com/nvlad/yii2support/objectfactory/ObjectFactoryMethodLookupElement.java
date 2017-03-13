@@ -23,13 +23,17 @@ public class ObjectFactoryMethodLookupElement extends LookupElement {
     @NotNull
     @Override
     public String getLookupString() {
-       return getAsPropertyName();
+        return getAsPropertyName();
     }
 
     @Override
     public void renderElement(LookupElementPresentation presentation) {
         presentation.setIcon(myMethod.getIcon());
-        presentation.setItemText(myMethod.getName());
+        String name = myMethod.getName();
+        if (name.length() > 3){
+            name =  Character.toLowerCase(name.charAt(3)) + name.substring(4);
+        }
+        presentation.setItemText(name);
         presentation.setItemTextBold(true);
 
         if (myMethod.getParameters().length > 0) {
@@ -64,7 +68,7 @@ public class ObjectFactoryMethodLookupElement extends LookupElement {
         Document document = context.getDocument();
         int insertPosition = context.getSelectionEndOffset();
 
-        if (myElement instanceof ArrayCreationExpression) {
+        if (myElement.getParent().getParent() instanceof ArrayCreationExpression) {
             document.insertString(insertPosition + 1, " => ");
             insertPosition += 5;
 
