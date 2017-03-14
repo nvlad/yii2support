@@ -97,13 +97,22 @@ class ObjectFactoryUtil {
     }
 
     static boolean isClassInherits(PhpClass classObject, PhpClass superClass) {
-        if (classObject.getSuperClass() != null) {
+        if (classObject == null || superClass == null)
+            return false;
+        if ( classObject.getSuperClass() != null) {
              if (classObject.getSuperClass().isEquivalentTo(superClass))
                  return true;
              else
                  return isClassInherits(classObject.getSuperClass(), superClass);
         }
         return false;
+    }
+
+    public static String getAsPropertyName(Method method) {
+        String methodName = method.getName();
+        String propertyName = methodName.substring(3);
+        propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
+        return propertyName;
     }
 
     static Collection<Method> getClassSetMethods(PhpClass phpClass) {
