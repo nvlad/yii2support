@@ -48,6 +48,7 @@
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
         <renamePsiElementProcessor implementation="com.nvlad.yii2support.views.refactor.RenameViewProcessor"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"
