@@ -14,36 +14,8 @@ import java.util.HashSet;
 /**
  * Created by NVlad on 11.01.2017.
  */
-class ObjectFactoryUtil {
+class ClassUtils {
 
-
-    @Nullable
-    static public PhpClass findClassByArray(@NotNull ArrayCreationExpression arrayCreationExpression) {
-        HashMap<String, String> keys = new HashMap<>();
-
-        for(ArrayHashElement arrayHashElement: arrayCreationExpression.getHashElements()) {
-            PhpPsiElement child = arrayHashElement.getKey();
-            if(child != null && ((child instanceof StringLiteralExpression))) {
-                String key;
-                if(child instanceof StringLiteralExpression) {
-                    key = ((StringLiteralExpression) child).getContents();
-                } else {
-                    key = child.getText();
-                }
-
-                Project project = child.getProject();
-
-                if (key.equals("class")) {
-                    String className = "";
-                    PhpPsiElement value = arrayHashElement.getValue();
-                    PhpClass methodRef = getPhpClassUniversal(project, value);
-                    if (methodRef != null) return methodRef;
-                }
-            }
-        }
-
-       return null;
-    }
 
     @Nullable
     public static PhpClass getPhpClassUniversal(Project project, PhpPsiElement value) {
@@ -131,6 +103,62 @@ class ObjectFactoryUtil {
 
         return result;
 
+    }
+
+    static String removeQuotes(String str) {
+        return str.replace("\"", "").replace("\'", "");
+    }
+
+    static Field findField(PhpClass phpClass, String fieldName) {
+
+        fieldName = ClassUtils.removeQuotes(fieldName);
+
+        final Collection<Field> fields = phpClass.getFields();
+        final Collection<Method> methods = phpClass.getMethods();
+
+        for (Field field : fields) {
+            if (! field.getName().equals(fieldName))
+                continue;
+
+            if (field.isConstant()) {
+                continue;
+            }
+
+            final PhpModifier modifier = field.getModifier();
+            if (!modifier.isPublic() || modifier.isStatic()) {
+                continue;
+            }
+
+            if (field instanceof PhpDocProperty) {
+                final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                Boolean setterExist = false;
+                for (Method method : methods) {
+                    if (method.getName().equals(setter)) {
+                        setterExist = true;
+                        break;
+                    }
+                }
+                if (!setterExist) {
+                    String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                    Boolean getterExist = false;
+                    for (Method method : methods) {
+                        if (method.getName().equals(getter)) {
+                            getterExist = true;
+                            break;
+                        }
+                    }
+                    if (getterExist) {
+                        continue;
+                    }
+                }
+
+            }
+
+           return field;
+        }
+
+
+        return null;
     }
 
     static Collection<Field> getClassFields(PhpClass phpClass) {
