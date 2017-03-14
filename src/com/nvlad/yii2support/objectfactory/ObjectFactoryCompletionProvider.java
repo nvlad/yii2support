@@ -75,7 +75,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
         PsiElement parent = arrayCreation.getParent().getParent();
         if (parent != null && parent instanceof MethodReference) {
             MethodReference method = (MethodReference) parent;
-            if (method.getName() != null && method.getName().equals("widget")) {
+            if (method.getName() != null && (method.getName().equals("widget") || method.getName().equals("begin"))) {
                 PhpExpression methodClass = method.getClassReference();
                 PhpClass callingClass = (PhpClass)((ClassReference)methodClass).resolve();
                 PhpClass superClass = ObjectFactoryUtil.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\base\\Widget");

@@ -97,7 +97,9 @@ class ObjectFactoryUtil {
     }
 
     static boolean isClassInherits(PhpClass classObject, PhpClass superClass) {
-        if (classObject.getSuperClass() != null) {
+        if (classObject == null || superClass == null)
+            return false;
+        if ( classObject.getSuperClass() != null) {
              if (classObject.getSuperClass().isEquivalentTo(superClass))
                  return true;
              else
