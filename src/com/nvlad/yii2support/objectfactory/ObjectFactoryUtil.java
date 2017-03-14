@@ -108,6 +108,13 @@ class ObjectFactoryUtil {
         return false;
     }
 
+    public static String getAsPropertyName(Method method) {
+        String methodName = method.getName();
+        String propertyName = methodName.substring(3);
+        propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
+        return propertyName;
+    }
+
     static Collection<Method> getClassSetMethods(PhpClass phpClass) {
         final HashSet<Method> result = new HashSet<>();
         final Collection<Method> methods = phpClass.getMethods();
