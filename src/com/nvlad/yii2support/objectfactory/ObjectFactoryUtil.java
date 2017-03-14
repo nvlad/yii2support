@@ -1,19 +1,9 @@
 package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
-import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
-import com.jetbrains.php.lang.parser.PhpElementTypes;
-import com.jetbrains.php.lang.patterns.PhpPatterns;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.elements.impl.FieldImpl;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.jetbrains.php.lang.psi.stubs.PhpFieldElementType;
-import com.jetbrains.php.lang.psi.stubs.PhpFieldStub;
-import com.jetbrains.php.lang.psi.stubs.PhpFieldStubImpl;
-import org.apache.commons.lang.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,6 +94,16 @@ class ObjectFactoryUtil {
         }
 
         return null;
+    }
+
+    static boolean isClassInherits(PhpClass classObject, PhpClass superClass) {
+        if (classObject.getSuperClass() != null) {
+             if (classObject.getSuperClass().isEquivalentTo(superClass))
+                 return true;
+             else
+                 return isClassInherits(classObject.getSuperClass(), superClass);
+        }
+        return false;
     }
 
     static Collection<Method> getClassSetMethods(PhpClass phpClass) {
