@@ -20,7 +20,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
-        if (! (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
+        if (!(completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
                 !(completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression)) {
             return;
         }
@@ -77,7 +77,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
             MethodReference method = (MethodReference) parent;
             if (method.getName() != null && method.getName().equals("widget")) {
                 PhpExpression methodClass = method.getClassReference();
-                PhpClass callingClass = (PhpClass)((ClassReference)methodClass).resolve();
+                PhpClass callingClass = (PhpClass) ((ClassReference) methodClass).resolve();
                 PhpClass superClass = ObjectFactoryUtil.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\base\\Widget");
                 if (ObjectFactoryUtil.isClassInherits(callingClass, superClass))
                     return callingClass;
@@ -88,50 +88,32 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
     }
 
     private PhpClass getPhpClassInGridColumns(ArrayCreationExpression arrayCreation) {
-        PsiElement parent = arrayCreation.getParent().getParent();
-        if (parent != null && parent instanceof ArrayCreationExpression) {
-            PsiElement possibleHashElement = arrayCreation.getParent().getParent().getParent().getParent();
-
-            if (possibleHashElement instanceof ArrayHashElement &&
-                    ((ArrayHashElement) possibleHashElement).getKey().getText() != null &&
-                    ((ArrayHashElement) possibleHashElement).getKey().getText().replace("\"", "").replace("\'", "").equals("columns")) {
-                PsiElement methodRef = possibleHashElement.getParent().getParent().getParent();
-                if (methodRef instanceof MethodReference) {
-                    MethodReference method = (MethodReference) methodRef;
-                    if (method.getClassReference() != null  ) {
-                        PhpExpression methodClass = method.getClassReference();
-                        PhpClass callingClass = (PhpClass)((ClassReference)methodClass).resolve();
-                        if (callingClass.getFQN().equals("\\yii\\grid\\GridView")) {
-                            return ObjectFactoryUtil.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\grid\\DataColumn");
-                        }
-
+        PsiElement possibleHashElement = arrayCreation.getParent().getParent();
+        if (possibleHashElement instanceof ArrayHashElement &&
+                ((ArrayHashElement) possibleHashElement).getKey().getText() != null &&
+                ((ArrayHashElement) possibleHashElement).getKey().getText().replace("\"", "").replace("\'", "").equals("columns")) {
+            PsiElement methodRef = possibleHashElement.getParent().getParent().getParent();
+            if (methodRef instanceof MethodReference) {
+                MethodReference method = (MethodReference) methodRef;
+                if (method.getClassReference() != null) {
+                    PhpExpression methodClass = method.getClassReference();
+                    PhpClass callingClass = (PhpClass) ((ClassReference) methodClass).resolve();
+                    if (callingClass.getFQN().equals("\\yii\\grid\\GridView")) {
+                        return ObjectFactoryUtil.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\grid\\DataColumn");
                     }
+
                 }
-                methodRef = methodRef;
             }
-
-
-
-            /*
-            MethodReference method = (MethodReference) parent;
-            if (method.getName() != null && method.getName().equals("widget")) {
-                PhpExpression methodClass = method.getClassReference();
-                PhpClass callingClass = (PhpClass)((ClassReference)methodClass).resolve();
-                PhpClass superClass = ObjectFactoryUtil.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\base\\Widget");
-                if (ObjectFactoryUtil.isClassInherits(callingClass, superClass))
-                    return callingClass;
-
-            }
-            */
         }
+
         return null;
     }
 
     private PhpClass getPhpClassInConfig(@NotNull CompletionParameters completionParameters, ArrayCreationExpression arrayCreation) {
         PhpClass phpClass = null;
-        PhpFile file = (PhpFile)completionParameters.getOriginalFile();
+        PhpFile file = (PhpFile) completionParameters.getOriginalFile();
         PsiDirectory dir = file.getContainingDirectory();
-        if ( dir != null && dir.getName().equals("config") ) {
+        if (dir != null && dir.getName().equals("config")) {
             PsiElement parent = arrayCreation.getParent().getParent();
             if (parent instanceof ArrayHashElement) {
                 ArrayHashElement hash = (ArrayHashElement) parent;
@@ -157,7 +139,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
                 if (methodClass != null && methodClass.getName() != null && methodClass.getName().equals("Yii")) {
                     PsiElement[] pList = method.getParameters();
                     if (pList.length == 2) { // \Yii::createObject takes 2 paramters
-                        phpClass =  ObjectFactoryUtil.getPhpClassUniversal(method.getProject(), (PhpPsiElement) pList[0]);
+                        phpClass = ObjectFactoryUtil.getPhpClassUniversal(method.getProject(), (PhpPsiElement) pList[0]);
                     }
                 }
             }
