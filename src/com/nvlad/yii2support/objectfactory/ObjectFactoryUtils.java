@@ -110,7 +110,7 @@ public class ObjectFactoryUtils {
                     if (method.getClassReference() != null) {
                         PhpExpression methodClass = method.getClassReference();
                         PhpClass callingClass = (PhpClass) ((ClassReference) methodClass).resolve();
-                        if (callingClass.getFQN().equals("\\yii\\grid\\GridView")) {
+                        if (callingClass != null && callingClass.getFQN().equals("\\yii\\grid\\GridView")) {
                             return ClassUtils.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\grid\\DataColumn");
                         }
 
