@@ -50,6 +50,11 @@
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
         <renamePsiElementProcessor implementation="com.nvlad.yii2support.views.refactor.RenameViewProcessor"/>
+        <localInspection language="PHP" shortName="MissedFieldInspection"
+                         displayName="Missing Field file"
+                         groupName="Views" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryMissedFieldInspection"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"
                          groupName="Views" groupPath="PHP,Framework,Yii2"

@@ -35,22 +35,11 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
             return;
         }
 
-        PhpClass phpClass = ObjectFactoryUtils.findClassByArray(arrayCreation);
-        if (phpClass == null) {
-            phpClass = ObjectFactoryUtils.getPhpClassByYiiCreateObject(arrayCreation);
-        }
-        if (phpClass == null) {
-            PhpFile file = (PhpFile) completionParameters.getOriginalFile();
-            PsiDirectory dir = file.getContainingDirectory();
-            phpClass = ObjectFactoryUtils.getPhpClassInConfig(dir, arrayCreation);
-        }
+        PhpClass phpClass = null;
+        PhpFile file = (PhpFile) completionParameters.getOriginalFile();
+        PsiDirectory dir = file.getContainingDirectory();
 
-        if (phpClass == null) {
-            phpClass = ObjectFactoryUtils.getPhpClassInWidget(arrayCreation);
-        }
-        if (phpClass == null) {
-            phpClass = ObjectFactoryUtils.getPhpClassInGridColumns(arrayCreation);
-        }
+        phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
 
         Hashtable<String, Object> uniqTracker = new Hashtable<>();
 

@@ -31,21 +31,8 @@ public class ObjectFactoryReference extends PsiReferenceBase<PsiElement> {
         PsiElement possibleArrayCreation = myElement.getParent().getParent().getParent();
         if (possibleArrayCreation instanceof ArrayCreationExpression) {
             ArrayCreationExpression  arrayCreation = (ArrayCreationExpression)possibleArrayCreation;
-            PhpClass phpClass = ObjectFactoryUtils.findClassByArray(arrayCreation);
-            if (phpClass == null) {
-                phpClass = ObjectFactoryUtils.getPhpClassByYiiCreateObject(arrayCreation);
-            }
-            if (phpClass == null) {
-                PsiDirectory dir = myElement.getContainingFile().getContainingDirectory();
-                phpClass = ObjectFactoryUtils.getPhpClassInConfig(dir, arrayCreation);
-            }
-
-            if (phpClass == null) {
-                phpClass = ObjectFactoryUtils.getPhpClassInWidget(arrayCreation);
-            }
-            if (phpClass == null) {
-                phpClass = ObjectFactoryUtils.getPhpClassInGridColumns(arrayCreation);
-            }
+            PsiDirectory dir = myElement.getContainingFile().getContainingDirectory();
+            PhpClass phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
 
             if (phpClass != null) {
                 PsiElement field = ClassUtils.findField(phpClass, myElement.getText());
@@ -60,52 +47,5 @@ public class ObjectFactoryReference extends PsiReferenceBase<PsiElement> {
     @Override
     public Object[] getVariants() {
         return new Object[0];
-    }
-
-    @Override
-    public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
-        final StringLiteralExpression string = (StringLiteralExpression) this.getElement();
-        final PsiDirectory context = ViewsUtil.getContextDirectory(string);
-        final PsiFile file = (PsiFile) element;
-        final PsiElement newValue;
-
-        String fileName = string.getContents();
-        if (fileName.contains("/")) {
-            fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
-        }
-        if (!file.getContainingDirectory().equals(context)) {
-            final PsiDirectory root = ViewsUtil.getRootDirectory(string);
-            if (root == null) {
-                return null;
-            }
-
-            PsiDirectory dir = file.getContainingDirectory();
-            while (dir != null && !(dir.equals(root) || dir.equals(context))) {
-                fileName = dir.getName() + "/" + fileName;
-                dir = dir.getParent();
-            }
-
-            if (dir == null) {
-                return null;
-            }
-
-            if (dir.equals(root)) {
-                fileName = "/" + fileName;
-            }
-        }
-        fileName = string.isSingleQuote() ? "'" + fileName + "'" : "\"" + fileName + "\"";
-        newValue = PhpPsiElementFactory.createFromText(element.getProject(), StringLiteralExpression.class, fileName);
-
-        if (newValue != null) {
-            string.replace(newValue);
-        }
-
-        for (MethodReference reference : PsiTreeUtil.findChildrenOfType(file, MethodReference.class)) {
-            if (reference.getName() != null && ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
-                reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, null);
-            }
-        }
-
-        return newValue;
     }
 }

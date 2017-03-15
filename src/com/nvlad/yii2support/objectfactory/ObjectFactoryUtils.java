@@ -122,4 +122,24 @@ public class ObjectFactoryUtils {
         }
         return null;
     }
+
+    static PhpClass findClassByArrayCreation(ArrayCreationExpression arrayCreation, PsiDirectory dir) {
+        PhpClass phpClass;
+        phpClass = findClassByArray(arrayCreation);
+        if (phpClass == null) {
+            phpClass = getPhpClassByYiiCreateObject(arrayCreation);
+        }
+        if (phpClass == null) {
+
+            phpClass = getPhpClassInConfig(dir, arrayCreation);
+        }
+
+        if (phpClass == null) {
+            phpClass = getPhpClassInWidget(arrayCreation);
+        }
+        if (phpClass == null) {
+            phpClass = getPhpClassInGridColumns(arrayCreation);
+        }
+        return phpClass;
+    }
 }

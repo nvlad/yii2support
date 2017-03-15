@@ -109,7 +109,7 @@ class ClassUtils {
         return str.replace("\"", "").replace("\'", "");
     }
 
-    static Field findField(PhpClass phpClass, String fieldName) {
+    static PhpClassMember findField(PhpClass phpClass, String fieldName) {
 
         fieldName = ClassUtils.removeQuotes(fieldName);
 
@@ -154,7 +154,19 @@ class ClassUtils {
 
             }
 
-           return field;
+            return field;
+        }
+
+        for (Method method : methods) {
+            String methodName = method.getName();
+            int pCount =  method.getParameters().length;
+            if (methodName.length() > 3 && methodName.startsWith("set")  && pCount == 1 &&
+                    Character.isUpperCase(methodName.charAt(3))) {
+                String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+                if (propertyName.equals(fieldName))
+                    return method;
+
+            }
         }
 
 

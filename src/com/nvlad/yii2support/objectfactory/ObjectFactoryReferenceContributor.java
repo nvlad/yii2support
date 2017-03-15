@@ -14,16 +14,16 @@ import org.jetbrains.annotations.NotNull;
 public class ObjectFactoryReferenceContributor extends com.intellij.psi.PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
-        psiReferenceRegistrar.registerReferenceProvider(PlatformPatterns.psiElement(), new ObjectFactoryReferenceProvider());
+        psiReferenceRegistrar.registerReferenceProvider(ElementPattern(), new ObjectFactoryReferenceProvider());
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
         return PlatformPatterns.psiElement()
-                .withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)
+
                         .withParent(PlatformPatterns.or(
                                 PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class),
                                 Patterns.withHashKey()
                                         .withParent(PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class))
-                        )));
+                        ));
     }
 }
