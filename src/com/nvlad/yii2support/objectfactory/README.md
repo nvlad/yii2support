@@ -3,3 +3,11 @@ Following class reference representations supported:
  - String represention, 
  - Class::class
  - Class::className().
+ 
+ Code completion also works for standard classes (detected by key) in config directory. 
+ 
+ widget() and begin() method for \yii\base\Widget class descendants is supported. 
+ widget() method for \yii\widgets\ActiveField is supported
+ 
+ This module supports Go To Declaration, Rename, Find usages
+ 
