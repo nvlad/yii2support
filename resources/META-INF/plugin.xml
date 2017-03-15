@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.10.11</version>
+    <version>0.3.10.11</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -73,6 +73,9 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+
+        <!-- Component -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.components.ComponentConfigCompletionContributor"/>
     </extensions>
 
     <actions>
