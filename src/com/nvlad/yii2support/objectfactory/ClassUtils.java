@@ -4,11 +4,9 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -68,14 +66,14 @@ class ClassUtils {
         return null;
     }
 
-    static boolean isClassInherits(PhpClass classObject, PhpClass superClass) {
+    static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
         if (classObject == null || superClass == null)
             return false;
-        if ( classObject.getSuperClass() != null) {
-             if (classObject.getSuperClass().isEquivalentTo(superClass))
+        if ( classObject != null) {
+             if (classObject.isEquivalentTo(superClass))
                  return true;
              else
-                 return isClassInherits(classObject.getSuperClass(), superClass);
+                 return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
         }
         return false;
     }
