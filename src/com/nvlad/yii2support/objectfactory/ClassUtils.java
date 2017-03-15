@@ -217,23 +217,4 @@ class ClassUtils {
         return result;
     }
 
-    static PhpClass getStandardPhpClass(PhpIndex phpIndex, String shortName) {
-        switch (shortName){
-            // web/Application
-            case "request":  return getClass(phpIndex, "\\yii\\web\\Request");
-            case "response":  return getClass(phpIndex, "\\yii\\web\\Response");
-            case "session":  return getClass(phpIndex, "\\yii\\web\\Session");
-            case "user":  return getClass(phpIndex, "\\yii\\web\\User");
-            case "errorHandler":  return getClass(phpIndex, "\\yii\\web\\ErrorHandler");
-            // base/Application
-            case "log":  return getClass(phpIndex, "\\yii\\log\\Dispatcher");
-            case "view":  return getClass(phpIndex, "\\yii\\web\\View");
-            case "formatter":  return getClass(phpIndex, "\\yii\\i18n\\I18N");
-            case "mailer":  return getClass(phpIndex, "\\yii\\swiftmailer\\Mailer");
-            case "urlManager":  return getClass(phpIndex, "\\yii\\web\\UrlManager");
-            case "assetManager":  return getClass(phpIndex, "\\yii\\web\\AssetManager");
-            case "security":  return getClass(phpIndex, "\\yii\\base\\Security");
-        }
-        return null;
-    }
 }
