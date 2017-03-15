@@ -25,6 +25,7 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     @Nullable
     @Override
     public PsiElement resolve() {
+
         return ViewsUtil.getViewFile(myElement);
     }
 

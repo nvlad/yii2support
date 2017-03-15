@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.2.10.11</version>
+    <version>0.3.10.11</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -46,8 +46,15 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
         <renamePsiElementProcessor implementation="com.nvlad.yii2support.views.refactor.RenameViewProcessor"/>
+        <localInspection language="PHP" shortName="MissedFieldInspection"
+                         displayName="Missing Field file"
+                         groupName="Views" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryMissedFieldInspection"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
@@ -66,6 +73,9 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+
+        <!-- Component -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.components.ComponentConfigCompletionContributor"/>
     </extensions>
 
     <actions>
