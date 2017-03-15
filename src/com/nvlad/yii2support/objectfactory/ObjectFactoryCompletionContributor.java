@@ -38,8 +38,5 @@ public class ObjectFactoryCompletionContributor extends com.intellij.codeInsight
                                         .withParent(PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class))
                         )));
 
-
-        // return PlatformPatterns.or(PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class),
-        //         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class));
     }
 }
