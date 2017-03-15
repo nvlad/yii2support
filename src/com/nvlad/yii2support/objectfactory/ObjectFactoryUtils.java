@@ -1,11 +1,9 @@
 package com.nvlad.yii2support.objectfactory;
 
-import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,13 +81,32 @@ public class ObjectFactoryUtils {
     static PhpClass getPhpClassInWidget(ArrayCreationExpression arrayCreation) {
         PsiElement parent = arrayCreation.getParent().getParent();
         if (parent != null && parent instanceof MethodReference) {
-            MethodReference method = (MethodReference) parent;
-            if (method.getName() != null && (method.getName().equals("widget") || method.getName().equals("begin"))) {
-                PhpExpression methodClass = method.getClassReference();
-                PhpClass callingClass = (PhpClass) ((ClassReference) methodClass).resolve();
-                PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\base\\Widget");
-                if (ClassUtils.isClassInherits(callingClass, superClass))
-                    return callingClass;
+            MethodReference methodRef = (MethodReference) parent;
+            if (methodRef.getName() != null && (methodRef.getName().equals("widget") || methodRef.getName().equals("begin"))) {
+                Method method = (Method)methodRef.resolve();
+
+                PhpExpression ref = methodRef.getClassReference();
+                if (ref != null && ref instanceof ClassReference ) {
+                    PhpClass callingClass = (PhpClass) ((ClassReference) ref).resolve();
+                    PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "\\yii\\base\\Widget");
+                    if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass))
+                        return callingClass;
+                } else if (ref != null && ref instanceof MethodReference ) {
+                    // This code process
+                    // $form->field($model, 'username')->widget(\Class::className())
+                    PhpClass callingClass = method.getContainingClass();
+                    PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "yii\\widgets\\ActiveField");
+                    if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass)
+                            && method.getParameters().length == 2 &&
+                            method.getParameters()[0].getName().equals("class")) {
+                        PhpPsiElement element = (PhpPsiElement)methodRef.getParameters()[0];
+                        PhpClass widgetClass = ClassUtils.getPhpClassUniversal(methodRef.getProject(), element);
+                        if (widgetClass != null)
+                            return widgetClass;
+
+                    }
+
+                }
 
             }
         }
