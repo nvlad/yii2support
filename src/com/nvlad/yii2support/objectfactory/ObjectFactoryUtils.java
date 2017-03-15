@@ -71,7 +71,7 @@ public class ObjectFactoryUtils {
                 if (element instanceof StringLiteralExpression) {
                     StringLiteralExpression literal = (StringLiteralExpression) element;
                     String key = literal.getContents();
-                    phpClass = ClassUtils.getStandardPhpClass(PhpIndex.getInstance(literal.getProject()), key);
+                    phpClass = getStandardPhpClass(PhpIndex.getInstance(literal.getProject()), key);
                 }
             }
         }
@@ -158,5 +158,26 @@ public class ObjectFactoryUtils {
             phpClass = getPhpClassInGridColumns(arrayCreation);
         }
         return phpClass;
+    }
+
+    static PhpClass getStandardPhpClass(PhpIndex phpIndex, String shortName) {
+        switch (shortName){
+            // web/Application
+            case "request":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\Request");
+            case "response":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\Response");
+            case "session":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\Session");
+            case "user":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\User");
+            case "errorHandler":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\ErrorHandler");
+            // base/Application
+            case "log":  return ClassUtils.getClass(phpIndex, "\\yii\\log\\Dispatcher");
+            case "view":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\View");
+            case "formatter":  return ClassUtils.getClass(phpIndex, "yii\\i18n\\Formatter");
+            case "i18n":  return ClassUtils.getClass(phpIndex, "yii\\i18n\\I18N");
+            case "mailer":  return ClassUtils.getClass(phpIndex, "\\yii\\swiftmailer\\Mailer");
+            case "urlManager":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\UrlManager");
+            case "assetManager":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\AssetManager");
+            case "security":  return ClassUtils.getClass(phpIndex, "\\yii\\base\\Security");
+        }
+        return null;
     }
 }

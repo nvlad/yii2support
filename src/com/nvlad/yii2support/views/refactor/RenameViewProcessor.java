@@ -6,6 +6,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.refactoring.listeners.RefactoringElementListener;
 import com.intellij.refactoring.rename.RenamePsiElementProcessor;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -28,7 +29,7 @@ public class RenameViewProcessor extends RenamePsiElementProcessor {
 
     @Override
     public boolean canProcessElement(@NotNull PsiElement psiElement) {
-        return true;
+        return psiElement instanceof PhpFile;
     }
 
     @Override
