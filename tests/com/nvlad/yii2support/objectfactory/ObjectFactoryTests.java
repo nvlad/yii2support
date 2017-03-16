@@ -8,7 +8,7 @@ import java.io.File;
 
 
 /**
- * Created by oleg on 16.03.2017.
+ * Created by oleg on 16.03.2017..
  */
 public class ObjectFactoryTests extends PluginTestCase {
     @Override
