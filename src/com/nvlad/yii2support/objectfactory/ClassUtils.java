@@ -1,6 +1,8 @@
 package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -107,6 +109,8 @@ class ClassUtils {
         return str.replace("\"", "").replace("\'", "");
     }
 
+
+
     static PhpClassMember findField(PhpClass phpClass, String fieldName) {
 
         fieldName = ClassUtils.removeQuotes(fieldName);
@@ -169,6 +173,19 @@ class ClassUtils {
 
 
         return null;
+    }
+
+    static int paramIndexForElement(PsiElement psiElement) {
+        PsiElement parent = psiElement.getParent();
+        if (parent == null) {
+            return -1;
+        }
+
+        if (parent instanceof ParameterList) {
+            return ArrayUtil.indexOf(((ParameterList) parent).getParameters(), psiElement);
+        }
+
+        return paramIndexForElement(parent);
     }
 
     static Collection<Field> getClassFields(PhpClass phpClass) {
