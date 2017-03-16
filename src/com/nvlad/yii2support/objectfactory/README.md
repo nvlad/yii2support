@@ -8,6 +8,7 @@ Following class reference representations supported:
  
  widget() and begin() method for \yii\base\Widget class descendants is supported. 
  widget() method for \yii\widgets\ActiveField is supported
+ Code completion for GridView columns is supported
  
  This module supports Go To Declaration, Rename, Find usages
  
