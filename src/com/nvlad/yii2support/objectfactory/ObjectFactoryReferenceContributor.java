@@ -19,7 +19,6 @@ public class ObjectFactoryReferenceContributor extends com.intellij.psi.PsiRefer
 
     private static ElementPattern<PsiElement> ElementPattern() {
         return PlatformPatterns.psiElement()
-
                         .withParent(PlatformPatterns.or(
                                 PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class),
                                 Patterns.withHashKey()

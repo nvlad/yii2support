@@ -1,14 +1,14 @@
 package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -68,14 +68,14 @@ class ClassUtils {
         return null;
     }
 
-    static boolean isClassInherits(PhpClass classObject, PhpClass superClass) {
+    static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
         if (classObject == null || superClass == null)
             return false;
-        if ( classObject.getSuperClass() != null) {
-             if (classObject.getSuperClass().isEquivalentTo(superClass))
+        if ( classObject != null) {
+             if (classObject.isEquivalentTo(superClass))
                  return true;
              else
-                 return isClassInherits(classObject.getSuperClass(), superClass);
+                 return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
         }
         return false;
     }
@@ -108,6 +108,8 @@ class ClassUtils {
     static String removeQuotes(String str) {
         return str.replace("\"", "").replace("\'", "");
     }
+
+
 
     static PhpClassMember findField(PhpClass phpClass, String fieldName) {
 
@@ -173,6 +175,19 @@ class ClassUtils {
         return null;
     }
 
+    static int paramIndexForElement(PsiElement psiElement) {
+        PsiElement parent = psiElement.getParent();
+        if (parent == null) {
+            return -1;
+        }
+
+        if (parent instanceof ParameterList) {
+            return ArrayUtil.indexOf(((ParameterList) parent).getParameters(), psiElement);
+        }
+
+        return paramIndexForElement(parent);
+    }
+
     static Collection<Field> getClassFields(PhpClass phpClass) {
         final HashSet<Field> result = new HashSet<>();
 
@@ -219,23 +234,4 @@ class ClassUtils {
         return result;
     }
 
-    static PhpClass getStandardPhpClass(PhpIndex phpIndex, String shortName) {
-        switch (shortName){
-            // web/Application
-            case "request":  return getClass(phpIndex, "\\yii\\web\\Request");
-            case "response":  return getClass(phpIndex, "\\yii\\web\\Response");
-            case "session":  return getClass(phpIndex, "\\yii\\web\\Session");
-            case "user":  return getClass(phpIndex, "\\yii\\web\\User");
-            case "errorHandler":  return getClass(phpIndex, "\\yii\\web\\ErrorHandler");
-            // base/Application
-            case "log":  return getClass(phpIndex, "\\yii\\log\\Dispatcher");
-            case "view":  return getClass(phpIndex, "\\yii\\web\\View");
-            case "formatter":  return getClass(phpIndex, "\\yii\\i18n\\I18N");
-            case "mailer":  return getClass(phpIndex, "\\yii\\swiftmailer\\Mailer");
-            case "urlManager":  return getClass(phpIndex, "\\yii\\web\\UrlManager");
-            case "assetManager":  return getClass(phpIndex, "\\yii\\web\\AssetManager");
-            case "security":  return getClass(phpIndex, "\\yii\\base\\Security");
-        }
-        return null;
-    }
 }
