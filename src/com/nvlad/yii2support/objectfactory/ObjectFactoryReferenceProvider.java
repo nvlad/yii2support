@@ -1,6 +1,7 @@
 package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.css.CssFileType;
 import com.intellij.util.ProcessingContext;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,7 @@ public class ObjectFactoryReferenceProvider extends com.intellij.psi.PsiReferenc
 
         ObjectFactoryReference reference = new ObjectFactoryReference(psiElement);
         references.add(reference);
+
 
         return references.toArray(new ObjectFactoryReference[references.size()]);
     }

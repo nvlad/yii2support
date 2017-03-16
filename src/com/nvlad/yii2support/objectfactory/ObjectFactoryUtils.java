@@ -8,6 +8,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.naming.spi.ObjectFactory;
 import java.util.HashMap;
 
 /**
@@ -52,7 +53,7 @@ public class ObjectFactoryUtils {
                 PhpExpression methodClass = method.getClassReference();
                 if (methodClass != null && methodClass.getName() != null && methodClass.getName().equals("Yii")) {
                     PsiElement[] pList = method.getParameters();
-                    if (pList.length == 2) { // \Yii::createObject takes 2 paramters
+                    if (pList.length == 2 && ClassUtils.paramIndexForElement(arrayCreation) == 1) { // \Yii::createObject takes 2 paramters
                         phpClass = ClassUtils.getPhpClassUniversal(method.getProject(), (PhpPsiElement) pList[0]);
                     }
                 }
@@ -63,7 +64,7 @@ public class ObjectFactoryUtils {
 
     static PhpClass getPhpClassInConfig(PsiDirectory dir, ArrayCreationExpression arrayCreation) {
         PhpClass phpClass = null;
-        if (dir != null && dir.getName().equals("config")) {
+        if (dir != null && (dir.getName().equals("config"))) {
             PsiElement parent = arrayCreation.getParent().getParent();
             if (parent instanceof ArrayHashElement) {
                 ArrayHashElement hash = (ArrayHashElement) parent;
@@ -86,12 +87,12 @@ public class ObjectFactoryUtils {
                 Method method = (Method)methodRef.resolve();
 
                 PhpExpression ref = methodRef.getClassReference();
-                if (ref != null && ref instanceof ClassReference ) {
+                if (ref != null && ref instanceof ClassReference && ClassUtils.paramIndexForElement(arrayCreation) == 0) {
                     PhpClass callingClass = (PhpClass) ((ClassReference) ref).resolve();
                     PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "\\yii\\base\\Widget");
                     if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass))
                         return callingClass;
-                } else if (ref != null && ref instanceof MethodReference ) {
+                } else if (ref != null && ref instanceof MethodReference && ClassUtils.paramIndexForElement(arrayCreation) == 1 ) {
                     // This code process
                     // $form->field($model, 'username')->widget(\Class::className())
                     PhpClass callingClass = method.getContainingClass();
@@ -143,6 +144,10 @@ public class ObjectFactoryUtils {
     static PhpClass findClassByArrayCreation(ArrayCreationExpression arrayCreation, PsiDirectory dir) {
         PhpClass phpClass;
         phpClass = findClassByArray(arrayCreation);
+        if (phpClass == null){
+            phpClass = getClassByInstatiation(arrayCreation);
+
+        }
         if (phpClass == null) {
             phpClass = getPhpClassByYiiCreateObject(arrayCreation);
         }
@@ -159,6 +164,32 @@ public class ObjectFactoryUtils {
         }
         return phpClass;
     }
+
+    static PhpClass getClassByInstatiation(PhpExpression element) {
+
+        PsiElement newElement = element.getParent().getParent();
+        if (newElement != null && newElement instanceof NewExpression) {
+            ClassReference ref = ((NewExpression) newElement).getClassReference();
+            if (ref == null)
+                return null;
+            PhpClass phpClass =(PhpClass)ref.resolve();
+            if (phpClass != null) {
+
+                Method constructor = phpClass.getConstructor();
+
+                PhpClass yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\Object");
+                if (! ClassUtils.isClassInheritsOrEqual(phpClass, yiiObjectClass))
+                    return null;
+
+                Parameter[] parameterList = constructor.getParameters();
+                if (parameterList.length >0 && parameterList[0].getName().equals("config") && ClassUtils.paramIndexForElement(element) == 0)
+                    return phpClass;
+
+            }
+        }
+        return null;
+    }
+
 
     static PhpClass getStandardPhpClass(PhpIndex phpIndex, String shortName) {
         switch (shortName){
