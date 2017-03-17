@@ -82,7 +82,7 @@ public class ObjectFactoryTests extends PluginTestCase {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
                 " \\yii\\grid\\GridView::widget([\n" +
-                "    'columns' => ['<caret>'] ");
+                "    'columns' => [['<caret>']] ");
         myFixture.completeBasic();
         assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
     }

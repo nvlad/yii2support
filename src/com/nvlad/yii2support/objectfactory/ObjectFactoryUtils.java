@@ -117,10 +117,9 @@ public class ObjectFactoryUtils {
     }
 
     static PhpClass getPhpClassInGridColumns(ArrayCreationExpression arrayCreation) {
-      //  PsiElement parent = arrayCreation.getParent();
-
-     //   if (parent != null && parent instanceof ArrayCreationExpression) {
-            PsiElement possibleHashElement = arrayCreation.getParent().getParent();
+        PsiElement parent = arrayCreation.getParent().getParent();
+        if (parent != null && parent instanceof ArrayCreationExpression) {
+            PsiElement possibleHashElement = arrayCreation.getParent().getParent().getParent().getParent();
 
             if (possibleHashElement instanceof ArrayHashElement &&
                     ((ArrayHashElement) possibleHashElement).getKey().getText() != null &&
@@ -140,7 +139,7 @@ public class ObjectFactoryUtils {
 
             }
 
-       // }
+        }
         return null;
     }
 
