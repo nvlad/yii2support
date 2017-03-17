@@ -51,13 +51,31 @@ public class ObjectFactoryTests extends PluginTestCase {
         assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
     }
 
-    public void testCompletionYii_createObject() {
+    public void testCompletion_createObject() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
                 " $test = new \\yii\\base\\TestWidget(['<caret>']) ;\n" +
                 ";");
         myFixture.completeBasic();
         assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
+    }
+
+    public void testCompletionInConfigAndSubObject() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " $test = ['request' => [ 'subobject' => ['<caret>']] ;\n" +
+                ";");
+        myFixture.completeBasic();
+        assertEquals(myFixture.getLookupElementStrings().toArray().length, 3);
+    }
+
+    public void testCompletionYii_createObject() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " \\yii\\Yii::createObject('\\yii\\web\\SubObject', ['<caret>']) ;\n" +
+                ";");
+        myFixture.completeBasic();
+        assertEquals(myFixture.getLookupElementStrings().toArray().length, 3);
     }
 
     /*

@@ -35,11 +35,38 @@ namespace  yii\base {
     }
 }
 
-namespace  yii\web\Request {
+namespace  yii\web {
 
     use yii\base\Object;
 
     class Request extends Object {
+        /**
+         * @var SubObject|string
+         */
+        var $subobject;
+    }
+
+    /**
+     * Class SubObject
+     * @property $test1 string
+     * @package yii\web\Request
+     */
+    class SubObject {
+        var $test2;
+        function setTest3($value) {
+
+        }
+    }
+}
+
+namespace yii {
+    class BaseYii {
+        public static function createObject($type, array $params = []) {
+
+        }
+    }
+
+    class Yii extends BaseYii {
 
     }
 }
