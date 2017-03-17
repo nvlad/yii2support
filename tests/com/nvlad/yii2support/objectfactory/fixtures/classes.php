@@ -71,3 +71,14 @@ namespace yii {
     }
 }
 
+namespace yii\grid {
+    class GridView {
+        public $column;
+    }
+
+    class DataColumn {
+        public $test1;
+        public $test2;
+    }
+}
+
