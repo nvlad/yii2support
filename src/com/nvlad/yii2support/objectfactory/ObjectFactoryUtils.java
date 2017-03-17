@@ -66,7 +66,7 @@ public class ObjectFactoryUtils {
 
     static PhpClass getPhpClassInConfig(PsiDirectory dir, ArrayCreationExpression arrayCreation) {
         PhpClass phpClass = null;
-        if (dir != null && (dir.getName().equals("config"))) {
+        if (dir != null && (dir.getName().equals("config") || dir.getName().equals("src") /* for tests */)) {
             PsiElement parent = arrayCreation.getParent().getParent();
             if (parent instanceof ArrayHashElement) {
                 ArrayHashElement hash = (ArrayHashElement) parent;
@@ -181,6 +181,8 @@ public class ObjectFactoryUtils {
             if (fieldName == null)
                 return null;
             PhpClassMember field = ClassUtils.findField(phpClass, fieldName);
+            if (field == null)
+                return null;
             Set<String> types = field.getType().getTypes();
             PhpClass resultClass = null;
             for (String type : types) {
