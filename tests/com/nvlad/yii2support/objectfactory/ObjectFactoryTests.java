@@ -78,4 +78,13 @@ public class ObjectFactoryTests extends PluginTestCase {
         assertEquals(myFixture.getLookupElementStrings().toArray().length, 3);
     }
 
+    public void testCompletionYii_gridColumns() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " \\yii\\grid\\GridView::widget([\n" +
+                "    'columns' => ['<caret>'] ");
+        myFixture.completeBasic();
+        assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
+    }
+
 }
