@@ -78,14 +78,4 @@ public class ObjectFactoryTests extends PluginTestCase {
         assertEquals(myFixture.getLookupElementStrings().toArray().length, 3);
     }
 
-    /*
-    public void testCompletionInConfig() {
-
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " return ['request' => ['<caret>']] ;\n" +
-                ";");
-        myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
-    }
-    */
 }
