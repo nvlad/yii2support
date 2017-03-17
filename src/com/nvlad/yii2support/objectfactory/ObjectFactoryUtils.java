@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.objectfactory;
 
+import com.intellij.codeInsight.generation.ClassMember;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.naming.spi.ObjectFactory;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Created by oleg on 14.03.2017.
@@ -141,6 +143,7 @@ public class ObjectFactoryUtils {
         return null;
     }
 
+    @Nullable
     static PhpClass findClassByArrayCreation(ArrayCreationExpression arrayCreation, PsiDirectory dir) {
         PhpClass phpClass;
         phpClass = findClassByArray(arrayCreation);
@@ -162,7 +165,32 @@ public class ObjectFactoryUtils {
         if (phpClass == null) {
             phpClass = getPhpClassInGridColumns(arrayCreation);
         }
+        if (phpClass == null && arrayCreation.getParent().getParent() instanceof ArrayHashElement) {
+            phpClass = getPhpClassByHash((ArrayHashElement)arrayCreation.getParent().getParent(), dir);
+
+        }
         return phpClass;
+    }
+
+    private static PhpClass getPhpClassByHash(ArrayHashElement hashElement, PsiDirectory dir) {
+        if (hashElement.getParent() instanceof ArrayCreationExpression) {
+            PhpClass phpClass = findClassByArrayCreation((ArrayCreationExpression)hashElement.getParent(), dir);
+            if (phpClass == null)
+                return null;
+            String fieldName = hashElement.getKey() != null ? hashElement.getKey().getText() : null;
+            if (fieldName == null)
+                return null;
+            PhpClassMember field = ClassUtils.findField(phpClass, fieldName);
+            Set<String> types = field.getType().getTypes();
+            PhpClass resultClass = null;
+            for (String type : types) {
+                resultClass = ClassUtils.getClass(PhpIndex.getInstance(field.getProject()), type);
+                if (resultClass != null) {
+                    return resultClass;
+                }
+            }
+        }
+        return null;
     }
 
     static PhpClass getClassByInstatiation(PhpExpression element) {
