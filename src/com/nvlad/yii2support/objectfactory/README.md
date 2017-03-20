@@ -15,7 +15,7 @@ Following class reference representations supported:
  This module supports Go To Declaration, Rename, Find usages
  
  ------------------------------------
- Description
+ Configuration arrays
  
  Code completion for Yii configuration arrays. Works both in configuration files and on object instantiation.
  Following cases are supported:
