@@ -227,6 +227,7 @@ public class ObjectFactoryUtils {
             case "user":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\User");
             case "errorHandler":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\ErrorHandler");
             // base/Application
+            case "db": return ClassUtils.getClass(phpIndex, "\\yii\\db\\Connection");
             case "log":  return ClassUtils.getClass(phpIndex, "\\yii\\log\\Dispatcher");
             case "view":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\View");
             case "formatter":  return ClassUtils.getClass(phpIndex, "yii\\i18n\\Formatter");
