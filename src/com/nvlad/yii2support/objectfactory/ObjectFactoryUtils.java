@@ -154,9 +154,6 @@ public class ObjectFactoryUtils {
             phpClass = getPhpClassByYiiCreateObject(arrayCreation);
         }
         if (phpClass == null) {
-            phpClass = getPhpClassInConfig(dir, arrayCreation);
-        }
-        if (phpClass == null) {
             phpClass = getPhpClassInWidget(arrayCreation);
         }
         if (phpClass == null) {
@@ -164,7 +161,9 @@ public class ObjectFactoryUtils {
         }
         if (phpClass == null && arrayCreation.getParent().getParent() instanceof ArrayHashElement) {
             phpClass = getPhpClassByHash((ArrayHashElement)arrayCreation.getParent().getParent(), dir);
-
+        }
+        if (phpClass == null) {
+            phpClass = getPhpClassInConfig(dir, arrayCreation);
         }
         return phpClass;
     }
@@ -227,7 +226,6 @@ public class ObjectFactoryUtils {
             case "user":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\User");
             case "errorHandler":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\ErrorHandler");
             // base/Application
-            case "db": return ClassUtils.getClass(phpIndex, "\\yii\\db\\Connection");
             case "log":  return ClassUtils.getClass(phpIndex, "\\yii\\log\\Dispatcher");
             case "view":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\View");
             case "formatter":  return ClassUtils.getClass(phpIndex, "yii\\i18n\\Formatter");
@@ -236,6 +234,8 @@ public class ObjectFactoryUtils {
             case "urlManager":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\UrlManager");
             case "assetManager":  return ClassUtils.getClass(phpIndex, "\\yii\\web\\AssetManager");
             case "security":  return ClassUtils.getClass(phpIndex, "\\yii\\base\\Security");
+            // custom
+            case "db": return ClassUtils.getClass(phpIndex, "\\yii\\db\\Connection");
         }
         return null;
     }
