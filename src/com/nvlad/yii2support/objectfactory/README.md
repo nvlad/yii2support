@@ -19,7 +19,7 @@ Following class reference representations supported:
  
  Code completion for Yii configuration arrays. Works both in configuration files and on object instantiation.
  Following cases are supported:
- * Array have "class" key with valid class representation: string representation, ClassName::class or Class::className()
+ * Array have "class" key with valid class representation: fully qualified string representation, ClassName::class or Class::className()
  * Array is a value of a key that corresponds to standard Yii classes (like "db", "request", "mailer" and so on), and file with this array located in a directory called "config"
  * WidgetClass::widget() and WidgetClass::begin calls if WidgetClass is a descendant of \yii\base\Widget
  * $field->widget() method call on \yii\widgets\ActiveField and its descendants
