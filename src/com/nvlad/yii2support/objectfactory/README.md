@@ -27,4 +27,4 @@ Following class reference representations supported:
  * Inside array in GridView "columns" key
  
  
-Go To Declaration, Rename and Find usages works whenever code completion works 
+Go To Declaration, Rename, Find usages and Help popup works whenever code completion works 
