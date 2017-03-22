@@ -1,14 +1,14 @@
 package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -29,7 +29,7 @@ class ClassUtils {
             return getPhpClass(classRef);
         }
         if (value instanceof StringLiteralExpression) {
-            StringLiteralExpression str = (StringLiteralExpression)value;
+            StringLiteralExpression str = (StringLiteralExpression) value;
             PhpIndex phpIndex = PhpIndex.getInstance(project);
             PhpClass classRef = getClass(phpIndex, str.getContents());
             return classRef;
@@ -39,11 +39,11 @@ class ClassUtils {
 
     @Nullable
     static public PhpClass getClass(PhpIndex phpIndex, String className) {
-        Collection<PhpClass> classes = phpIndex.getClassesByFQN(className);
+        Collection<PhpClass> classes = phpIndex.getAnyByFQN(className);
         return classes.isEmpty() ? null : classes.iterator().next();
     }
 
-     @Nullable
+    @Nullable
     static PhpClass getPhpClass(PhpPsiElement phpPsiElement) {
         while (phpPsiElement != null) {
             if (phpPsiElement instanceof ClassConstantReference) {
@@ -68,14 +68,14 @@ class ClassUtils {
         return null;
     }
 
-    static boolean isClassInherits(PhpClass classObject, PhpClass superClass) {
+    static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
         if (classObject == null || superClass == null)
             return false;
-        if ( classObject.getSuperClass() != null) {
-             if (classObject.getSuperClass().isEquivalentTo(superClass))
-                 return true;
-             else
-                 return isClassInherits(classObject.getSuperClass(), superClass);
+        if (classObject != null) {
+            if (classObject.isEquivalentTo(superClass))
+                return true;
+            else
+                return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
         }
         return false;
     }
@@ -94,8 +94,8 @@ class ClassUtils {
 
         for (Method method : methods) {
             String methodName = method.getName();
-            int pCount =  method.getParameters().length;
-            if (methodName.length() > 3 && methodName.startsWith("set")  && pCount == 1 &&
+            int pCount = method.getParameters().length;
+            if (methodName.length() > 3 && methodName.startsWith("set") && pCount == 1 &&
                     Character.isUpperCase(methodName.charAt(3))) {
                 result.add(method);
             }
@@ -111,61 +111,70 @@ class ClassUtils {
 
     static PhpClassMember findField(PhpClass phpClass, String fieldName) {
 
+        if (phpClass == null || fieldName == null)
+            return null;
         fieldName = ClassUtils.removeQuotes(fieldName);
+
 
         final Collection<Field> fields = phpClass.getFields();
         final Collection<Method> methods = phpClass.getMethods();
 
-        for (Field field : fields) {
-            if (! field.getName().equals(fieldName))
-                continue;
+        if (fields != null) {
+            for (Field field : fields) {
+                if (!field.getName().equals(fieldName))
+                    continue;
 
-            if (field.isConstant()) {
-                continue;
-            }
-
-            final PhpModifier modifier = field.getModifier();
-            if (!modifier.isPublic() || modifier.isStatic()) {
-                continue;
-            }
-
-            if (field instanceof PhpDocProperty) {
-                final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                Boolean setterExist = false;
-                for (Method method : methods) {
-                    if (method.getName().equals(setter)) {
-                        setterExist = true;
-                        break;
-                    }
+                if (field.isConstant()) {
+                    continue;
                 }
-                if (!setterExist) {
-                    String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                    Boolean getterExist = false;
+
+                final PhpModifier modifier = field.getModifier();
+                if (!modifier.isPublic() || modifier.isStatic()) {
+                    continue;
+                }
+
+
+                if (field instanceof PhpDocProperty) {
+                    final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                    Boolean setterExist = false;
                     for (Method method : methods) {
-                        if (method.getName().equals(getter)) {
-                            getterExist = true;
+                        if (method.getName().equals(setter)) {
+                            setterExist = true;
                             break;
                         }
                     }
-                    if (getterExist) {
-                        continue;
+                    if (!setterExist) {
+                        String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                        Boolean getterExist = false;
+                        for (Method method : methods) {
+                            if (method.getName().equals(getter)) {
+                                getterExist = true;
+                                break;
+                            }
+                        }
+                        if (getterExist) {
+                            continue;
+                        }
                     }
+
                 }
 
+                return field;
             }
-
-            return field;
         }
 
-        for (Method method : methods) {
-            String methodName = method.getName();
-            int pCount =  method.getParameters().length;
-            if (methodName.length() > 3 && methodName.startsWith("set")  && pCount == 1 &&
-                    Character.isUpperCase(methodName.charAt(3))) {
-                String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-                if (propertyName.equals(fieldName))
-                    return method;
 
+        if (methods != null) {
+            for (Method method : methods) {
+                String methodName = method.getName();
+                int pCount = method.getParameters().length;
+                if (methodName.length() > 3 && methodName.startsWith("set") && pCount == 1 &&
+                        Character.isUpperCase(methodName.charAt(3))) {
+                    String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+                    if (propertyName.equals(fieldName))
+                        return method;
+
+                }
             }
         }
 
@@ -173,7 +182,22 @@ class ClassUtils {
         return null;
     }
 
+    static int paramIndexForElement(PsiElement psiElement) {
+        PsiElement parent = psiElement.getParent();
+        if (parent == null) {
+            return -1;
+        }
+
+        if (parent instanceof ParameterList) {
+            return ArrayUtil.indexOf(((ParameterList) parent).getParameters(), psiElement);
+        }
+
+        return paramIndexForElement(parent);
+    }
+
     static Collection<Field> getClassFields(PhpClass phpClass) {
+        if (phpClass == null)
+            return null;
         final HashSet<Field> result = new HashSet<>();
 
         final Collection<Field> fields = phpClass.getFields();
@@ -216,26 +240,9 @@ class ClassUtils {
         }
 
 
+
+
         return result;
     }
 
-    static PhpClass getStandardPhpClass(PhpIndex phpIndex, String shortName) {
-        switch (shortName){
-            // web/Application
-            case "request":  return getClass(phpIndex, "\\yii\\web\\Request");
-            case "response":  return getClass(phpIndex, "\\yii\\web\\Response");
-            case "session":  return getClass(phpIndex, "\\yii\\web\\Session");
-            case "user":  return getClass(phpIndex, "\\yii\\web\\User");
-            case "errorHandler":  return getClass(phpIndex, "\\yii\\web\\ErrorHandler");
-            // base/Application
-            case "log":  return getClass(phpIndex, "\\yii\\log\\Dispatcher");
-            case "view":  return getClass(phpIndex, "\\yii\\web\\View");
-            case "formatter":  return getClass(phpIndex, "\\yii\\i18n\\I18N");
-            case "mailer":  return getClass(phpIndex, "\\yii\\swiftmailer\\Mailer");
-            case "urlManager":  return getClass(phpIndex, "\\yii\\web\\UrlManager");
-            case "assetManager":  return getClass(phpIndex, "\\yii\\web\\AssetManager");
-            case "security":  return getClass(phpIndex, "\\yii\\base\\Security");
-        }
-        return null;
-    }
 }
