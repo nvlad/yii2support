@@ -3,6 +3,7 @@
     <name>Yii2 Support</name>
     <version>0.3.0.0</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
+    <vendor email="oleg@insperedia.com" url="http://insperedia.com">Oleg Lemesenko</vendor>
 
     <description><![CDATA[
       <h2>Yii2 Support for PhpStorm</h2>
