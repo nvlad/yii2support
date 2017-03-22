@@ -5,23 +5,38 @@
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
-      Yii2 Support for PhpStorm<br/>
-      <br/>
-      <strong>Features</strong>
+      <h2>Yii2 Support for PhpStorm</h2>
+
+      <h3>Views</h3>
       <ul>
-        <li>
-            Views<br/>
-            - View files completion<br/>
-            - Add View parameters after completion<br/>
-            - Inspection missed View files<br/>
-            - QuickFix for missed files<br/>
-            - Jump to View file (go to declaration)<br/>
-            - Inspection by required &amp; unused parameters for View render<br/>
-            - QuickFix for required &amp; unused parameters<br/>
-            - Update path to View file on file move<br/>
-        </li>
-        <li>i18n (completion, generate params array)</li>
-      </ul>
+          <li>View files completion</li>
+          <li>Add View parameters after completion</li>
+          <li>Inspection missed View files</li>
+          <li>QuickFix for missed files</li>
+          <li>Jump to View file (go to declaration)</li>
+          <li>Inspection by required &amp; unused parameters for View render</li>
+          <li>QuickFix for required &amp; unused parameters</li>
+          <li>Update path to View file on file move</li>
+          </ul>
+        <h3>i18n</h3>
+        <ul>
+            <li>Code completion </li>
+            <li>Generate params array</li>
+            </ul>
+        <h3>Configuration arrays</h3>
+         Code completion for Yii configuration arrays. Works both in configuration files and on object instantiation. <br/>
+         Following cases are supported:
+         <ul>
+         <li>Array in $config parameter in yii\base\Object or its descendants constructor</li>
+         <li>Array have "class" key with valid class representation: fully qualified string representation, ClassName::class or Class::className()</li>
+         <li>Array is a value of a key that corresponds to standard Yii classes (like "db", "request", "mailer" and so on), and file with this array located in a directory called "config"</li>
+         <li>WidgetClass::widget() and WidgetClass::begin calls if WidgetClass is a descendant of yii\base\Widget</li>
+         <li>$field->widget() method call on yii\widgets\ActiveField and its descendants</li>
+         <li>Inside array in GridView "columns" key</li>
+         </ul>
+         Go To Declaration, Rename, Find usages and Help popup works whenever code completion works
+
+
     ]]></description>
 
     <change-notes><![CDATA[
@@ -45,8 +60,10 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
-        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
-        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
+        <completion.contributor language="PHP"
+                                implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
+        <psi.referenceContributor language="PHP"
+                                  implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
         <renamePsiElementProcessor implementation="com.nvlad.yii2support.views.refactor.RenameViewProcessor"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"
@@ -65,8 +82,10 @@
                          implementationClass="com.nvlad.yii2support.views.inspections.UnusedParameterInspection"/>
 
         <!-- Object Factory -->
-        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
-        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
+        <completion.contributor language="PHP"
+                                implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
+        <psi.referenceContributor language="PHP"
+                                  implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
         <localInspection language="PHP" shortName="MissedFieldInspection"
                          displayName="Missed field"
                          groupName="Object Factory" groupPath="PHP,Framework,Yii2"
