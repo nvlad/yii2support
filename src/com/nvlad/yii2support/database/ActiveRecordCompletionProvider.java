@@ -29,7 +29,7 @@ public class ActiveRecordCompletionProvider extends com.intellij.codeInsight.com
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
-       ToolWindow dbTool = DatabaseView.getDatabaseToolWindow(completionParameters.getPosition().getProject());
+
         Project project = completionParameters.getPosition().getProject();
         DatabaseView dbView = DatabaseView.getDatabaseView(project);
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
@@ -38,6 +38,8 @@ public class ActiveRecordCompletionProvider extends com.intellij.codeInsight.com
             item = item;
             if (item instanceof DbTable) {
                 TableInfo tableInfo = new TableInfo((DbTable) item);
+                tableInfo = tableInfo;
+                DatabaseLookup[] lookups = DatabaseUtils.getLookupItemsByTable("wp_links", project);
                 tableInfo = tableInfo;
             }
         }
