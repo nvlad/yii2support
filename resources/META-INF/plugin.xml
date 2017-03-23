@@ -91,6 +91,8 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ActiveRecordCompletionContributor"/>
     </extensions>
 
     <actions>

@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.objectfactory;
+package com.nvlad.yii2support.database;
 
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.ElementPattern;
@@ -16,31 +16,22 @@ import com.nvlad.yii2support.database.ActiveRecordCompletionProvider;
 import org.jetbrains.annotations.NotNull;
 
 public class ActiveRecordCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
-public ObjectFactoryCompletionContributor() {
-extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new ActiveRecordCompletionProvider());
-}
-
-@Override
-public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-if ((typeChar == '\'' || typeChar == '"') && position.getParent() instanceof ArrayCreationExpression) {
-return true;
-}
-
-return false;
-}
-
-private static ElementPattern<PsiElement> ElementPattern() {
-
-    return PlatformPatterns.psiElement()
-    .withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)
-    .withParent(PlatformPatterns.or(
-    PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class),
-    Patterns.withHashKey()
-    .withParent(PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class))
-    )));
-
-
-    // return PlatformPatterns.or(PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class),
-    //         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class));
+    public ActiveRecordCompletionContributor() {
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new ActiveRecordCompletionProvider());
     }
+
+    private static ElementPattern<PsiElement> ElementPattern() {
+
+        return PlatformPatterns.psiElement()
+                .withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)
+                        .withParent(PlatformPatterns.or(
+                                PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class),
+                                Patterns.withHashKey()
+                                        .withParent(PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class))
+                        )));
+
+
+        // return PlatformPatterns.or(PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class),
+        //         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class));
     }
+}
