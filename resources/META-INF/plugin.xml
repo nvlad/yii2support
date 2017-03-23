@@ -56,6 +56,7 @@
     -->
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.database</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
