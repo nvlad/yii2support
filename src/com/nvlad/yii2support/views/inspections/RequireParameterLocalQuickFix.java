@@ -9,6 +9,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
@@ -56,12 +57,16 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
         }
 
         PsiElement[] parameters = parameterList.getParameters();
-        if (parameters.length == 1) {
+        if (parameters.length == 1 || parameters[1] instanceof PsiErrorElement) {
             ArrayCreationExpression params = PhpPsiElementFactory.createFromText(project, ArrayCreationExpression.class, "[]");
             if (params == null) {
                 return;
             }
-            parameterList.add(PhpPsiElementFactory.createComma(project));
+            if (parameters.length == 1) {
+                parameterList.add(PhpPsiElementFactory.createComma(project));
+            } else {
+                parameterList.deleteChildRange(parameters[1], parameters[1]);
+            }
             parameterList.add(params);
             parameters = parameterList.getParameters();
         }
