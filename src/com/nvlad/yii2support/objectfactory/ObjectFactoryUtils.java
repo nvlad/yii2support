@@ -197,7 +197,12 @@ public class ObjectFactoryUtils {
             ClassReference ref = ((NewExpression) newElement).getClassReference();
             if (ref == null)
                 return null;
-            PhpClass phpClass =(PhpClass)ref.resolve();
+
+            PsiElement possiblePhpClass = ref.resolve();
+            if (! (possiblePhpClass instanceof PhpClass))
+                return null;
+
+            PhpClass phpClass =(PhpClass)possiblePhpClass;
             if (phpClass != null) {
 
                 Method constructor = phpClass.getConstructor();
