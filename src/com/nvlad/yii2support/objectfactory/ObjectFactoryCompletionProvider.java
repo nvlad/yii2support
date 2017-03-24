@@ -8,6 +8,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Hashtable;

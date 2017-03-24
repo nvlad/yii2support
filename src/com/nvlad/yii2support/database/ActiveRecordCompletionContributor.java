@@ -17,12 +17,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class ActiveRecordCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     public ActiveRecordCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new ActiveRecordCompletionProvider());
+        extend(CompletionType.BASIC, ElementPattern(), new ActiveRecordCompletionProvider());
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-
-        return PlatformPatterns.psiElement()
+/*
+ return PlatformPatterns.psiElement()
                 .withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)
                         .withParent(PlatformPatterns.or(
                                 PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class),
@@ -30,8 +30,18 @@ public class ActiveRecordCompletionContributor extends com.intellij.codeInsight.
                                         .withParent(PlatformPatterns.psiElement().withParent(ArrayCreationExpression.class))
                         )));
 
+ */
 
-        // return PlatformPatterns.or(PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class),
-        //         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class));
+
+         return
+                 PlatformPatterns.or(
+                         // ["<caret>
+                     PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class).withSuperParent(5, MethodReference.class),
+                         // string
+                     PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class).withParent(StringLiteralExpression.class),
+                         // ["<caret>" => ""]
+                         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class).withSuperParent(6, MethodReference.class) );
+
+
     }
 }
