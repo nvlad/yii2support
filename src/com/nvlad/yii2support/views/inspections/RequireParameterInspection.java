@@ -11,8 +11,8 @@ import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.common.PhpUtil;
+import com.nvlad.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -56,18 +56,20 @@ public class RequireParameterInspection extends PhpInspection {
                     if (parameters.length > 1) {
                         if (parameters[1] instanceof ArrayCreationExpression) {
                             existKeys = PhpUtil.getArrayKeys((ArrayCreationExpression) parameters[1]);
-                        } else {
-                            existKeys = new HashSet<>();
-                            if (parameters[1] instanceof FunctionReference) {
-                                FunctionReference function = (FunctionReference) parameters[1];
-                                if (function.getName() != null && function.getName().equals("compact")) {
-                                    for (PsiElement element : function.getParameters()) {
-                                        if (element instanceof StringLiteralExpression) {
-                                            existKeys.add(((StringLiteralExpression) element).getContents());
-                                        }
+                        } else if (parameters[1] instanceof FunctionReference) {
+                            FunctionReference function = (FunctionReference) parameters[1];
+                            if (function.getName() != null && function.getName().equals("compact")) {
+                                existKeys = new HashSet<>();
+                                for (PsiElement element : function.getParameters()) {
+                                    if (element instanceof StringLiteralExpression) {
+                                        existKeys.add(((StringLiteralExpression) element).getContents());
                                     }
                                 }
+                            } else {
+                                return;
                             }
+                        } else {
+                            return;
                         }
                     } else {
                         existKeys = new HashSet<>();
