@@ -33,7 +33,7 @@ public class DatabaseUtils {
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
         for (DbDataSource source: dataSources) {
-            for (Object item : source.getModel().traverser()) {
+            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
                 if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
                     TableInfo tableInfo = new TableInfo((DbTable) item);
                     ArrayList<LookupElementBuilder> list = new ArrayList<>();
