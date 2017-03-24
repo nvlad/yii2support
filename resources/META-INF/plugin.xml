@@ -93,6 +93,10 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+
+        <!-- PhpDoc -->
+        <psi.referenceContributor language="PHP"
+                                  implementation="com.nvlad.yii2support.phpdoc.PhpDocReferenceContributor"/>
     </extensions>
 
     <actions>
