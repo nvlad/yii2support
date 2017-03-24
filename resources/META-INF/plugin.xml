@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.3.17.2</version>
+    <version>0.3.17.3</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -41,8 +41,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Fix exception with resolved non class on get class by instantiation</li>
-            <li>Fix not worked RequireParameterQuickFix on empty second parameter</li>
+            <li>Ignore method and function(except "compact") calls as second parameter for render* functions</li>
         </ul>
     ]]>
     </change-notes>
