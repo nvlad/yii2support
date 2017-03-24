@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.3.17.1</version>
+    <version>0.3.17.2</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -41,7 +41,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Code completion for object configuration array (with "class" key), config files, widgets and object creating</li>
+            <li>Fix exception with resolved non class on get class by instantiation</li>
+            <li>Fix not worked RequireParameterQuickFix on empty second parameter</li>
         </ul>
     ]]>
     </change-notes>
