@@ -2,16 +2,14 @@ package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-
-import javax.naming.spi.ObjectFactory;
 
 /**
  * Created by oleg on 15.03.2017.

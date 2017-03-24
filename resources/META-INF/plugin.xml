@@ -35,6 +35,7 @@
           <li>WidgetClass::widget() and WidgetClass::begin calls if WidgetClass is a descendant of yii\base\Widget</li>
           <li>$field->widget() method call on yii\widgets\ActiveField and its descendants</li>
           <li>Inside array in GridView "columns" key</li>
+          <li>Yii::createObject method</li>
       </ul>
       <p>Go To Declaration, Rename, Find usages and Help popup works whenever code completion works.</p>
     ]]></description>
@@ -56,6 +57,7 @@
     -->
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.database</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
@@ -93,6 +95,8 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ActiveRecordCompletionContributor"/>
     </extensions>
 
     <actions>

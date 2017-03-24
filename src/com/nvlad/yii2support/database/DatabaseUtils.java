@@ -1,0 +1,123 @@
+package com.nvlad.yii2support.database;
+
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.database.model.DasColumn;
+import com.intellij.database.model.DasObject;
+import com.intellij.database.psi.DbDataSource;
+import com.intellij.database.psi.DbPsiFacade;
+import com.intellij.database.psi.DbTable;
+import com.intellij.database.view.DatabaseView;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
+import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.ClassUtils;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+/**
+ * Created by oleg on 23.03.2017.
+ */
+public class DatabaseUtils {
+    public static final String[] findMethods = {"where", "orWhere", "andWhere"};
+
+    @Nullable
+    public static ArrayList<LookupElementBuilder> getLookupItemsByTable(String table, Project project, PhpExpression position) {
+        DbPsiFacade facade =  DbPsiFacade.getInstance(project);
+        List<DbDataSource> dataSources = facade.getDataSources();
+        for (DbDataSource source: dataSources) {
+            for (Object item : source.getModel().traverser()) {
+                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
+                    TableInfo tableInfo = new TableInfo((DbTable) item);
+                    ArrayList<LookupElementBuilder> list = new ArrayList<>();
+                    for (DasColumn column : tableInfo.getColumns()) {
+                        list.add(DatabaseUtils.buildLookup(column, position));
+                    }
+                    return list;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static ArrayList<LookupElementBuilder> getLookupItemsByAnnotations(PhpClass phpClass, PhpExpression position) {
+        if (phpClass == null)
+            return null;
+        final ArrayList<LookupElementBuilder> result = new ArrayList<>();
+        final Field[] fields = phpClass.getOwnFields();
+        for (Field field : fields) {
+            if (field instanceof PhpDocProperty) {
+                result.add(buildLookup(field, position));
+            }
+        }
+
+        return result;
+    }
+
+    @NotNull
+    static private LookupElementBuilder buildLookup(Object field, PhpExpression position) {
+        String lookupString = "-";
+        if (field instanceof DasColumn)
+            lookupString = ((DasColumn)field).getName();
+        if (field instanceof Field) {
+            lookupString = ((Field) field).getName();
+        }
+        LookupElementBuilder builder =  LookupElementBuilder.create(field, lookupString)
+                .withInsertHandler((insertionContext, lookupElement) -> {
+
+                    Document document = insertionContext.getDocument();
+                    int insertPosition = insertionContext.getSelectionEndOffset();
+
+                    if (position.getParent().getParent() instanceof ArrayCreationExpression) {
+                        document.insertString(insertPosition + 1, " => ");
+                        insertPosition += 5;
+                        insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
+                    }
+                    if (position instanceof StringLiteralExpression) {
+                        document.insertString(insertPosition , " ");
+                        insertPosition += 1;
+                        insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
+                    }
+                });
+        if (field instanceof Field) {
+            builder.withIcon(((Field) field).getIcon());
+            builder = builder.withTypeText(((Field) field).getType().toString());
+        }
+        if (field instanceof DasColumn) {
+            DasColumn column = (DasColumn)field;
+            builder = builder.withTypeText(column.getDataType().typeName)
+            .withTailText("(" + column.getDbParent().getDbParent().getName() + '.' +column.getTableName() + ")", true);
+        }
+        return builder;
+    }
+
+    @Nullable
+    public static String getTableByActiveRecordClass(PhpClass phpClass) {
+        Method[] methods = phpClass.getOwnMethods();
+        for (Method method: methods) {
+            if (method.getName().equals("tableName")) {
+                for (PsiElement elem: method.getChildren()) {
+                    if (elem.getChildren().length > 0) {
+                        for (PsiElement element: elem.getChildren()) {
+                            if (element instanceof PhpReturn) {
+                                if ((element).getChildren().length > 0)
+                                    return (element).getChildren()[0].getText();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+}
