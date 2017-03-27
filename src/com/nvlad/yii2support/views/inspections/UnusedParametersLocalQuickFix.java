@@ -29,6 +29,13 @@ class UnusedParametersLocalQuickFix implements LocalQuickFix {
     @Nls
     @NotNull
     @Override
+    public String getName() {
+        return getFamilyName();
+    }
+
+    @Nls
+    @NotNull
+    @Override
     public String getFamilyName() {
         return "Remove all unused parameters";
     }
