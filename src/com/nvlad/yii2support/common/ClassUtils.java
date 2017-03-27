@@ -213,9 +213,6 @@ public class ClassUtils {
         return paramIndexForElement(parent);
     }
 
-    public function Meth
-
-
 
     public static Collection<Field> getClassFields(PhpClass phpClass) {
         if (phpClass == null)
