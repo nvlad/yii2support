@@ -26,11 +26,13 @@ import java.util.List;
  * Created by oleg on 23.03.2017.
  */
 public class DatabaseUtils {
+
     @Nullable
     public static ArrayList<LookupElementBuilder> getLookupItemsByTable(String table, Project project, PhpExpression position) {
         ArrayList<LookupElementBuilder> list = new ArrayList<>();
         if (table == null ||table.isEmpty())
             return list;
+
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
         for (DbDataSource source: dataSources) {
@@ -98,19 +100,6 @@ public class DatabaseUtils {
                     Document document = insertionContext.getDocument();
                     int insertPosition = insertionContext.getSelectionEndOffset();
 
-                    /*
-                    if (position.getParent().getParent() instanceof ArrayCreationExpression) {
-                        document.insertString(insertPosition + 1, " => ");
-                        insertPosition += 5;
-                        insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
-                    }
-
-                    if (position instanceof StringLiteralExpression && !(position.getParent().getParent() instanceof ArrayHashElement)) {
-                        document.insertString(insertPosition , " ");
-                        insertPosition += 1;
-                        insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
-                    }
-                    */
                 });
         if (field instanceof Field) {
             builder.withIcon(((Field) field).getIcon());
@@ -147,6 +136,5 @@ public class DatabaseUtils {
     public static String clearTablePrefixTags(String str) {
         return str.replace("{{%", "").replace("}}", "").replace("{{", "");
     }
-
 
 }
