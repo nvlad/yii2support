@@ -26,25 +26,48 @@ import java.util.List;
  * Created by oleg on 23.03.2017.
  */
 public class DatabaseUtils {
-    public static final String[] findMethods = {"where", "orWhere", "andWhere"};
-
     @Nullable
     public static ArrayList<LookupElementBuilder> getLookupItemsByTable(String table, Project project, PhpExpression position) {
+        ArrayList<LookupElementBuilder> list = new ArrayList<>();
+        if (table == null ||table.isEmpty())
+            return list;
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
         for (DbDataSource source: dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
                 if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
                     TableInfo tableInfo = new TableInfo((DbTable) item);
-                    ArrayList<LookupElementBuilder> list = new ArrayList<>();
                     for (DasColumn column : tableInfo.getColumns()) {
                         list.add(DatabaseUtils.buildLookup(column, position));
                     }
-                    return list;
                 }
             }
         }
-        return null;
+        return list;
+    }
+
+    public static ArrayList<LookupElementBuilder> getLookupItemsTables(Project project, PhpExpression position) {
+        DbPsiFacade facade =  DbPsiFacade.getInstance(project);
+        List<DbDataSource> dataSources = facade.getDataSources();
+        ArrayList<LookupElementBuilder> list = new  ArrayList<>();
+        for (DbDataSource source: dataSources) {
+            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
+                if (item instanceof DbTable) {
+                    list.add(DatabaseUtils.buildLookup(item, position));
+                }
+            }
+        }
+        return list;
+    }
+
+    @Nullable
+    public static MethodReference getMethodRef(PsiElement element) {
+        PsiElement parent = element.getParent();
+         if (parent == null)
+             return null;
+          else if (parent instanceof MethodReference)
+            return (MethodReference)parent;
+        else return getMethodRef(parent);
     }
 
     public static ArrayList<LookupElementBuilder> getLookupItemsByAnnotations(PhpClass phpClass, PhpExpression position) {
@@ -64,8 +87,8 @@ public class DatabaseUtils {
     @NotNull
     static private LookupElementBuilder buildLookup(Object field, PhpExpression position) {
         String lookupString = "-";
-        if (field instanceof DasColumn)
-            lookupString = ((DasColumn)field).getName();
+        if (field instanceof DasObject)
+            lookupString = ((DasObject)field).getName();
         if (field instanceof Field) {
             lookupString = ((Field) field).getName();
         }
@@ -75,16 +98,19 @@ public class DatabaseUtils {
                     Document document = insertionContext.getDocument();
                     int insertPosition = insertionContext.getSelectionEndOffset();
 
+                    /*
                     if (position.getParent().getParent() instanceof ArrayCreationExpression) {
                         document.insertString(insertPosition + 1, " => ");
                         insertPosition += 5;
                         insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
                     }
-                    if (position instanceof StringLiteralExpression) {
+
+                    if (position instanceof StringLiteralExpression && !(position.getParent().getParent() instanceof ArrayHashElement)) {
                         document.insertString(insertPosition , " ");
                         insertPosition += 1;
                         insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
                     }
+                    */
                 });
         if (field instanceof Field) {
             builder.withIcon(((Field) field).getIcon());
@@ -108,7 +134,7 @@ public class DatabaseUtils {
                         for (PsiElement element: elem.getChildren()) {
                             if (element instanceof PhpReturn) {
                                 if ((element).getChildren().length > 0)
-                                    return (element).getChildren()[0].getText();
+                                    return clearTablePrefixTags( (element).getChildren()[0].getText());
                             }
                         }
                     }
@@ -118,6 +144,9 @@ public class DatabaseUtils {
         return null;
     }
 
+    public static String clearTablePrefixTags(String str) {
+        return str.replace("{{%", "").replace("}}", "").replace("{{", "");
+    }
 
 
 }

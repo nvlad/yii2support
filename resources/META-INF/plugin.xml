@@ -1,12 +1,13 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.3.17.1</version>
+    <version>0.3.17.0</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
+      <h2>Yii2 Support for PhpStorm</h2>
 
-      <b>Views</b>
+      <h3>Views</h3>
       <ul>
           <li>View files completion</li>
           <li>Add View parameters after completion</li>
@@ -18,13 +19,13 @@
           <li>Update path to View file on file move</li>
       </ul>
 
-      <b>i18n</b>
+      <h3>i18n</h3>
       <ul>
           <li>Code completion</li>
           <li>Generate params array</li>
       </ul>
 
-      <b>Configuration arrays</b>
+      <h3>Configuration arrays</h3>
       <p>Code completion for Yii configuration arrays. Works both in configuration files and on object instantiation.<br/>
           Following cases are supported:</p>
       <ul>
@@ -34,7 +35,7 @@
           <li>WidgetClass::widget() and WidgetClass::begin calls if WidgetClass is a descendant of yii\base\Widget</li>
           <li>$field->widget() method call on yii\widgets\ActiveField and its descendants</li>
           <li>Inside array in GridView "columns" key</li>
-           <li>Yii::createObject method</li>
+          <li>Yii::createObject method</li>
       </ul>
       <p>Go To Declaration, Rename, Find usages and Help popup works whenever code completion works.</p>
     ]]></description>
@@ -56,6 +57,7 @@
     -->
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.database</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
@@ -93,6 +95,9 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+        <!-- Database -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ActiveQueryCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.MigrationCompletionContributor"/>
     </extensions>
 
     <actions>

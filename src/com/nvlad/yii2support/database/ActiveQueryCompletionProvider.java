@@ -30,24 +30,14 @@ import java.util.Hashtable;
 /**
  * Created by oleg on 16.02.2017.
  */
-public class ActiveRecordCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
+public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-
-
-
-        Object possibleMethodRef = completionParameters.getPosition().getParent().getParent().getParent().getParent().getParent();
-        if (! (possibleMethodRef instanceof MethodReference)) {
-            possibleMethodRef= completionParameters.getPosition().getParent().getParent().getParent();
-        }
-        if (! (possibleMethodRef instanceof MethodReference)) {
-            possibleMethodRef= completionParameters.getPosition().getParent().getParent().getParent().getParent().getParent().getParent();
-        }
-        if (possibleMethodRef instanceof MethodReference) {
-            MethodReference methodRef = (MethodReference) possibleMethodRef;
+        MethodReference methodRef = DatabaseUtils.getMethodRef(completionParameters.getPosition());
+        if (methodRef != null) {
             Method method = (Method)methodRef.resolve();
             if (method != null && method.getParameters().length > 0
-                    && method.getParameters()[0].getName().equals("condition")
+                    && (method.getParameters()[0].getName().equals("condition") || method.getParameters()[0].getName().equals("column"))
                     && ClassUtils.paramIndexForElement(completionParameters.getPosition()) == 0) {
 
                 PhpClass phpClass = method.getContainingClass();
@@ -55,8 +45,9 @@ public class ActiveRecordCompletionProvider extends com.intellij.codeInsight.com
                 if (phpClass == null || activeRecordClass == null)
                     return;
                 PhpIndex index = PhpIndex.getInstance(method.getProject());
-                if (ClassUtils.isClassInheritsOrEqual(phpClass,
-                        ClassUtils.getClass(index, "\\yii\\db\\Query"))
+                if ((ClassUtils.isClassInheritsOrEqual(phpClass,
+                        ClassUtils.getClass(index, "\\yii\\db\\Query")) || ClassUtils.isClassInheritsOrEqual(phpClass,
+                        ClassUtils.getClass(index, "\\yii\\db\\QueryTrait")))
                         && ClassUtils.isClassInheritsOrEqual(activeRecordClass,
                         ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord")) ) {
 
@@ -73,24 +64,6 @@ public class ActiveRecordCompletionProvider extends com.intellij.codeInsight.com
                 }
             }
         }
-
-/*
-        Project project = completionParameters.getPosition().getProject();
-        DatabaseView dbView = DatabaseView.getDatabaseView(project);
-        DbPsiFacade facade =  DbPsiFacade.getInstance(project);
-        DbDataSource source = (DbDataSource)facade.getDataSources().toArray()[0];
-        for (Object item: source.getModel().traverser()) {
-            item = item;
-            if (item instanceof DbTable) {
-                TableInfo tableInfo = new TableInfo((DbTable) item);
-                tableInfo = tableInfo;
-                DatabaseLookup[] lookups = DatabaseUtils.getLookupItemsByTable("wp_links", project);
-                tableInfo = tableInfo;
-            }
-        }
-        dbView = dbView;
-        */
-
 
     }
 }
