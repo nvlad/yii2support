@@ -214,7 +214,6 @@ public class ClassUtils {
     }
 
 
-
     public static Collection<Field> getClassFields(PhpClass phpClass) {
         if (phpClass == null)
             return null;
