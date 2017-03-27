@@ -33,7 +33,11 @@ public class ObjectFactoryMissedFieldInspection extends PhpInspection {
                     for (ArrayHashElement elem: expression.getHashElements()) {
                         String keyName = elem.getKey() != null ? elem.getKey().getText() : null;
                         keyName = ClassUtils.removeQuotes(keyName);
-                        if ( keyName != null &&  ! keyName.equals("class") &&  ClassUtils.findField(phpClass,  keyName) == null) {
+                        if ( keyName != null
+                                &&  ! keyName.equals("class")
+                                &&  ! keyName.startsWith("as ")
+                                &&  ! keyName.startsWith("on ")
+                                && ClassUtils.findField(phpClass,  keyName) == null) {
                             final String descriptionTemplate = "Field '"+keyName+"' not exists in referenced class "+phpClass.getFQN();
                             problemsHolder.registerProblem(elem, descriptionTemplate);
                         }
