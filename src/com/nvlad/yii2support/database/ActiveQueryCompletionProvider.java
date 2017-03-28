@@ -36,9 +36,11 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
         MethodReference methodRef = DatabaseUtils.getMethodRef(completionParameters.getPosition());
         if (methodRef != null) {
             Method method = (Method)methodRef.resolve();
+            int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
             if (method != null && method.getParameters().length > 0
-                    && (method.getParameters()[0].getName().equals("condition") || method.getParameters()[0].getName().startsWith("column"))
-                    && ClassUtils.paramIndexForElement(completionParameters.getPosition()) == 0) {
+                    &&
+                    ( method.getParameters()[paramPosition].getName().equals("condition") || method.getParameters()[paramPosition].getName().startsWith("column"))
+               ) {
 
                 PhpClass phpClass = method.getContainingClass();
                 PhpClass activeRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
@@ -46,8 +48,10 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                     return;
                 PhpIndex index = PhpIndex.getInstance(method.getProject());
                 if ((ClassUtils.isClassInheritsOrEqual(phpClass,
-                        ClassUtils.getClass(index, "\\yii\\db\\Query")) || ClassUtils.isClassInheritsOrEqual(phpClass,
-                        ClassUtils.getClass(index, "\\yii\\db\\QueryTrait")))
+                        ClassUtils.getClass(index, "\\yii\\db\\Query"))
+                        || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\QueryTrait"))
+                        || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))
+                )
                         && ClassUtils.isClassInheritsOrEqual(activeRecordClass,
                         ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord")) ) {
 
@@ -55,13 +59,17 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                     if (tableName != null) {
                         tableName = ClassUtils.removeQuotes(tableName);
                         ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsByTable(tableName, completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
-                        if (lookups != null) {
+                        if (lookups != null && ! lookups.isEmpty()) {
                             completionResultSet.addAllElements(lookups);
                         } else {
                             completionResultSet.addAllElements(DatabaseUtils.getLookupItemsByAnnotations(activeRecordClass, (PhpExpression) completionParameters.getPosition().getParent()));
                         }
                     }
                 }
+            } else if (method != null && method.getParameters().length > 0
+                    && (method.getParameters()[paramPosition].getName().startsWith("table"))) {
+                ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                completionResultSet.addAllElements(lookups);
             }
         }
 
