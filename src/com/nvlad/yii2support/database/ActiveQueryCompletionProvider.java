@@ -37,7 +37,7 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
         if (methodRef != null) {
             Method method = (Method)methodRef.resolve();
             if (method != null && method.getParameters().length > 0
-                    && (method.getParameters()[0].getName().equals("condition") || method.getParameters()[0].getName().equals("column"))
+                    && (method.getParameters()[0].getName().equals("condition") || method.getParameters()[0].getName().startsWith("column"))
                     && ClassUtils.paramIndexForElement(completionParameters.getPosition()) == 0) {
 
                 PhpClass phpClass = method.getContainingClass();

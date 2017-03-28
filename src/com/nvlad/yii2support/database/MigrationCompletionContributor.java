@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class MigrationCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     public MigrationCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new MigrationCompletionProvider());
+        extend(CompletionType.BASIC, ElementPattern(), new MigrationCompletionProvider());
     }
 
     @Override
@@ -22,10 +22,12 @@ public class MigrationCompletionContributor extends com.intellij.codeInsight.com
         if ((typeChar == '\'' || typeChar == '"')  ) {
             if (position.getParent() instanceof MethodReference) {
                 Method method = (Method)((MethodReference) position.getParent()).resolve();
-                Object possibleClass = method.getParent();
-                if (possibleClass instanceof PhpClass) {
-                    if (((PhpClass)possibleClass).getName().equals("Migration")) {
-                        return true;
+                if (method != null) {
+                    Object possibleClass = method.getParent();
+                    if (possibleClass instanceof PhpClass) {
+                        if (((PhpClass) possibleClass).getName().equals("Migration")) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -35,6 +37,6 @@ public class MigrationCompletionContributor extends com.intellij.codeInsight.com
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-        return  PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class).withParent(StringLiteralExpression.class);
+        return  PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class);
     }
 }
