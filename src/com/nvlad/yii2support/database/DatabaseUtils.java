@@ -3,6 +3,7 @@ package com.nvlad.yii2support.database;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
+import com.intellij.database.model.DasTable;
 import com.intellij.database.psi.DbDataSource;
 import com.intellij.database.psi.DbPsiFacade;
 import com.intellij.database.psi.DbTable;
@@ -120,6 +121,11 @@ public class DatabaseUtils {
             DasColumn column = (DasColumn)field;
             builder = builder.withTypeText(column.getDataType().typeName)
             .withTailText("(" + column.getDbParent().getDbParent().getName() + '.' +column.getTableName() + ")", true);
+        }
+        if (field instanceof DasTable) {
+            DasTable table = (DasTable)field;
+            builder = builder.withTypeText("DbTable")
+                    .withTailText("(" + table.getDbParent().getName() + ")", true);
         }
         return builder;
     }
