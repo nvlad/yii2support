@@ -97,6 +97,7 @@
         <!-- Database -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ActiveQueryCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.MigrationCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ParamsCompletionContributor"/>
 
     </extensions>
 
