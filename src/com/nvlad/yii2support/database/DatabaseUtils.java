@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by oleg on 23.03.2017.
@@ -85,6 +87,17 @@ public class DatabaseUtils {
         }
 
         return result;
+    }
+
+    static String[] extractParamsFromCondition(String condition) {
+        ArrayList<String> matches = new ArrayList<>();
+        String pattern = ":\\w+";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(condition);
+        while (m.find()) {
+            matches.add(m.group());
+        }
+        return (String[])matches.toArray(new String[0]);
     }
 
     @NotNull
