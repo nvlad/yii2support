@@ -33,7 +33,7 @@ import java.util.Hashtable;
 public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-        MethodReference methodRef = DatabaseUtils.getMethodRef(completionParameters.getPosition());
+        MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         if (methodRef != null) {
             Method method = (Method)methodRef.resolve();
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());

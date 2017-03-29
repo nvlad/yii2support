@@ -16,9 +16,8 @@ import org.jetbrains.annotations.NotNull;
 public class MigrationCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters>  {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-        Object possibleMethodRef = completionParameters.getPosition().getParent().getParent().getParent();
-        if (possibleMethodRef instanceof MethodReference) {
-            MethodReference methodRef = (MethodReference)possibleMethodRef;
+        MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
+        if (methodRef != null) {
             Method classMethod = (Method)methodRef.resolve();
             if (classMethod == null || !( classMethod.getParent() instanceof  PhpClass))
                 return;
