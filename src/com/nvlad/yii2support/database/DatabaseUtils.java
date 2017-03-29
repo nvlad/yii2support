@@ -65,16 +65,6 @@ public class DatabaseUtils {
         return list;
     }
 
-    @Nullable
-    public static MethodReference getMethodRef(PsiElement element) {
-        PsiElement parent = element.getParent();
-         if (parent == null)
-             return null;
-          else if (parent instanceof MethodReference)
-            return (MethodReference)parent;
-        else return getMethodRef(parent);
-    }
-
     public static ArrayList<LookupElementBuilder> getLookupItemsByAnnotations(PhpClass phpClass, PhpExpression position) {
         if (phpClass == null)
             return null;

@@ -37,6 +37,9 @@ public class MigrationCompletionContributor extends com.intellij.codeInsight.com
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-        return  PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class);
+        return  PlatformPatterns.or(
+                PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class),
+                PlatformPatterns.psiElement().withSuperParent(5, MethodReference.class)
+                );
     }
 }

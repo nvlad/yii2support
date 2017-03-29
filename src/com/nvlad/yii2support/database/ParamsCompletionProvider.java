@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class ParamsCompletionProvider extends CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-        MethodReference methodRef = DatabaseUtils.getMethodRef(completionParameters.getPosition());
+        MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         PsiElement position = completionParameters.getPosition();
         if (methodRef != null) {
             Method method = (Method) methodRef.resolve();

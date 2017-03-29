@@ -123,6 +123,18 @@ public class ClassUtils {
 
     }
 
+    @Nullable
+    public static MethodReference getMethodRef(PsiElement el, int recursionLimit) {
+        if (el == null)
+            return null;
+        else if (el.getParent() instanceof MethodReference)
+            return (MethodReference)el.getParent();
+        else if (recursionLimit <= 0)
+            return null;
+        else
+            return getMethodRef(el.getParent(), recursionLimit - 1);
+    }
+
     public static String removeQuotes(String str) {
         return str.replace("\"", "").replace("\'", "");
     }
