@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.database;
 
+import com.intellij.codeInsight.completion.CompletionInitializationContext;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
@@ -17,11 +18,23 @@ public class MigrationCompletionContributor extends com.intellij.codeInsight.com
     }
 
     @Override
+    public void beforeCompletion(@NotNull CompletionInitializationContext context) {
+
+        super.beforeCompletion(context);
+    }
+
+    @Override
+    public void duringCompletion(@NotNull CompletionInitializationContext context) {
+        super.duringCompletion(context);
+    }
+
+    @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
         //((MethodReferenceImpl) position.getParent()).resolve().getParent()
-        if ((typeChar == '\'' || typeChar == '"')  ) {
-            if (position.getParent() instanceof MethodReference) {
-                Method method = (Method)((MethodReference) position.getParent()).resolve();
+        if ((typeChar == '\'' || typeChar == '"' || typeChar == ',')  ) {
+            MethodReference methodRef = ClassUtils.getMethodRef(position, 2);
+            if (methodRef != null) {
+                Method method = (Method)methodRef.resolve();
                 if (method != null) {
                     Object possibleClass = method.getParent();
                     if (possibleClass instanceof PhpClass) {

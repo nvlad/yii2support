@@ -98,13 +98,8 @@ public class DatabaseUtils {
         if (field instanceof Field) {
             lookupString = ((Field) field).getName();
         }
-        LookupElementBuilder builder =  LookupElementBuilder.create(field, lookupString)
-                .withInsertHandler((insertionContext, lookupElement) -> {
+        LookupElementBuilder builder =  LookupElementBuilder.create(field, lookupString);
 
-                    Document document = insertionContext.getDocument();
-                    int insertPosition = insertionContext.getSelectionEndOffset();
-
-                });
         if (field instanceof Field) {
             builder.withIcon(((Field) field).getIcon());
             builder = builder.withTypeText(((Field) field).getType().toString());
