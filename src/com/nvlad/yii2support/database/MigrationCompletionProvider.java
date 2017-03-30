@@ -2,6 +2,8 @@ package com.nvlad.yii2support.database;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.PrefixMatcher;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
@@ -10,14 +12,24 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+
 /**
  * Created by oleg on 24.03.2017.
  */
 public class MigrationCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters>  {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-        MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
+
+       MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         if (methodRef != null) {
+
+            String currentColumn = completionResultSet.getPrefixMatcher().getPrefix();
+            if (currentColumn.indexOf(',') != -1) {
+                currentColumn = currentColumn.substring(currentColumn.lastIndexOf(',') + 1).trim();
+                completionResultSet = completionResultSet.withPrefixMatcher(currentColumn);
+            }
+
             Method classMethod = (Method)methodRef.resolve();
             if (classMethod == null || !( classMethod.getParent() instanceof  PhpClass))
                 return;
@@ -28,9 +40,11 @@ public class MigrationCompletionProvider extends com.intellij.codeInsight.comple
                 Method method = (Method)methodRef.resolve();
                 if (method != null) {
                     int paramIndex = ClassUtils.paramIndexForElement(completionParameters.getPosition());
-                    if (method.getParameters()[paramIndex].getName().equals("table") || method.getParameters()[paramIndex].getName().equals("refTable")) {
+                    Parameter currentParam = method.getParameters()[paramIndex];
+                    String currentParamName = currentParam.getName();
+                    if (currentParamName.equals("table") || currentParamName.equals("refTable")) {
                         completionResultSet.addAllElements(DatabaseUtils.getLookupItemsTables(project,  (PhpExpression) completionParameters.getPosition().getParent()));
-                    } else if  (method.getParameters()[paramIndex].getName().startsWith("column")) {
+                    } else if  (currentParamName.startsWith("column")) {
                         //methodRef.getParameterList().getParameters()[0].getText()
 
                         for (int i = 0; method.getParameters().length > i ; i++) {
@@ -54,7 +68,11 @@ public class MigrationCompletionProvider extends com.intellij.codeInsight.comple
                                 }
                                 tableName = ClassUtils.removeQuotes(tableName);
                                 tableName = DatabaseUtils.clearTablePrefixTags(tableName);
-                                completionResultSet.addAllElements(DatabaseUtils.getLookupItemsByTable(tableName, project, (PhpExpression) completionParameters.getPosition().getParent()));
+                                ArrayList<LookupElementBuilder> completionList = DatabaseUtils.getLookupItemsByTable(tableName, project, (PhpExpression) completionParameters.getPosition().getParent());
+                                if (completionList != null) {
+                                    completionResultSet.addAllElements(completionList);
+                                  }
+
                             }
                         }
                     }
