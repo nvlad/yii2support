@@ -40,6 +40,8 @@ public class MigrationCompletionProvider extends com.intellij.codeInsight.comple
                 Method method = (Method)methodRef.resolve();
                 if (method != null) {
                     int paramIndex = ClassUtils.paramIndexForElement(completionParameters.getPosition());
+                    if ( paramIndex == -1)
+                        return;
                     Parameter currentParam = method.getParameters()[paramIndex];
                     String currentParamName = currentParam.getName();
                     if (currentParamName.equals("table") || currentParamName.equals("refTable")) {
