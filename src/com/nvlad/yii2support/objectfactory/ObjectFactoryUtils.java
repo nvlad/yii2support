@@ -81,12 +81,15 @@ public class ObjectFactoryUtils {
         return phpClass;
     }
 
+    @Nullable
     static PhpClass getPhpClassInWidget(ArrayCreationExpression arrayCreation) {
         PsiElement parent = arrayCreation.getParent().getParent();
         if (parent != null && parent instanceof MethodReference) {
             MethodReference methodRef = (MethodReference) parent;
             if (methodRef.getName() != null && (methodRef.getName().equals("widget") || methodRef.getName().equals("begin"))) {
                 Method method = (Method)methodRef.resolve();
+                if (method == null)
+                    return null;
 
                 PhpExpression ref = methodRef.getClassReference();
                 if (ref != null && ref instanceof ClassReference && ClassUtils.paramIndexForElement(arrayCreation) == 0) {
@@ -106,9 +109,7 @@ public class ObjectFactoryUtils {
                         PhpClass widgetClass = ClassUtils.getPhpClassUniversal(methodRef.getProject(), element);
                         if (widgetClass != null)
                             return widgetClass;
-
                     }
-
                 }
 
             }
