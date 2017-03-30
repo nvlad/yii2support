@@ -40,14 +40,19 @@ public class MigrationCompletionProvider extends com.intellij.codeInsight.comple
                 Method method = (Method)methodRef.resolve();
                 if (method != null) {
                     int paramIndex = ClassUtils.paramIndexForElement(completionParameters.getPosition());
-                    if ( paramIndex == -1)
+                    if ( paramIndex == -1 || method.getParameters().length-1 < paramIndex)
                         return;
                     Parameter currentParam = method.getParameters()[paramIndex];
                     String currentParamName = currentParam.getName();
                     if (currentParamName.equals("table") || currentParamName.equals("refTable")) {
                         completionResultSet.addAllElements(DatabaseUtils.getLookupItemsTables(project,  (PhpExpression) completionParameters.getPosition().getParent()));
                     } else if  (currentParamName.startsWith("column")) {
-                        //methodRef.getParameterList().getParameters()[0].getText()
+                        if (currentParamName.equals("column") && methodRef.getParameters().length > paramIndex ) {
+                            PsiElement element = methodRef.getParameters()[paramIndex];
+                            String content = element.getText();
+                            if (content.indexOf(',') >= 0)
+                                return;
+                        }
 
                         for (int i = 0; method.getParameters().length > i ; i++) {
                             Parameter param = method.getParameters()[i];

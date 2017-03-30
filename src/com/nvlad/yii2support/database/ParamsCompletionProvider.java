@@ -25,7 +25,7 @@ public class ParamsCompletionProvider extends CompletionProvider<CompletionParam
         if (methodRef != null) {
             Method method = (Method) methodRef.resolve();
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
-            if (paramPosition > 0) {
+            if (paramPosition > 0 && method.getParameters().length > paramPosition) {
                 if (method.getParameters()[paramPosition].getName().equals("params") &&
                         method.getParameters()[paramPosition - 1].getName().equals("condition")) {
                     PsiElement element = methodRef.getParameters()[paramPosition - 1];

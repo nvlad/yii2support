@@ -24,7 +24,10 @@ public class ParamsCompletionContributor  extends com.intellij.codeInsight.compl
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
-        return  PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class);
+        return
+                PlatformPatterns.or(
+                    PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class),
+                        PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class));
     }
 
 }
