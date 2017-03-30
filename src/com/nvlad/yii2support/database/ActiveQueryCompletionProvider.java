@@ -37,11 +37,22 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         if (methodRef != null) {
+            // comma fix
+            String currentColumn = completionResultSet.getPrefixMatcher().getPrefix();
+            if (currentColumn.indexOf(',') != -1) {
+                currentColumn = currentColumn.substring(currentColumn.lastIndexOf(',') + 1).trim();
+                completionResultSet = completionResultSet.withPrefixMatcher(currentColumn);
+            }
+
+
             Method method = (Method)methodRef.resolve();
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
-            if (paramPosition >= 0 && method != null && method.getParameters().length > 0
-                    &&
-                    ( method.getParameters()[paramPosition].getName().equals("condition") || method.getParameters()[paramPosition].getName().startsWith("column"))
+            if (paramPosition >= 0 &&
+                    method.getParameters().length > paramPosition &&
+                    method != null &&
+                    method.getParameters().length > 0 &&
+                    ( method.getParameters()[paramPosition].getName().equals("condition") ||
+                            method.getParameters()[paramPosition].getName().startsWith("column"))
                ) {
 
                 PhpClass phpClass = method.getContainingClass();
@@ -68,8 +79,18 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                         }
                     }
                 }
-            } else if (method != null && method.getParameters().length > 0
-                    && (method.getParameters()[paramPosition].getName().startsWith("table"))) {
+            } else if ( method.getParameters().length > paramPosition &&
+                    method != null && method.getParameters().length > 0 &&
+                    (method.getParameters()[paramPosition].getName().startsWith("table"))) {
+
+                // cancel codecompletion in case of "table" have ,
+                if (method.getParameters()[paramPosition].getName().equals("table") && methodRef.getParameters().length > paramPosition ) {
+                    PsiElement element = methodRef.getParameters()[paramPosition];
+                    String content = element.getText();
+                    if (content.indexOf(',') >= 0)
+                        return;
+                }
+
                 ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
                 completionResultSet.addAllElements(lookups);
             }
