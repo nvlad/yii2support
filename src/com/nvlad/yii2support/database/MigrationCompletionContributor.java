@@ -30,7 +30,6 @@ public class MigrationCompletionContributor extends com.intellij.codeInsight.com
 
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-        //((MethodReferenceImpl) position.getParent()).resolve().getParent()
         if ((typeChar == '\'' || typeChar == '"' || typeChar == ',')  ) {
             MethodReference methodRef = ClassUtils.getMethodRef(position, 2);
             if (methodRef != null) {

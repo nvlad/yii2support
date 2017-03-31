@@ -1,6 +1,8 @@
 package com.nvlad.yii2support.database;
 
+import com.intellij.codeInsight.completion.PrioritizedLookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.codeInsight.lookup.LookupElementWeigher;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
@@ -28,7 +30,7 @@ import java.util.regex.Pattern;
 public class DatabaseUtils {
 
     @Nullable
-    public static ArrayList<LookupElementBuilder> getLookupItemsByTable(String table, Project project, PhpExpression position) {
+    static ArrayList<LookupElementBuilder> getLookupItemsByTable(String table, Project project, PhpExpression position) {
         ArrayList<LookupElementBuilder> list = new ArrayList<>();
         if (table == null ||table.isEmpty())
             return list;
@@ -48,7 +50,7 @@ public class DatabaseUtils {
         return list;
     }
 
-    public static ArrayList<LookupElementBuilder> getLookupItemsTables(Project project, PhpExpression position) {
+    static ArrayList<LookupElementBuilder> getLookupItemsTables(Project project, PhpExpression position) {
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
         ArrayList<LookupElementBuilder> list = new  ArrayList<>();
@@ -62,7 +64,7 @@ public class DatabaseUtils {
         return list;
     }
 
-    public static ArrayList<LookupElementBuilder> getLookupItemsByAnnotations(PhpClass phpClass, PhpExpression position) {
+    static ArrayList<LookupElementBuilder> getLookupItemsByAnnotations(PhpClass phpClass, PhpExpression position) {
         if (phpClass == null)
             return null;
         final ArrayList<LookupElementBuilder> result = new ArrayList<>();
@@ -115,7 +117,7 @@ public class DatabaseUtils {
     }
 
     @Nullable
-    public static String getTableByActiveRecordClass(PhpClass phpClass) {
+    static String getTableByActiveRecordClass(PhpClass phpClass) {
         Method[] methods = phpClass.getOwnMethods();
         for (Method method: methods) {
             if (method.getName().equals("tableName")) {
@@ -134,7 +136,7 @@ public class DatabaseUtils {
         return null;
     }
 
-    public static String clearTablePrefixTags(String str) {
+    static String clearTablePrefixTags(String str) {
         return str.replace("{{%", "").replace("}}", "").replace("{{", "");
     }
 
