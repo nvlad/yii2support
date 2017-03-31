@@ -18,10 +18,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,7 +77,7 @@ public class DatabaseUtils {
     }
 
     static String[] extractParamsFromCondition(String condition) {
-        ArrayList<String> matches = new ArrayList<>();
+        LinkedHashSet<String> matches = new LinkedHashSet<>();
         String pattern = ":\\w+";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(condition);

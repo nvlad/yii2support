@@ -141,6 +141,7 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
         template.addTextSegment(newLined ? "," : " ");
 
         editor.getCaretModel().moveToOffset(psiElement.getTextRange().getEndOffset());
+
         PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
         templateManager.startTemplate(editor, template);
     }
