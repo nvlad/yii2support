@@ -1,36 +1,16 @@
 package com.nvlad.yii2support.database;
 
-import com.intellij.codeInsight.ClassUtil;
 import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.completion.impl.CompletionSorterImpl;
-import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
-import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.codeInsight.lookup.LookupElementWeigher;
-import com.intellij.database.psi.DbDataSource;
-import com.intellij.database.psi.DbPsiFacade;
-import com.intellij.database.psi.DbTable;
-import com.intellij.database.psi.DbTableImpl;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.util.ArrayUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.PhpReadWriteAccessDetector;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.database.view.DatabaseView;
+import org.jetbrains.annotations.Nullable;
 
-import javax.naming.spi.ObjectFactory;
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 /**
  * Created by oleg on 16.02.2017.
@@ -44,13 +24,12 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
 
         MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         if (methodRef != null) {
+            String prefix = completionResultSet.getPrefixMatcher().getPrefix();
             // comma fix
-            String currentColumn = completionResultSet.getPrefixMatcher().getPrefix();
-            if (currentColumn.indexOf(',') != -1) {
-                currentColumn = currentColumn.substring(currentColumn.lastIndexOf(',') + 1).trim();
-                completionResultSet = completionResultSet.withPrefixMatcher(currentColumn);
-            }
-
+            completionResultSet = adjustPrefix(',', completionResultSet);
+            completionResultSet = adjustPrefix('.', completionResultSet);
+            completionResultSet = adjustPrefix('{', completionResultSet);
+            completionResultSet = adjustPrefix('%', completionResultSet);
 
             Method method = (Method)methodRef.resolve();
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
@@ -74,9 +53,11 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                         && ClassUtils.isClassInheritsOrEqual(activeRecordClass,
                         ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord")) ) {
 
-                    String tableName = DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+
+                    String tableName = getTable(prefix, activeRecordClass);
+
                     if (tableName != null) {
-                        tableName = ClassUtils.removeQuotes(tableName);
+                        tableName = DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
                         ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsByTable(tableName, completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
                         if (lookups != null && ! lookups.isEmpty()) {
                             addAllElementsPrioritiezed(lookups, completionResultSet);
@@ -105,6 +86,29 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
             }
         }
 
+    }
+
+    @Nullable
+    private String getTable(String stringToComplete, PhpClass activeRecordClass) {
+        String tableName = null;
+        if (stringToComplete.length() > 2 && stringToComplete.lastIndexOf(".") == stringToComplete.length() - 1 ) {
+            int startIndex = stringToComplete.lastIndexOf(' ');
+            if  (startIndex == -1)
+                startIndex = 0;
+            return stringToComplete.substring(startIndex + 1, stringToComplete.length() - 1 );
+        }
+
+        return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+    }
+
+    @NotNull
+    private CompletionResultSet adjustPrefix(Character chr, @NotNull CompletionResultSet completionResultSet) {
+        String currentColumn = completionResultSet.getPrefixMatcher().getPrefix();
+        if (currentColumn.indexOf(chr) != -1) {
+            currentColumn = currentColumn.substring(currentColumn.lastIndexOf(chr) + 1).trim();
+            completionResultSet = completionResultSet.withPrefixMatcher(currentColumn);
+        }
+        return completionResultSet;
     }
 
     private void addAllElementsPrioritiezed(ArrayList<LookupElementBuilder> lookups, @NotNull CompletionResultSet completionResultSet) {
