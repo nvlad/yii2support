@@ -54,9 +54,8 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
 
             Method method = (Method)methodRef.resolve();
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
-            if (paramPosition >= 0 &&
+            if (method != null && paramPosition >= 0 &&
                     method.getParameters().length > paramPosition &&
-                    method != null &&
                     method.getParameters().length > 0 &&
                     ( method.getParameters()[paramPosition].getName().equals("condition") ||
                             method.getParameters()[paramPosition].getName().startsWith("column"))
