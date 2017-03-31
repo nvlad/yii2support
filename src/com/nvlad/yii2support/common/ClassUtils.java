@@ -84,6 +84,8 @@ public class ClassUtils {
                 String strType = type.toString();
                 int index1 = strType.indexOf('\\');
                 int index2 = strType.indexOf('.');
+                if (index2 == -1)
+                    index2 = strType.length() - index1;;
                 if (index1 >= 0 && index2 >= 0){
                     String className = strType.substring(index1, index2);
                     return ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), className);
