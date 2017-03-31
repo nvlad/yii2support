@@ -6,6 +6,7 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -78,6 +79,19 @@ public class ClassUtils {
             }
             else if (expr instanceof MethodReference) {
                 methodRef = (MethodReference) expr;
+            } else if (expr instanceof Variable) {
+                PhpType type = expr.getType();
+                String strType = type.toString();
+                int index1 = strType.indexOf('\\');
+                int index2 = strType.indexOf('.');
+                if (index1 >= 0 && index2 >= 0){
+                    String className = strType.substring(index1, index2);
+                    return ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), className);
+                } else {
+                    return null;
+                }
+
+                // type.toString()
             } else {
                 return null;
             }
