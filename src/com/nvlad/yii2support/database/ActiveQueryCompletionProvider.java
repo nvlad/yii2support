@@ -30,6 +30,7 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
             completionResultSet = adjustPrefix('.', completionResultSet);
             completionResultSet = adjustPrefix('{', completionResultSet);
             completionResultSet = adjustPrefix('%', completionResultSet);
+            completionResultSet = adjustPrefix('(', completionResultSet);
 
             Method method = (Method)methodRef.resolve();
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
@@ -95,7 +96,7 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
             int startIndex = stringToComplete.lastIndexOf(' ');
             if  (startIndex == -1)
                 startIndex = 0;
-            return stringToComplete.substring(startIndex + 1, stringToComplete.length() - 1 );
+            return stringToComplete.substring(startIndex, stringToComplete.length() - 1 ).trim();
         }
 
         return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
