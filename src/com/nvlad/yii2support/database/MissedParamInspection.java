@@ -29,6 +29,8 @@ public class MissedParamInspection extends PhpInspection {
                 MethodReference methodRef = ClassUtils.getMethodRef(expression, 10);
                 if (methodRef != null) {
                     Method method = (Method) methodRef.resolve();
+                    if (method == null)
+                        return;
                     int paramPosition = ClassUtils.paramIndexForElement(expression);
                     if (paramPosition > 0 && method.getParameters().length > paramPosition) {
                         if (method.getParameters()[paramPosition].getName().equals("params") &&
