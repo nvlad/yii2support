@@ -6,9 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElementWeigher;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
-import com.intellij.database.psi.DbDataSource;
-import com.intellij.database.psi.DbPsiFacade;
-import com.intellij.database.psi.DbTable;
+import com.intellij.database.psi.*;
 import com.intellij.database.view.DatabaseView;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
@@ -16,6 +14,7 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
+import icons.DatabaseIcons;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -100,18 +99,20 @@ public class DatabaseUtils {
         LookupElementBuilder builder =  LookupElementBuilder.create(field, lookupString);
 
         if (field instanceof Field) {
-            builder.withIcon(((Field) field).getIcon());
-            builder = builder.withTypeText(((Field) field).getType().toString());
+            builder = builder.withTypeText(((Field) field).getType().toString())
+                             .withIcon(((Field) field).getIcon());
         }
         if (field instanceof DasColumn) {
             DasColumn column = (DasColumn)field;
             builder = builder.withTypeText(column.getDataType().typeName)
-            .withTailText("(" + column.getDbParent().getDbParent().getName() + '.' +column.getTableName() + ")", true);
+            .withTailText(" => " + column.getDbParent().getDbParent().getName() + '.' +column.getTableName(), true)
+            .withIcon(((DbColumnImpl) column).getIcon());
         }
         if (field instanceof DasTable) {
             DasTable table = (DasTable)field;
             builder = builder.withTypeText("DbTable")
-                    .withTailText("(" + table.getDbParent().getName() + ")", true);
+                    .withTailText(" => " + table.getDbParent().getName(), true)
+                    .withIcon(((DbTableImpl) table).getIcon());
         }
         return builder;
     }
