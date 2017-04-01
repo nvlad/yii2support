@@ -96,7 +96,7 @@ public class ObjectFactoryUtils {
                     PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "\\yii\\base\\Widget");
                     if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass))
                         return callingClass;
-                } else if (ref != null && ref instanceof MethodReference && ClassUtils.paramIndexForElement(arrayCreation) == 1 ) {
+                } else if (method != null && ref != null && ref instanceof MethodReference && ClassUtils.paramIndexForElement(arrayCreation) == 1 ) {
                     // This code process
                     // $form->field($model, 'username')->widget(\Class::className())
                     PhpClass callingClass = method.getContainingClass();
@@ -121,9 +121,11 @@ public class ObjectFactoryUtils {
         if (parent != null && parent instanceof ArrayCreationExpression) {
             PsiElement possibleHashElement = arrayCreation.getParent().getParent().getParent().getParent();
 
+            PsiElement key = ((ArrayHashElement) possibleHashElement).getKey();
             if (possibleHashElement instanceof ArrayHashElement &&
-                    ((ArrayHashElement) possibleHashElement).getKey().getText() != null &&
-                    ((ArrayHashElement) possibleHashElement).getKey().getText().replace("\"", "").replace("\'", "").equals("columns")) {
+                    key != null &
+                    key.getText() != null &&
+                    key.getText().replace("\"", "").replace("\'", "").equals("columns")) {
                 PsiElement methodRef = possibleHashElement.getParent().getParent().getParent();
                 if (methodRef instanceof MethodReference) {
                     MethodReference method = (MethodReference) methodRef;
