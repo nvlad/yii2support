@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
 
 
-
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
@@ -32,58 +31,69 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
             completionResultSet = adjustPrefix('%', completionResultSet);
             completionResultSet = adjustPrefix('(', completionResultSet);
 
-            Method method = (Method)methodRef.resolve();
-            int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
-            if (method != null && paramPosition >= 0 &&
-                    method.getParameters().length > paramPosition &&
-                    method.getParameters().length > 0 &&
-                    ( method.getParameters()[paramPosition].getName().equals("condition") ||
-                            method.getParameters()[paramPosition].getName().startsWith("column"))
-               ) {
+            Method method = (Method) methodRef.resolve();
+            if (method == null) {
+                return;
+            }
 
-                PhpClass phpClass = method.getContainingClass();
-                PhpClass activeRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
-                if (phpClass == null || activeRecordClass == null)
-                    return;
-                PhpIndex index = PhpIndex.getInstance(method.getProject());
-                if ((ClassUtils.isClassInheritsOrEqual(phpClass,
-                        ClassUtils.getClass(index, "\\yii\\db\\Query"))
-                        || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\QueryTrait"))
-                        || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))
-                )
-                        && ClassUtils.isClassInheritsOrEqual(activeRecordClass,
-                        ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord")) ) {
+            int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
+
+            PhpClass phpClass = method.getContainingClass();
+            if (phpClass == null)
+                return;
+
+            PhpClass activeRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
+
+            PhpIndex index = PhpIndex.getInstance(method.getProject());
+            if ((ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Query"))
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\QueryTrait"))
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")))) {
+
+                if (activeRecordClass != null && paramPosition >= 0 &&
+                        method.getParameters().length > paramPosition &&
+                        method.getParameters().length > 0 &&
+                        (method.getParameters()[paramPosition].getName().equals("condition") ||
+                                method.getParameters()[paramPosition].getName().startsWith("column")) ) {
+
 
 
                     String tableName = getTable(prefix, activeRecordClass);
-
-                    if (tableName != null) {
-                        tableName = DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
-                        ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsByTable(tableName, completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
-                        if (lookups != null && ! lookups.isEmpty()) {
-                            addAllElementsPrioritiezed(lookups, completionResultSet);
-                        } else {
-                            ArrayList<LookupElementBuilder> items = DatabaseUtils.getLookupItemsByAnnotations(activeRecordClass, (PhpExpression) completionParameters.getPosition().getParent());
-                            completionResultSet.addAllElements(items);
-                        }
-                        lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
-                        completionResultSet.addAllElements(lookups);
-                    }
-                }
-            } else if ( method.getParameters().length > paramPosition &&
-                    method != null && method.getParameters().length > 0 &&
-                    (method.getParameters()[paramPosition].getName().startsWith("table"))) {
-
-                // cancel codecompletion in case of "table" have ,
-                if (method.getParameters()[paramPosition].getName().equals("table") && methodRef.getParameters().length > paramPosition ) {
-                    PsiElement element = methodRef.getParameters()[paramPosition];
-                    String content = element.getText();
-                    if (content.indexOf(',') >= 0)
+                    if ( tableName == null || tableName.isEmpty())
                         return;
-                }
 
-                ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
-                completionResultSet.addAllElements(lookups);
+
+                    tableName = DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
+                    ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsByTable(tableName, completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                    if (lookups != null && !lookups.isEmpty()) {
+                        addAllElementsPrioritiezed(lookups, completionResultSet);
+                    } else {
+                        ArrayList<LookupElementBuilder> items = DatabaseUtils.getLookupItemsByAnnotations(activeRecordClass, (PhpExpression) completionParameters.getPosition().getParent());
+                        completionResultSet.addAllElements(items);
+                    }
+                    lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                    completionResultSet.addAllElements(lookups);
+
+
+                } else if ( method.getParameters().length > paramPosition &&
+                        method.getParameters().length > 0 &&
+                        (method.getParameters()[paramPosition].getName().startsWith("table"))) {
+
+                    // cancel codecompletion in case of "table" have ,
+                    if (method.getParameters()[paramPosition].getName().equals("table") && methodRef.getParameters().length > paramPosition) {
+                        PsiElement element = methodRef.getParameters()[paramPosition];
+                        String content = element.getText();
+                        if (content.indexOf(',') >= 0)
+                            return;
+                    }
+
+                    ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                    completionResultSet.addAllElements(lookups);
+                } else if (activeRecordClass == null &&
+                        (method.getParameters()[paramPosition].getName().equals("condition") || method.getParameters()[paramPosition].getName().startsWith("column"))) {
+                    ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                    completionResultSet.addAllElements(lookups);
+
+                }
             }
         }
 
@@ -92,14 +102,16 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
     @Nullable
     private String getTable(String stringToComplete, PhpClass activeRecordClass) {
         String tableName = null;
-        if (stringToComplete.length() > 2 && stringToComplete.lastIndexOf(".") == stringToComplete.length() - 1 ) {
+        if (stringToComplete.length() > 2 && stringToComplete.lastIndexOf(".") == stringToComplete.length() - 1) {
             int startIndex = stringToComplete.lastIndexOf(' ');
-            if  (startIndex == -1)
+            if (startIndex == -1)
                 startIndex = 0;
-            return stringToComplete.substring(startIndex, stringToComplete.length() - 1 ).trim();
+            return stringToComplete.substring(startIndex, stringToComplete.length() - 1).trim();
         }
-
-        return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+        if (activeRecordClass != null)
+            return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+        else
+            return null;
     }
 
     @NotNull
