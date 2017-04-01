@@ -40,6 +40,7 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
             completionResultSet = adjustPrefix('(', completionResultSet);
 
             Method method = (Method) methodRef.resolve();
+
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
             if (method != null && paramPosition >= 0 &&
                     method.getParameters().length > paramPosition &&
@@ -63,6 +64,9 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
 
 
                     String tableName = getTable(prefix, activeRecordClass);
+                    if ( tableName == null || tableName.isEmpty())
+                        return;
+
 
                     if (tableName != null) {
                         tableName = DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
@@ -108,8 +112,10 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                 return matcher.group(1).startsWith("{{") ? matcher.group("te") : matcher.group("tu");
             }
         }
-
-        return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+        if (activeRecordClass != null)
+            return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+        else
+            return null;
     }
 
     private boolean isTabledPrefix(String prefix) {
