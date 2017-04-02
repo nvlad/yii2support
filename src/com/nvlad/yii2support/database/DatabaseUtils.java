@@ -1,25 +1,23 @@
 package com.nvlad.yii2support.database;
 
-import com.intellij.codeInsight.completion.PrioritizedLookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.codeInsight.lookup.LookupElementWeigher;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
 import com.intellij.database.psi.*;
-import com.intellij.database.view.DatabaseView;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.nvlad.yii2support.common.ClassUtils;
-import icons.DatabaseIcons;
-import org.jetbrains.annotations.Contract;
+import com.nvlad.yii2support.common.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,21 +117,14 @@ public class DatabaseUtils {
 
     @Nullable
     static String getTableByActiveRecordClass(PhpClass phpClass) {
-        Method[] methods = phpClass.getOwnMethods();
-        for (Method method: methods) {
-            if (method.getName().equals("tableName")) {
-                for (PsiElement elem: method.getChildren()) {
-                    if (elem.getChildren().length > 0) {
-                        for (PsiElement element: elem.getChildren()) {
-                            if (element instanceof PhpReturn) {
-                                if ((element).getChildren().length > 0)
-                                    return clearTablePrefixTags( (element).getChildren()[0].getText());
-                            }
-                        }
-                    }
-                }
+        Method method = phpClass.findMethodByName("tableName");
+        Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
+        for (PhpReturn element: returns) {
+            if ((element).getChildren().length > 0) {
+                return clearTablePrefixTags((element).getChildren()[0].getText());
             }
         }
+
         return null;
     }
 
