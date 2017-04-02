@@ -1,26 +1,30 @@
 package com.nvlad.yii2support.database;
 
-import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.PrioritizedLookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpExpression;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by oleg on 16.02.2017.
  */
 public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
-
-
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-
         MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         if (methodRef != null) {
             String prefix = completionResultSet.getPrefixMatcher().getPrefix();
@@ -28,6 +32,7 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
             completionResultSet = adjustPrefix(',', completionResultSet);
             completionResultSet = adjustPrefix('.', completionResultSet);
             completionResultSet = adjustPrefix('{', completionResultSet);
+            completionResultSet = adjustPrefix('[', completionResultSet);
             completionResultSet = adjustPrefix('%', completionResultSet);
             completionResultSet = adjustPrefix('(', completionResultSet);
 
@@ -53,28 +58,26 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                         method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
                         (method.getParameters()[paramPosition].getName().equals("condition") ||
-                                method.getParameters()[paramPosition].getName().startsWith("column")) ) {
-
+                                method.getParameters()[paramPosition].getName().startsWith("column"))) {
 
 
                     String tableName = getTable(prefix, activeRecordClass);
-                    if ( tableName == null || tableName.isEmpty())
+                    if (tableName == null || tableName.isEmpty())
                         return;
-
 
                     tableName = DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
                     ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsByTable(tableName, completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
                     if (lookups != null && !lookups.isEmpty()) {
-                        addAllElementsPrioritiezed(lookups, completionResultSet);
+                        addAllElementsWithPriority(lookups, completionResultSet, 2, true); // columns
                     } else {
                         ArrayList<LookupElementBuilder> items = DatabaseUtils.getLookupItemsByAnnotations(activeRecordClass, (PhpExpression) completionParameters.getPosition().getParent());
-                        completionResultSet.addAllElements(items);
+                        addAllElementsWithPriority(lookups, completionResultSet, 2, true); // fields
                     }
-                    lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
-                    completionResultSet.addAllElements(lookups);
-
-
-                } else if ( method.getParameters().length > paramPosition &&
+                    if (isTabledPrefix(prefix)) {
+                        lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                        addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
+                    }
+                } else if (method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
                         (method.getParameters()[paramPosition].getName().startsWith("table"))) {
 
@@ -86,13 +89,14 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                             return;
                     }
 
-                    ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
-                    completionResultSet.addAllElements(lookups);
+                    if (isTabledPrefix(prefix)) {
+                        ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                        addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
+                    }
                 } else if (activeRecordClass == null &&
                         (method.getParameters()[paramPosition].getName().equals("condition") || method.getParameters()[paramPosition].getName().startsWith("column"))) {
                     ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
-                    completionResultSet.addAllElements(lookups);
-
+                    addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                 }
             }
         }
@@ -101,17 +105,29 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
 
     @Nullable
     private String getTable(String stringToComplete, PhpClass activeRecordClass) {
-        String tableName = null;
-        if (stringToComplete.length() > 2 && stringToComplete.lastIndexOf(".") == stringToComplete.length() - 1) {
-            int startIndex = stringToComplete.lastIndexOf(' ');
-            if (startIndex == -1)
-                startIndex = 0;
-            return stringToComplete.substring(startIndex, stringToComplete.length() - 1).trim();
+        if (stringToComplete.length() > 2 && stringToComplete.contains(".")) {
+            // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
+            // "table.[[", "table.col" and "table." at end of string and set named group value
+            // "te" for escaped table name or "tu" for unescaped table name
+            Pattern pattern = Pattern.compile("((\\{{2}%?)(?=[\\w-]+}{2})(?<te>[\\w-]+)}{2}|(?<tu>[\\w-]+))\\.((\\[\\[)?[\\w-]*)?$");
+            Matcher matcher = pattern.matcher(stringToComplete);
+            if (matcher.matches()) {
+                return matcher.group(1).startsWith("{{") ? matcher.group("te") : matcher.group("tu");
+            }
         }
+
         if (activeRecordClass != null)
             return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
         else
             return null;
+    }
+
+    private boolean isTabledPrefix(String prefix) {
+        // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
+        // "table.[[", "table.col" and "table." at end of string
+        Pattern pattern = Pattern.compile("((\\{{2}%?)(?=[\\w-]+}{2})[\\w-]+}{2}|[\\w-]+)\\.((\\[\\[)?[\\w-]*)?$");
+        Matcher matcher = pattern.matcher(prefix);
+        return matcher.find();
     }
 
     @NotNull
@@ -124,10 +140,14 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
         return completionResultSet;
     }
 
-    private void addAllElementsPrioritiezed(ArrayList<LookupElementBuilder> lookups, @NotNull CompletionResultSet completionResultSet) {
+    private void addAllElementsWithPriority(ArrayList<LookupElementBuilder> lookups, @NotNull CompletionResultSet completionResultSet, double priority) {
+        addAllElementsWithPriority(lookups, completionResultSet, priority, false);
+    }
+
+    private void addAllElementsWithPriority(ArrayList<LookupElementBuilder> lookups, @NotNull CompletionResultSet completionResultSet, double priority, boolean bold) {
         for (LookupElementBuilder element : lookups) {
-            element = element.withBoldness(true).withItemTextUnderlined(true);
-            completionResultSet.addElement(PrioritizedLookupElement.withPriority(element, Double.MAX_VALUE));
+            element = element.withBoldness(bold);
+            completionResultSet.addElement(PrioritizedLookupElement.withPriority(element, priority));
         }
     }
 
