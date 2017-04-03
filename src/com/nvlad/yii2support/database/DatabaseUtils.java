@@ -108,9 +108,12 @@ public class DatabaseUtils {
         }
         if (field instanceof DasTable) {
             DasTable table = (DasTable)field;
-            builder = builder.withTypeText("DbTable")
-                    .withTailText(" => " + table.getDbParent().getName(), true)
-                    .withIcon(((DbTableImpl) table).getIcon());
+            DasObject tableSchema = table.getDbParent();
+            builder = builder.withTypeText("DbTable");
+            if (tableSchema != null)
+                builder = builder.withTailText(" => " + table.getDbParent().getName(), true);
+            if (table instanceof DbTableImpl )
+                builder = builder.withIcon(((DbTableImpl) table).getIcon());
         }
         return builder;
     }

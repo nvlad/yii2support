@@ -22,13 +22,12 @@ import java.util.regex.Pattern;
 /**
  * Created by oleg on 16.02.2017.
  */
-public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
+public class QueryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         if (methodRef != null) {
             String prefix = completionResultSet.getPrefixMatcher().getPrefix();
-            // comma fix
             completionResultSet = adjustPrefix(',', completionResultSet);
             completionResultSet = adjustPrefix('.', completionResultSet);
             completionResultSet = adjustPrefix('{', completionResultSet);
@@ -47,19 +46,22 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
             if (phpClass == null)
                 return;
 
-            PhpClass activeRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
+
 
             PhpIndex index = PhpIndex.getInstance(method.getProject());
-            if ((ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Query"))
+            if ( (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Query"))
                     || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\QueryTrait"))
-                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")))) {
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")) )) {
 
+
+                PhpClass activeRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
+
+                /*----- ActiveQuery condition and column paramters ----*/
                 if (activeRecordClass != null && paramPosition >= 0 &&
                         method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
                         (method.getParameters()[paramPosition].getName().equals("condition") ||
                                 method.getParameters()[paramPosition].getName().startsWith("column"))) {
-
 
                     String tableName = getTable(prefix, activeRecordClass);
                     if (tableName == null || tableName.isEmpty())
@@ -73,10 +75,11 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                         ArrayList<LookupElementBuilder> items = DatabaseUtils.getLookupItemsByAnnotations(activeRecordClass, (PhpExpression) completionParameters.getPosition().getParent());
                         addAllElementsWithPriority(lookups, completionResultSet, 2, true); // fields
                     }
-                    if (isTabledPrefix(prefix)) {
+                    if (!isTabledPrefix(prefix)) {
                         lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
                         addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                     }
+                /*---  table parameter -----*/
                 } else if (method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
                         (method.getParameters()[paramPosition].getName().startsWith("table"))) {
@@ -93,6 +96,7 @@ public class ActiveQueryCompletionProvider extends com.intellij.codeInsight.comp
                         ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
                         addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                     }
+                    /*---  Query -----*/
                 } else if (activeRecordClass == null &&
                         (method.getParameters()[paramPosition].getName().equals("condition") || method.getParameters()[paramPosition].getName().startsWith("column"))) {
                     ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());

@@ -6,7 +6,6 @@ import com.nvlad.yii2support.PluginTestCase;
 
 import java.io.File;
 
-
 /**
  * Created by oleg on 16.03.2017..
  */

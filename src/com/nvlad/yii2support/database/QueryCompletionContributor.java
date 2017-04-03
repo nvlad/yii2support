@@ -5,20 +5,17 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.ProcessingContext;
 import com.intellij.util.containers.MultiMap;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-
-public class ActiveQueryCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
+public class QueryCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     private final MultiMap<CompletionType, Pair<ElementPattern<? extends PsiElement>, CompletionProvider<CompletionParameters>>> myMap = new MultiMap();
 
-    public ActiveQueryCompletionContributor() {
-        extend(CompletionType.BASIC, ElementPattern(), new ActiveQueryCompletionProvider());
+    public QueryCompletionContributor() {
+        extend(CompletionType.BASIC, ElementPattern(), new QueryCompletionProvider());
     }
 
     @Override
