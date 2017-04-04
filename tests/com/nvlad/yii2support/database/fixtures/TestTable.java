@@ -7,6 +7,7 @@ import com.intellij.database.model.ObjectKind;
 import com.intellij.database.psi.DbDataSource;
 import com.intellij.database.psi.DbElement;
 import com.intellij.database.psi.DbTable;
+import com.intellij.database.util.DasUtil;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.navigation.ItemPresentation;
@@ -25,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,11 +39,16 @@ public class TestTable implements DbTable {
     String name;
     TestNamespace parent;
     Project project;
+    List<DasColumn> columns = new ArrayList<>();
 
     public TestTable(String name, TestNamespace parent, Project project) {
         this.name = name;
         this.parent = parent;
         this.project = project;
+    }
+
+    public void addColumn(DasColumn column) {
+        columns.add(column);
     }
 
     @Override
@@ -55,7 +64,9 @@ public class TestTable implements DbTable {
     @NotNull
     @Override
     public Set<DasColumn.Attribute> getColumnAttrs(@Nullable DasColumn columnInfo) {
-        return null;
+
+        return DasUtil.NO_ATTRS;
+
     }
 
     @Nullable
@@ -128,6 +139,35 @@ public class TestTable implements DbTable {
     @NotNull
     @Override
     public <C> JBIterable<C> getDbChildren(@NotNull Class<C> clazz, @NotNull ObjectKind kind) {
+        if (clazz == DasColumn.class) {
+            JBIterable<C> iter = new JBIterable<C>() {
+                @Override
+                public Iterator<C> iterator() {
+                    return new Iterator<C>() {
+                        int counter = 0;
+                        @Override
+                        public boolean hasNext() {
+                            if (clazz == DasColumn.class) {
+                                return columns.size() > counter;
+                            } else
+                                return false;
+                        }
+
+                        @Override
+                        public C next() {
+                            if (clazz == DasColumn.class) {
+                                return (C)columns.get(counter++);
+                            } else
+                                return null;
+
+                        }
+                    };
+                }
+            };
+            return iter;
+
+
+        }
         return null;
     }
 

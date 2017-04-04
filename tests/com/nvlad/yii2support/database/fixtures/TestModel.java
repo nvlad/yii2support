@@ -1,8 +1,7 @@
 package com.nvlad.yii2support.database.fixtures;
 
 import com.intellij.database.model.*;
-import com.intellij.database.psi.DbNamespaceImpl;
-import com.intellij.database.psi.DbSchemaChildImpl;
+import com.intellij.database.psi.*;
 import com.intellij.database.util.Casing;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.JBIterable;
@@ -74,7 +73,12 @@ public class TestModel implements DasModel {
 
         List<DasObject> list = new LinkedList<>();
         TestNamespace namespace = new TestNamespace();
-        list.add(new TestTable("person", namespace, project));
+        TestTable table1 = new TestTable("person", namespace, project);
+
+        table1.addColumn(new TestColumn("name", project));
+        table1.addColumn(new TestColumn("surname", project));
+        table1.addColumn(new TestColumn("birth_date", project));
+        list.add(table1);
         list.add(new TestTable("address", namespace, project));
         return new JBTreeTraverser<>(dasObject -> () -> new Iterator<DasObject>() {
             int current = 0;

@@ -124,7 +124,7 @@ public class TestDataSource implements DbDataSource {
     @NotNull
     @Override
     public DbDataSource getDataSource() {
-        return null;
+        return this;
     }
 
     @Override

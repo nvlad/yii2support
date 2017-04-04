@@ -29,7 +29,7 @@ public class ObjectFactoryTests extends PluginTestCase {
                 " \\yii\\base\\TestWidget::widget(['<caret>']) ;\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
+        assertEquals(myFixture.getLookupElementStrings().size(), 2);
     }
 
     public void testCompletionWidget_begin() {
@@ -38,7 +38,7 @@ public class ObjectFactoryTests extends PluginTestCase {
                 " \\yii\\base\\TestWidget::begin(['<caret>']) ;\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
+        assertEquals(myFixture.getLookupElementStrings().size(), 2);
     }
 
     public void testCompletionObject_create() {
@@ -47,7 +47,7 @@ public class ObjectFactoryTests extends PluginTestCase {
                 " new \\yii\\base\\TestWidget(['<caret>']) ;\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
+        assertEquals(myFixture.getLookupElementStrings().size(), 2);
     }
 
     public void testCompletion_createObject() {
@@ -56,7 +56,7 @@ public class ObjectFactoryTests extends PluginTestCase {
                 " $test = new \\yii\\base\\TestWidget(['<caret>']) ;\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
+        assertEquals(myFixture.getLookupElementStrings().size(), 2);
     }
 
     public void testCompletionInConfigAndSubObject() {
@@ -65,7 +65,7 @@ public class ObjectFactoryTests extends PluginTestCase {
                 " $test = ['request' => [ 'subobject' => ['<caret>']] ;\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 3);
+        assertEquals(myFixture.getLookupElementStrings().size(), 3);
     }
 
     public void testCompletionYii_createObject() {
@@ -74,7 +74,7 @@ public class ObjectFactoryTests extends PluginTestCase {
                 " \\yii\\Yii::createObject('\\yii\\web\\SubObject', ['<caret>']) ;\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 3);
+        assertEquals(myFixture.getLookupElementStrings().size(), 3);
     }
 
     public void testCompletionYii_gridColumns() {
@@ -83,7 +83,7 @@ public class ObjectFactoryTests extends PluginTestCase {
                 " \\yii\\grid\\GridView::widget([\n" +
                 "    'columns' => [['<caret>']] ");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().toArray().length, 2);
+        assertEquals(myFixture.getLookupElementStrings().size(), 2);
     }
 
 }

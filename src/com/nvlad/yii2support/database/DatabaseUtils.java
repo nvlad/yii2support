@@ -50,6 +50,11 @@ public class DatabaseUtils {
     static ArrayList<LookupElementBuilder> getLookupItemsTables(Project project, PhpExpression position) {
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
+
+        // Code to test tests :)
+        //dataSources.clear();
+        //dataSources.add(new TestDataSource(project));
+
         ArrayList<LookupElementBuilder> list = new  ArrayList<>();
         for (DbDataSource source: dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
@@ -102,9 +107,11 @@ public class DatabaseUtils {
         }
         if (field instanceof DasColumn) {
             DasColumn column = (DasColumn)field;
-            builder = builder.withTypeText(column.getDataType().typeName)
-            .withTailText(" => " + column.getDbParent().getDbParent().getName() + '.' +column.getTableName(), true)
-            .withIcon(((DbColumnImpl) column).getIcon());
+            builder = builder.withTypeText(column.getDataType().typeName);
+            if (column.getDbParent() != null)
+                builder = builder.withTailText(" => " + column.getDbParent().getDbParent().getName() + '.' +column.getTableName(), true);
+            if (column instanceof  DbColumnImpl)
+                builder = builder.withIcon(((DbColumnImpl) column).getIcon());
         }
         if (field instanceof DasTable) {
             DasTable table = (DasTable)field;

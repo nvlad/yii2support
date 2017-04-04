@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.PrioritizedLookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
@@ -46,8 +47,6 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
             if (phpClass == null)
                 return;
 
-
-
             PhpIndex index = PhpIndex.getInstance(method.getProject());
             if ( (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Query"))
                     || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\QueryTrait"))
@@ -57,6 +56,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                 PhpClass activeRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
 
                 /*----- ActiveQuery condition and column paramters ----*/
+                Project project = completionParameters.getPosition().getProject();
                 if (activeRecordClass != null && paramPosition >= 0 &&
                         method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
@@ -67,8 +67,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                     if (tableName == null || tableName.isEmpty())
                         return;
 
-                    tableName = DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
-                    ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsByTable(tableName, completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                    ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsByTable(tableName, project, (PhpExpression) completionParameters.getPosition().getParent());
                     if (lookups != null && !lookups.isEmpty()) {
                         addAllElementsWithPriority(lookups, completionResultSet, 2, true); // columns
                     } else {
@@ -76,7 +75,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                         addAllElementsWithPriority(lookups, completionResultSet, 2, true); // fields
                     }
                     if (!isTabledPrefix(prefix)) {
-                        lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                        lookups = DatabaseUtils.getLookupItemsTables(project, (PhpExpression) completionParameters.getPosition().getParent());
                         addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                     }
                 /*---  table parameter -----*/
@@ -93,13 +92,19 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                     }
 
                     if (isTabledPrefix(prefix)) {
-                        ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                        ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(project, (PhpExpression) completionParameters.getPosition().getParent());
                         addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                     }
                     /*---  Query -----*/
                 } else if (activeRecordClass == null &&
                         (method.getParameters()[paramPosition].getName().equals("condition") || method.getParameters()[paramPosition].getName().startsWith("column"))) {
-                    ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(completionParameters.getPosition().getProject(), (PhpExpression) completionParameters.getPosition().getParent());
+                    ArrayList<LookupElementBuilder> lookups = null;
+                    PhpExpression expr = (PhpExpression) completionParameters.getPosition().getParent();
+                    if (isTabledPrefix(prefix)) {
+                        lookups = DatabaseUtils.getLookupItemsByTable(getTable(prefix, null), project, expr);
+                    } else {
+                        lookups = DatabaseUtils.getLookupItemsTables(project, expr);
+                    }
                     addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                 }
             }
@@ -108,7 +113,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
     }
 
     @Nullable
-    private String getTable(String stringToComplete, PhpClass activeRecordClass) {
+    private String getTable(String stringToComplete, @Nullable PhpClass activeRecordClass) {
         if (stringToComplete.length() > 2 && stringToComplete.contains(".")) {
             // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
             // "table.[[", "table.col" and "table." at end of string and set named group value
@@ -116,12 +121,15 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
             Pattern pattern = Pattern.compile("((\\{{2}%?)(?=[\\w-]+}{2})(?<te>[\\w-]+)}{2}|(?<tu>[\\w-]+))\\.((\\[\\[)?[\\w-]*)?$");
             Matcher matcher = pattern.matcher(stringToComplete);
             if (matcher.matches()) {
-                return matcher.group(1).startsWith("{{") ? matcher.group("te") : matcher.group("tu");
+                String tableName = matcher.group(1).startsWith("{{") ? matcher.group("te") : matcher.group("tu");
+                return DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
             }
         }
 
-        if (activeRecordClass != null)
-            return DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+        if (activeRecordClass != null) {
+            String tableName =  DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
+            return DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
+        }
         else
             return null;
     }
