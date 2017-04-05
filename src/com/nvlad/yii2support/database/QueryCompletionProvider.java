@@ -126,10 +126,12 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
 
         if (activeRecordClass != null) {
             String tableName =  DatabaseUtils.getTableByActiveRecordClass(activeRecordClass);
-            return DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
+            if (tableName != null) {
+                return DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
+            }
         }
-        else
-            return null;
+
+        return null;
     }
 
     private boolean isTabledPrefix(String prefix) {
