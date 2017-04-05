@@ -116,13 +116,11 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
     private String getTable(String stringToComplete, @Nullable PhpClass activeRecordClass) {
         if (stringToComplete.length() > 2 && stringToComplete.contains(".")) {
             // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
-            // "table.[[", "table.col" and "table." at end of string and set named group value
-            // "te" for escaped table name or "tu" for unescaped table name
-            Pattern pattern = Pattern.compile("((\\{{2}%?)(?=[\\w-]+}{2})(?<te>[\\w-]+)}{2}|(?<tu>[\\w-]+))\\.((\\[\\[)?[\\w-]*)?$");
+            // "table.[[", "table.col" and "table." at end of string and return "tn" group with table name
+            Pattern pattern = Pattern.compile("((?<tn>[\\w-]+)}{2})\\.((\\[\\[)?[\\w-]*)?$");
             Matcher matcher = pattern.matcher(stringToComplete);
             if (matcher.matches()) {
-                String tableName = matcher.group(1).startsWith("{{") ? matcher.group("te") : matcher.group("tu");
-                return DatabaseUtils.clearTablePrefixTags(ClassUtils.removeQuotes(tableName));
+                return matcher.group("tn");
             }
         }
 
@@ -137,7 +135,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
     private boolean isTabledPrefix(String prefix) {
         // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
         // "table.[[", "table.col" and "table." at end of string
-        Pattern pattern = Pattern.compile("((\\{{2}%?)(?=[\\w-]+}{2})[\\w-]+}{2}|[\\w-]+)\\.((\\[\\[)?[\\w-]*)?$");
+        Pattern pattern = Pattern.compile("[\\w-]+}{2}?\\.((\\[\\[)?[\\w-]*)?$");
         Matcher matcher = pattern.matcher(prefix);
         return matcher.find();
     }
