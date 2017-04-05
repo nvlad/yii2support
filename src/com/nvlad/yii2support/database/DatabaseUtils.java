@@ -34,6 +34,11 @@ public class DatabaseUtils {
 
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
+
+        // Code to test tests :)
+        //dataSources.clear();
+        //dataSources.add(new TestDataSource(project));
+
         for (DbDataSource source: dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
                 if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {

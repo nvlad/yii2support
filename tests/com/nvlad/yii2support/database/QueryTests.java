@@ -85,18 +85,16 @@ public class QueryTests extends PluginTestCase {
                 " (new \\yii\\db\\Query())->where('person.<caret>\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(3, myFixture.getLookupElementStrings().toArray().length);
+        assertEquals(3, myFixture.getLookupElementStrings().size());
     }
 
     public void testQuery_ColumnPrefix() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('person.na<caret>\n" +
-                ";");
+                " (new \\yii\\db\\Query())->where('person.na<caret>;");
         myFixture.completeBasic();
 
-        assertEquals("name", myFixture.getLookupElementStrings().get(0));
-        assertEquals("surname", myFixture.getLookupElementStrings().get(1));
+        assertEquals(3, myFixture.getLookupElementStrings().size());
     }
 
     public void testQuery_ColumnPrefixTableQuoting() {
@@ -104,7 +102,8 @@ public class QueryTests extends PluginTestCase {
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
                 " (new \\yii\\db\\Query())->where('{{person}}.na<caret>');");
         myFixture.completeBasic();
-        assertEquals("'{{person}}.name'", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
+        assertEquals("name", myFixture.getLookupElementStrings().get(0));
+        assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
     public void testQuery_ColumnQuotingAndPrefixTableQuoting() {
@@ -112,7 +111,8 @@ public class QueryTests extends PluginTestCase {
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
                 " (new \\yii\\db\\Query())->where('{{person}}.[[na<caret>');");
         myFixture.completeBasic();
-        assertEquals("'{{person}}.[[name'", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
+        assertEquals("name", myFixture.getLookupElementStrings().get(0));
+        assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
 }
