@@ -88,7 +88,7 @@
         <psi.referenceContributor language="PHP"
                                   implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
         <localInspection language="PHP" shortName="MissedFieldInspection"
-                         displayName="Missed field"
+                         displayName="Missing field"
                          groupName="Object Factory" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryMissedFieldInspection"/>
