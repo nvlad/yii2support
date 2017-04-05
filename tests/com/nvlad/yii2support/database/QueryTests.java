@@ -97,6 +97,16 @@ public class QueryTests  extends LightCodeInsightFixtureTestCase {
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
+    public void testQuery_ColumnPrefixWithPrevCondition() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " (new \\yii\\db\\Query())->where('person.surname AND person.na<caret>");
+        myFixture.completeBasic();
+
+        assertEquals("name", myFixture.getLookupElementStrings().get(0));
+        assertEquals("surname", myFixture.getLookupElementStrings().get(1));
+    }
+
     public void testQuery_ColumnPrefixTableQuoting() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
