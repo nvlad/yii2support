@@ -1,7 +1,7 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.3.17.5</version>
+    <version>0.3.17.9</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -34,16 +34,15 @@
           <li>WidgetClass::widget() and WidgetClass::begin calls if WidgetClass is a descendant of yii\base\Widget</li>
           <li>$field->widget() method call on yii\widgets\ActiveField and its descendants</li>
           <li>Inside array in GridView "columns" key</li>
-           <li>Yii::createObject method</li>
+          <li>Yii::createObject method</li>
       </ul>
       <p>Go To Declaration, Rename, Find usages and Help popup works whenever code completion works.</p>
     ]]></description>
 
     <change-notes><![CDATA[
         <ul>
-            <li>Ignore method and function(except "compact") calls as second parameter for render* functions</li>
-            <li>False-positive missed field inspection on event & behavior declaration in config object create array</li>
-            <li>Fix exception from UnusedParametersLocalQuickFix in older PhpStorm versions</li>
+            <li>False-positive missed field inspection for \Closure class</li>
+            <li>Small fixes</li>
         </ul>
     ]]>
     </change-notes>
@@ -88,7 +87,7 @@
         <psi.referenceContributor language="PHP"
                                   implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
         <localInspection language="PHP" shortName="MissedFieldInspection"
-                         displayName="Missed field"
+                         displayName="Missing field"
                          groupName="Object Factory" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryMissedFieldInspection"/>
