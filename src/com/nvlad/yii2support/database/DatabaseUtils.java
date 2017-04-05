@@ -1,25 +1,23 @@
 package com.nvlad.yii2support.database;
 
-import com.intellij.codeInsight.completion.PrioritizedLookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.codeInsight.lookup.LookupElementWeigher;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
 import com.intellij.database.psi.*;
-import com.intellij.database.view.DatabaseView;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.nvlad.yii2support.common.ClassUtils;
-import icons.DatabaseIcons;
-import org.jetbrains.annotations.Contract;
+import com.nvlad.yii2support.common.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +50,11 @@ public class DatabaseUtils {
     static ArrayList<LookupElementBuilder> getLookupItemsTables(Project project, PhpExpression position) {
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
+
+        // Code to test tests :)
+        //dataSources.clear();
+        //dataSources.add(new TestDataSource(project));
+
         ArrayList<LookupElementBuilder> list = new  ArrayList<>();
         for (DbDataSource source: dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
@@ -104,36 +107,34 @@ public class DatabaseUtils {
         }
         if (field instanceof DasColumn) {
             DasColumn column = (DasColumn)field;
-            builder = builder.withTypeText(column.getDataType().typeName)
-            .withTailText(" => " + column.getDbParent().getDbParent().getName() + '.' +column.getTableName(), true)
-            .withIcon(((DbColumnImpl) column).getIcon());
+            builder = builder.withTypeText(column.getDataType().typeName);
+            if (column.getDbParent() != null)
+                builder = builder.withTailText(" => " + column.getDbParent().getDbParent().getName() + '.' +column.getTableName(), true);
+            if (column instanceof  DbColumnImpl)
+                builder = builder.withIcon(((DbColumnImpl) column).getIcon());
         }
         if (field instanceof DasTable) {
             DasTable table = (DasTable)field;
-            builder = builder.withTypeText("DbTable")
-                    .withTailText(" => " + table.getDbParent().getName(), true)
-                    .withIcon(((DbTableImpl) table).getIcon());
+            DasObject tableSchema = table.getDbParent();
+            builder = builder.withTypeText("DbTable");
+            if (tableSchema != null)
+                builder = builder.withTailText(" => " + table.getDbParent().getName(), true);
+            if (table instanceof DbTableImpl )
+                builder = builder.withIcon(((DbTableImpl) table).getIcon());
         }
         return builder;
     }
 
     @Nullable
     static String getTableByActiveRecordClass(PhpClass phpClass) {
-        Method[] methods = phpClass.getOwnMethods();
-        for (Method method: methods) {
-            if (method.getName().equals("tableName")) {
-                for (PsiElement elem: method.getChildren()) {
-                    if (elem.getChildren().length > 0) {
-                        for (PsiElement element: elem.getChildren()) {
-                            if (element instanceof PhpReturn) {
-                                if ((element).getChildren().length > 0)
-                                    return clearTablePrefixTags( (element).getChildren()[0].getText());
-                            }
-                        }
-                    }
-                }
+        Method method = phpClass.findMethodByName("tableName");
+        Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
+        for (PhpReturn element: returns) {
+            if ((element).getChildren().length > 0) {
+                return clearTablePrefixTags((element).getChildren()[0].getText());
             }
         }
+
         return null;
     }
 
