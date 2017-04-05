@@ -8,10 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpExpression;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,14 +47,21 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
             PhpIndex index = PhpIndex.getInstance(method.getProject());
             if ( (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Query"))
                     || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\QueryTrait"))
-                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")) )) {
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Connection"))
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command"))
+                )) {
 
 
-                PhpClass activeRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
+                PhpClass activeRecordClass = null;
+                PhpClass possibleActiveRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
+                if ( ClassUtils.isClassInheritsOrEqual(possibleActiveRecordClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")))
+                    activeRecordClass = possibleActiveRecordClass;
 
                 /*----- ActiveQuery condition and column paramters ----*/
                 Project project = completionParameters.getPosition().getProject();
-                if (activeRecordClass != null && paramPosition >= 0 &&
+                if (activeRecordClass != null &&
+                        paramPosition >= 0 &&
                         method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
                         (method.getParameters()[paramPosition].getName().equals("condition") ||
@@ -91,17 +95,31 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                             return;
                     }
 
-                    if (isTabledPrefix(prefix)) {
+                    if (!isTabledPrefix(prefix)) {
                         ArrayList<LookupElementBuilder> lookups = DatabaseUtils.getLookupItemsTables(project, (PhpExpression) completionParameters.getPosition().getParent());
                         addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                     }
-                    /*---  Query -----*/
+                    /*---  Query & Command -----*/
                 } else if (activeRecordClass == null &&
-                        (method.getParameters()[paramPosition].getName().equals("condition") || method.getParameters()[paramPosition].getName().startsWith("column"))) {
+                        (method.getParameters()[paramPosition].getName().equals("condition") ||
+                                method.getParameters()[paramPosition].getName().startsWith("column") ||
+                                method.getParameters()[paramPosition].getName().startsWith("sql")) ) {
                     ArrayList<LookupElementBuilder> lookups = null;
                     PhpExpression expr = (PhpExpression) completionParameters.getPosition().getParent();
-                    if (isTabledPrefix(prefix)) {
-                        lookups = DatabaseUtils.getLookupItemsByTable(getTable(prefix, null), project, expr);
+                    if (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) && paramPosition == 1) {
+                        PsiElement paramRef = methodRef.getParameters()[0];
+                        Parameter param = method.getParameters()[0];
+                        if (param.getName().equals("table")) {
+                            String table = paramRef.getText();
+                            if (table != null) {
+                                table = ClassUtils.removeQuotes(table);
+                                lookups = DatabaseUtils.getLookupItemsByTable(table, project, expr);
+                            }
+                        }
+                    }
+                    else if (isTabledPrefix(prefix)) {
+                        String table = getTable(prefix, null);
+                        lookups = DatabaseUtils.getLookupItemsByTable(table, project, expr);
                     } else {
                         lookups = DatabaseUtils.getLookupItemsTables(project, expr);
                     }
