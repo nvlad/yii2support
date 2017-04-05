@@ -117,7 +117,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
         if (stringToComplete.length() > 2 && stringToComplete.contains(".")) {
             // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
             // "table.[[", "table.col" and "table." at end of string and return "tn" group with table name
-            Pattern pattern = Pattern.compile("((?<tn>[\\w-]+)}{2})\\.((\\[\\[)?[\\w-]*)?$");
+            Pattern pattern = Pattern.compile(".*?((?<tn>[\\w-]+)(}{2})?)\\.((\\[\\[)?[\\w-]*)?$");
             Matcher matcher = pattern.matcher(stringToComplete);
             if (matcher.matches()) {
                 return matcher.group("tn");
@@ -135,7 +135,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
     private boolean isTabledPrefix(String prefix) {
         // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
         // "table.[[", "table.col" and "table." at end of string
-        Pattern pattern = Pattern.compile("[\\w-]+}{2}?\\.((\\[\\[)?[\\w-]*)?$");
+        Pattern pattern = Pattern.compile("[\\w-]+(}{2})?\\.(\\[{2})?[\\w-]*?$");
         Matcher matcher = pattern.matcher(prefix);
         return matcher.find();
     }
