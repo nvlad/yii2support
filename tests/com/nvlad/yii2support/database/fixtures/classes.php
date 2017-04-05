@@ -8,12 +8,16 @@ namespace yii\db {
         }
     }
 
-    class ActiveRecord {
+    class BaseActiveRecord {
         public static function find()
         {
             return new Query();
 
         }
+    }
+
+    class ActiveRecord extends BaseActiveRecord {
+
     }
 }
 
@@ -26,6 +30,7 @@ namespace test {
      * @package test
      * @property $prop1
      * @property $prop2
+     * @property $test
      */
     class PersonModel extends ActiveRecord {
         public static function tableName()
@@ -34,4 +39,5 @@ namespace test {
         }
     }
 }
+
 

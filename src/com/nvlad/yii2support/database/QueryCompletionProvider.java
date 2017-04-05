@@ -80,6 +80,8 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                     }
                     if (!isTabledPrefix(prefix)) {
                         lookups = DatabaseUtils.getLookupItemsTables(project, (PhpExpression) completionParameters.getPosition().getParent());
+                        if (lookups != null && lookups.size() == 0)
+                            lookups = DatabaseUtils.getLookupItemsByAnnotations(activeRecordClass, (PhpExpression) completionParameters.getPosition().getParent());
                         addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                     }
                 /*---  table parameter -----*/
