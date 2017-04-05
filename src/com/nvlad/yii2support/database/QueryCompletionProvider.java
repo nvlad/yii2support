@@ -106,9 +106,9 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                                 method.getParameters()[paramPosition].getName().startsWith("sql")) ) {
                     ArrayList<LookupElementBuilder> lookups = null;
                     PhpExpression expr = (PhpExpression) completionParameters.getPosition().getParent();
-                    if (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) && paramPosition == 1) {
-                        PsiElement paramRef = methodRef.getParameters()[0];
-                        Parameter param = method.getParameters()[0];
+                    if (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) && paramPosition > 0) {
+                        PsiElement paramRef = methodRef.getParameters()[paramPosition - 1];
+                        Parameter param = method.getParameters()[paramPosition - 1];
                         if (param.getName().equals("table")) {
                             String table = paramRef.getText();
                             if (table != null) {
