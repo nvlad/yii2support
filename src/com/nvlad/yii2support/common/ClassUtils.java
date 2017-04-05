@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.objectfactory;
+package com.nvlad.yii2support.common;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -14,7 +14,7 @@ import java.util.HashSet;
 /**
  * Created by NVlad on 11.01.2017.
  */
-class ClassUtils {
+public class ClassUtils {
 
 
     @Nullable
@@ -38,13 +38,13 @@ class ClassUtils {
     }
 
     @Nullable
-    static public PhpClass getClass(PhpIndex phpIndex, String className) {
+    public static PhpClass getClass(PhpIndex phpIndex, String className) {
         Collection<PhpClass> classes = phpIndex.getAnyByFQN(className);
         return classes.isEmpty() ? null : classes.iterator().next();
     }
 
     @Nullable
-    static PhpClass getPhpClass(PhpPsiElement phpPsiElement) {
+    public static PhpClass getPhpClass(PhpPsiElement phpPsiElement) {
         while (phpPsiElement != null) {
             if (phpPsiElement instanceof ClassConstantReference) {
                 phpPsiElement = ((ClassConstantReference) phpPsiElement).getClassReference();
@@ -68,7 +68,25 @@ class ClassUtils {
         return null;
     }
 
-    static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
+    @Nullable
+    public static PhpClass getPhpClassByCallChain(MethodReference methodRef) {
+
+        while (methodRef != null) {
+            PhpExpression expr = methodRef.getClassReference();
+            if (expr instanceof ClassReference) {
+                return (PhpClass) ((ClassReference)expr).resolve();
+            }
+            else if (expr instanceof MethodReference) {
+                methodRef = (MethodReference) expr;
+            } else {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
         if (classObject == null || superClass == null)
             return false;
         if (classObject != null) {
@@ -87,7 +105,7 @@ class ClassUtils {
         return propertyName;
     }
 
-    static Collection<Method> getClassSetMethods(PhpClass phpClass) {
+    public static Collection<Method> getClassSetMethods(PhpClass phpClass) {
         final HashSet<Method> result = new HashSet<>();
         final Collection<Method> methods = phpClass.getMethods();
 
@@ -105,11 +123,23 @@ class ClassUtils {
 
     }
 
-    static String removeQuotes(String str) {
+    @Nullable
+    public static MethodReference getMethodRef(PsiElement el, int recursionLimit) {
+        if (el == null)
+            return null;
+        else if (el.getParent() instanceof MethodReference)
+            return (MethodReference)el.getParent();
+        else if (recursionLimit <= 0)
+            return null;
+        else
+            return getMethodRef(el.getParent(), recursionLimit - 1);
+    }
+
+    public static String removeQuotes(String str) {
         return str.replace("\"", "").replace("\'", "");
     }
 
-    static PhpClassMember findField(PhpClass phpClass, String fieldName) {
+    public static PhpClassMember findField(PhpClass phpClass, String fieldName) {
 
         if (phpClass == null || fieldName == null)
             return null;
@@ -182,7 +212,7 @@ class ClassUtils {
         return null;
     }
 
-    static int paramIndexForElement(PsiElement psiElement) {
+    public static int paramIndexForElement(PsiElement psiElement) {
         PsiElement parent = psiElement.getParent();
         if (parent == null) {
             return -1;
@@ -195,7 +225,8 @@ class ClassUtils {
         return paramIndexForElement(parent);
     }
 
-    static Collection<Field> getClassFields(PhpClass phpClass) {
+
+    public static Collection<Field> getClassFields(PhpClass phpClass) {
         if (phpClass == null)
             return null;
         final HashSet<Field> result = new HashSet<>();

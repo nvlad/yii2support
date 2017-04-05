@@ -1,15 +1,14 @@
 package com.nvlad.yii2support.objectfactory;
 
-import com.intellij.codeInsight.generation.ClassMember;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.naming.spi.ObjectFactory;
 import java.util.HashMap;
 import java.util.Set;
 

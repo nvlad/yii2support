@@ -57,6 +57,7 @@
     -->
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.database</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
@@ -94,6 +95,17 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+        <!-- Database -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ActiveQueryCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.MigrationCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ParamsCompletionContributor"/>
+
+        <localInspection language="PHP" shortName="MissedParamInspection"
+                         displayName="Wrong database parameterS"
+                         groupName="Database" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.database.MissedParamInspection"/>
+
     </extensions>
 
     <actions>
