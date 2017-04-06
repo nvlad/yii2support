@@ -111,6 +111,12 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissingPropertiesInspection"/>
 
+        <localInspection language="PHP" shortName="CanNotDetectTableInspection"
+                         displayName="Undetectable table for ActiveRecord"
+                         groupName="Database" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.database.UndetectableTableInspection"/>
+
     </extensions>
 
     <actions>
