@@ -42,8 +42,9 @@ public class MissingPropertiesInspection  extends PhpInspection {
                             ArrayList<String[]> notDeclaredColumns = DatabaseUtils.getNotDeclaredColumns(table, propertyTags, element.getProject());
                             if (notDeclaredColumns.size() > 0) {
                                 MissingPropertiesQuickFix qFix = new MissingPropertiesQuickFix(notDeclaredColumns, docComment);
+                                String str1 = notDeclaredColumns.size() > 1 ? "properties" : "property";
                                 problemsHolder.registerProblem(docComment, "Class " + phpClass.getFQN() +
-                                        " is missing " + notDeclaredColumns.size() + " propertie(s) that corresponds to database columns",qFix);
+                                        " is missing " + notDeclaredColumns.size() + " " + str1 + " that corresponds to database columns",qFix);
                             }
                         }
                     }

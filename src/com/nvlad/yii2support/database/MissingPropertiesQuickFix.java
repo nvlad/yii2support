@@ -62,12 +62,12 @@ public class MissingPropertiesQuickFix   implements LocalQuickFix {
             }
 
             int offset =  comment.getLastChild().getTextOffset();
-            if (comment.getPropertyTags().size() > 0) {
-                PhpDocPropertyTag phpDocPropertyTag = comment.getPropertyTags().get(comment.getPropertyTags().size() - 1);
+            if (propertyTags.size() > 0) {
+                PhpDocPropertyTag phpDocPropertyTag = propertyTags.get(comment.getPropertyTags().size() - 1);
                 offset = phpDocPropertyTag.getTextOffset() + phpDocPropertyTag.getTextLength();
             }
             editor.getCaretModel().moveToOffset(offset);
-            comment.getPropertyTags().add(new PhpDocPropertyTagImpl(comment.getNode()));
+            propertyTags.add(new PhpDocPropertyTagImpl(comment.getNode()));
             PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document);
             templateManager.startTemplate(editor, template);
 
