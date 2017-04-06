@@ -51,7 +51,9 @@ public class QueryCompletionContributor extends com.intellij.codeInsight.complet
                          // string
                      PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class).withParent(StringLiteralExpression.class),
                          // ["<caret>" => ""]
-                         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class) );
+                         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class)
+
+                 );
 
 
     }

@@ -53,7 +53,7 @@ public class MissingPropertiesQuickFix   implements LocalQuickFix {
             template.setToReformat(true);
             for (String[] missingProperty: this.missingProperties)
             {
-                String propertyText = "* @property "+ missingProperty[1] + ' $' + missingProperty[0];
+                String propertyText = "* @property "+ missingProperty[1] + " $" + missingProperty[0];
                 if (missingProperty.length > 2 && missingProperty[2] != null) {
                     propertyText += " " + missingProperty[2];
                 }

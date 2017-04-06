@@ -59,7 +59,8 @@ public class MissedParamInspection extends PhpInspection {
                     int paramPosition = ClassUtils.paramIndexForElement(expression);
                     if (paramPosition > 0 && method.getParameters().length > paramPosition) {
                         if (method.getParameters()[paramPosition].getName().equals("params") &&
-                                method.getParameters()[paramPosition - 1].getName().equals("condition")) {
+                                (method.getParameters()[paramPosition - 1].getName().equals("condition") ||
+                                 method.getParameters()[paramPosition - 1].getName().equals("expression"))) {
                             PsiElement element = methodRef.getParameters()[paramPosition - 1];
                             if (element instanceof StringLiteralExpression) {
                                 String condition = ((StringLiteralExpression) element).getContents();
