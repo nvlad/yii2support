@@ -1,9 +1,7 @@
 package com.nvlad.yii2support.database;
 
 import com.google.common.collect.Lists;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiErrorElement;
@@ -11,10 +9,9 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.nvlad.yii2support.common.ClassUtils;
-import com.nvlad.yii2support.objectfactory.ObjectFactoryUtils;
+import com.nvlad.yii2support.common.DatabaseUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

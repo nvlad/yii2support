@@ -100,10 +100,16 @@
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ParamsCompletionContributor"/>
 
         <localInspection language="PHP" shortName="MissedParamInspection"
-                         displayName="Wrong database parameterS"
+                         displayName="Wrong database parameters"
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissedParamInspection"/>
+
+        <localInspection language="PHP" shortName="MissingProperyInspection"
+                         displayName="Missing property"
+                         groupName="Database" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.database.MissingPropertiesInspection"/>
 
     </extensions>
 

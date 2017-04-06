@@ -6,10 +6,10 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
+import com.nvlad.yii2support.common.DatabaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
