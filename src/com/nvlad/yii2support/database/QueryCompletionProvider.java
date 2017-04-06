@@ -26,12 +26,8 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
         MethodReference methodRef = ClassUtils.getMethodRef(completionParameters.getPosition(), 10);
         if (methodRef != null) {
             String prefix = completionResultSet.getPrefixMatcher().getPrefix();
-            completionResultSet = adjustPrefix(',', completionResultSet);
-            completionResultSet = adjustPrefix('.', completionResultSet);
-            completionResultSet = adjustPrefix('{', completionResultSet);
-            completionResultSet = adjustPrefix('[', completionResultSet);
-            completionResultSet = adjustPrefix('%', completionResultSet);
-            completionResultSet = adjustPrefix('(', completionResultSet);
+            char[] prefixes = {' ', ',', '.','[', '{', '%', '('};
+            completionResultSet = adjustPrefixes(prefixes, completionResultSet);
 
             Method method = (Method) methodRef.resolve();
             if (method == null) {
@@ -50,6 +46,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                     || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))
                     || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Connection"))
                     || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command"))
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
                 )) {
 
 
@@ -76,7 +73,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                         addAllElementsWithPriority(lookups, completionResultSet, 2, true); // columns
                     } else {
                         ArrayList<LookupElementBuilder> items = DatabaseUtils.getLookupItemsByAnnotations(activeRecordClass, (PhpExpression) completionParameters.getPosition().getParent());
-                        addAllElementsWithPriority(lookups, completionResultSet, 2, true); // fields
+                        addAllElementsWithPriority(items, completionResultSet, 2, true); // fields
                     }
                     if (!isTabledPrefix(prefix)) {
                         lookups = DatabaseUtils.getLookupItemsTables(project, (PhpExpression) completionParameters.getPosition().getParent());
@@ -87,7 +84,8 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                 /*---  table parameter -----*/
                 } else if (method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
-                        (method.getParameters()[paramPosition].getName().startsWith("table"))) {
+                        ( method.getParameters()[paramPosition].getName().startsWith("table") ||
+                        method.getParameters()[paramPosition].getName().startsWith("refTable" ) )) {
 
                     // cancel codecompletion in case of "table" have ,
                     if (method.getParameters()[paramPosition].getName().equals("table") && methodRef.getParameters().length > paramPosition) {
@@ -105,13 +103,17 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                 } else if (activeRecordClass == null &&
                         (method.getParameters()[paramPosition].getName().equals("condition") ||
                                 method.getParameters()[paramPosition].getName().startsWith("column") ||
+                                method.getParameters()[paramPosition].getName().startsWith("refColumn") ||
                                 method.getParameters()[paramPosition].getName().startsWith("sql")) ) {
                     ArrayList<LookupElementBuilder> lookups = null;
                     PhpExpression expr = (PhpExpression) completionParameters.getPosition().getParent();
-                    if (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) && paramPosition > 0) {
+                    if ((
+                            ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) ||
+                            ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
+                    ) && paramPosition > 0) {
                         PsiElement paramRef = methodRef.getParameters()[paramPosition - 1];
                         Parameter param = method.getParameters()[paramPosition - 1];
-                        if (param.getName().equals("table")) {
+                        if (param.getName().equals("table") || param.getName().equals("refTable")) {
                             String table = paramRef.getText();
                             if (table != null) {
                                 table = ClassUtils.removeQuotes(table);
@@ -162,6 +164,13 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
         return matcher.find();
     }
 
+    private CompletionResultSet adjustPrefixes(char[] prefixes, @NotNull CompletionResultSet completionResultSet) {
+        for (char prefix: prefixes) {
+            completionResultSet = adjustPrefix(prefix, completionResultSet);
+        }
+        return completionResultSet;
+    }
+
     @NotNull
     private CompletionResultSet adjustPrefix(Character chr, @NotNull CompletionResultSet completionResultSet) {
         String currentColumn = completionResultSet.getPrefixMatcher().getPrefix();
@@ -182,5 +191,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
             completionResultSet.addElement(PrioritizedLookupElement.withPriority(element, priority));
         }
     }
+
+
 
 }

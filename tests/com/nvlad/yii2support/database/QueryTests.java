@@ -134,4 +134,15 @@ public class QueryTests  extends LightCodeInsightFixtureTestCase {
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
+    public void testActiveQuery_TableCompletionWithPrevCondition() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                "(new \\yii\\db\\Query())->where('person.name AND per<caret>");
+        myFixture.completeBasic();
+
+        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
+
+    }
+
+
 }

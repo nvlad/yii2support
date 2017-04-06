@@ -96,7 +96,7 @@
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
         <!-- Database -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.QueryCompletionContributor"/>
-        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.MigrationCompletionContributor"/>
+      <!--  <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.MigrationCompletionContributor"/> -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ParamsCompletionContributor"/>
 
         <localInspection language="PHP" shortName="MissedParamInspection"

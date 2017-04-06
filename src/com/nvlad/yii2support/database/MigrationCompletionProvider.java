@@ -13,6 +13,7 @@ import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by oleg on 24.03.2017.
@@ -36,7 +37,11 @@ public class MigrationCompletionProvider extends com.intellij.codeInsight.comple
             PhpClass phpClass = (PhpClass)classMethod.getParent();
             Project project = completionParameters.getPosition().getProject();
             PhpIndex index = PhpIndex.getInstance(project);
-            if (phpClass != null && ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))) {
+            if (phpClass != null &&
+                    (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Connection"))
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command"))
+                    )) {
                 Method method = (Method)methodRef.resolve();
                 if (method != null) {
                     int paramIndex = ClassUtils.paramIndexForElement(completionParameters.getPosition());
@@ -44,8 +49,10 @@ public class MigrationCompletionProvider extends com.intellij.codeInsight.comple
                         return;
                     Parameter currentParam = method.getParameters()[paramIndex];
                     String currentParamName = currentParam.getName();
-                    if (currentParamName.equals("table") || currentParamName.equals("refTable")) {
-                        completionResultSet.addAllElements(DatabaseUtils.getLookupItemsTables(project,  (PhpExpression) completionParameters.getPosition().getParent()));
+                    if (currentParamName.equals("table") || currentParamName.equals("refTable") ||  currentParamName.equals("condition") ||
+                            currentParamName.equals("sql")) {
+                        List<LookupElementBuilder> lookups =  DatabaseUtils.getLookupItemsTables(project,  (PhpExpression) completionParameters.getPosition().getParent());
+                        completionResultSet.addAllElements(lookups);
                     } else if  (currentParamName.startsWith("column")) {
                         if (currentParamName.equals("column") && methodRef.getParameters().length > paramIndex ) {
                             PsiElement element = methodRef.getParameters()[paramIndex];

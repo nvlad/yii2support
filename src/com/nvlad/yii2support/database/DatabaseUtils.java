@@ -44,7 +44,7 @@ public class DatabaseUtils {
                 if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
                     TableInfo tableInfo = new TableInfo((DbTable) item);
                     for (DasColumn column : tableInfo.getColumns()) {
-                        list.add(DatabaseUtils.buildLookup(column, position));
+                        list.add(DatabaseUtils.buildLookup(column, dataSources.size() > 1));
                     }
                 }
             }
@@ -64,7 +64,7 @@ public class DatabaseUtils {
         for (DbDataSource source: dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
                 if (item instanceof DbTable) {
-                    list.add(DatabaseUtils.buildLookup(item, position));
+                    list.add(DatabaseUtils.buildLookup(item, dataSources.size() > 1));
                 }
             }
         }
@@ -78,7 +78,7 @@ public class DatabaseUtils {
         final Field[] fields = phpClass.getOwnFields();
         for (Field field : fields) {
             if (field instanceof PhpDocProperty) {
-                result.add(buildLookup(field, position));
+                result.add(buildLookup(field, false));
             }
         }
 
@@ -97,7 +97,7 @@ public class DatabaseUtils {
     }
 
     @NotNull
-    static private LookupElementBuilder buildLookup(Object field, PhpExpression position) {
+    static private LookupElementBuilder buildLookup(Object field, boolean showSchema) {
         String lookupString = "-";
         if (field instanceof DasObject)
             lookupString = ((DasObject)field).getName();
@@ -113,8 +113,9 @@ public class DatabaseUtils {
         if (field instanceof DasColumn) {
             DasColumn column = (DasColumn)field;
             builder = builder.withTypeText(column.getDataType().typeName);
-            if (column.getDbParent() != null)
-                builder = builder.withTailText(" => " + column.getDbParent().getDbParent().getName() + '.' +column.getTableName(), true);
+            if (column.getDbParent() != null && showSchema) {
+                     builder = builder.withTailText(" => " + column.getDbParent().getDbParent().getName(), true);
+            }
             if (column instanceof  DbColumnImpl)
                 builder = builder.withIcon(((DbColumnImpl) column).getIcon());
         }
@@ -122,7 +123,7 @@ public class DatabaseUtils {
             DasTable table = (DasTable)field;
             DasObject tableSchema = table.getDbParent();
             builder = builder.withTypeText("DbTable");
-            if (tableSchema != null)
+            if (showSchema && tableSchema != null)
                 builder = builder.withTailText(" => " + table.getDbParent().getName(), true);
             if (table instanceof DbTableImpl )
                 builder = builder.withIcon(((DbTableImpl) table).getIcon());

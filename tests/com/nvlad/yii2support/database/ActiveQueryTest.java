@@ -75,6 +75,26 @@ public class ActiveQueryTest  extends LightCodeInsightFixtureTestCase {
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
+    public void testActiveQuery_TableCompletionWithPrevCondition() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " \\test\\PersonModel::find()->where('person.name AND per<caret>");
+        myFixture.completeBasic();
+
+        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
+
+    }
+
+    public void testActiveQuery_TableCompletion() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " \\test\\PersonModel::find()->where('<caret>");
+        myFixture.completeBasic();
+
+        assertEquals(5, myFixture.getLookupElementStrings().size());
+
+    }
+
     public void testActiveQuery_ColumnPrefixWithPrevCondition() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
