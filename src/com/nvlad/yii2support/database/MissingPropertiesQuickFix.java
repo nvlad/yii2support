@@ -11,11 +11,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
+import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.impl.PhpDocCommentImpl;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.impl.tags.PhpDocPropertyTagImpl;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocPropertyTag;
+import com.nvlad.yii2support.common.VirtualProperty;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +28,10 @@ import java.util.List;
  */
 public class MissingPropertiesQuickFix   implements LocalQuickFix {
 
-    private ArrayList<String[]> missingProperties;
+    private ArrayList<VirtualProperty> missingProperties;
     private PhpDocComment comment;
 
-    public MissingPropertiesQuickFix(ArrayList<String[]> missingProperties, PhpDocComment comment) {
+    public MissingPropertiesQuickFix(ArrayList<VirtualProperty> missingProperties, PhpDocComment comment) {
         this.missingProperties = missingProperties;
         this.comment = comment;
     }
@@ -52,14 +55,16 @@ public class MissingPropertiesQuickFix   implements LocalQuickFix {
             TemplateManager templateManager = TemplateManager.getInstance(project);
             Template template = templateManager.createTemplate("", "");
             template.setToReformat(true);
-            for (String[] missingProperty: this.missingProperties)
+            for (VirtualProperty missingProperty: this.missingProperties)
             {
-                String propertyText = "* @property "+ (missingProperty[1] != null ? missingProperty[1] : "") + " $" + missingProperty[0];
-                if (missingProperty.length > 2 && missingProperty[2] != null) {
-                    propertyText += " " + missingProperty[2];
+
+                String propertyText = "* @property "+ (missingProperty.getType() != null ? missingProperty.getType() : "") + " $" +missingProperty.getName();
+                if ( missingProperty.getComment() != null) {
+                    propertyText += " " + missingProperty.getComment();
                 }
-                template.addTextSegment(propertyText + "\n");
+                template.addTextSegment("\n" + propertyText);
             }
+            template.addTextSegment("\n");
 
             int offset =  comment.getLastChild().getTextOffset();
             if (propertyTags.size() > 0) {
@@ -67,10 +72,8 @@ public class MissingPropertiesQuickFix   implements LocalQuickFix {
                 offset = phpDocPropertyTag.getTextOffset() + phpDocPropertyTag.getTextLength();
             }
             editor.getCaretModel().moveToOffset(offset);
-            propertyTags.add(new PhpDocPropertyTagImpl(comment.getNode()));
             PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document);
             templateManager.startTemplate(editor, template);
-
-
     }
+
 }

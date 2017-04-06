@@ -10,9 +10,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
-import com.jetbrains.php.lang.documentation.phpdoc.psi.impl.tags.PhpDocPropertyTagImpl;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocPropertyTag;
+import com.jetbrains.php.lang.parser.parsing.classes.ClassConstant;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
+import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl;
 import com.nvlad.yii2support.database.TableInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -145,7 +147,16 @@ public class DatabaseUtils {
         Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
         for (PhpReturn element: returns) {
             if ((element).getChildren().length > 0) {
-                return clearTablePrefixTags((element).getChildren()[0].getText());
+                if ((element).getChildren()[0] instanceof ClassConstantReference) {
+                    PsiElement resolved = ((ClassConstantReference) (element).getChildren()[0]).resolve();
+                    if (resolved != null && resolved instanceof ClassConstImpl) {
+                        ClassConstImpl constant = (ClassConstImpl) resolved;
+                        if (constant.getChildren().length > 0)
+                            return ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();
+                    }
+
+                } else if ((element).getChildren()[0] instanceof StringLiteralExpression)
+                    return clearTablePrefixTags((element).getChildren()[0].getText());
             }
         }
 
@@ -186,11 +197,14 @@ public class DatabaseUtils {
         return null;
     }
 
-    public static ArrayList<String[]> getNotDeclaredColumns(@NotNull  String table, List<PhpDocPropertyTag> propertyTags, Project project) {
+    public static ArrayList<VirtualProperty> getNotDeclaredColumns( String table, List<PhpDocPropertyTag> propertyTags, Project project) {
+
         DbPsiFacade facade =  DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
 
-        final ArrayList<String[]> result = new ArrayList<>();
+        final ArrayList<VirtualProperty> result = new ArrayList<>();
+        if (table == null)
+            return result;
         for (DbDataSource source: dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace()) ) {
                 table = ClassUtils.removeQuotes(table);
@@ -199,16 +213,22 @@ public class DatabaseUtils {
 
                     for (DasColumn column : tableInfo.getColumns()) {
                         boolean found = false;
+                        PhpDocProperty prevProperty = null;
                         for (PhpDocPropertyTag tag: propertyTags) {
                             PhpDocProperty property = tag.getProperty();
                             if (property != null && property.getName().equals(column.getName()))
                             {
                                 found = true;
                                 break;
-                            }
+                            } else
+                                prevProperty = property;
                         }
                         if (! found) {
-                            String[] newItem = {column.getName(), column.getDataType().typeName, column.getComment()};
+                            VirtualProperty newItem = new VirtualProperty(column.getName(),
+                                    column.getDataType().typeName,
+                                    column.getDataType().toString(),
+                                    column.getComment(),
+                                    prevProperty != null ? prevProperty.getName() : null );
                             result.add(newItem);
                         }
                     }
