@@ -42,10 +42,11 @@ public class MissingPropertiesQuickFix   implements LocalQuickFix {
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
-        List<PhpDocPropertyTag> propertyTags = this.comment.getPropertyTags();
-
+            List<PhpDocPropertyTag> propertyTags = this.comment.getPropertyTags();
 
             Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            if (editor == null)
+                return;
             Document document = editor.getDocument();
             PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document);
             TemplateManager templateManager = TemplateManager.getInstance(project);
@@ -53,7 +54,7 @@ public class MissingPropertiesQuickFix   implements LocalQuickFix {
             template.setToReformat(true);
             for (String[] missingProperty: this.missingProperties)
             {
-                String propertyText = "* @property "+ missingProperty[1] + " $" + missingProperty[0];
+                String propertyText = "* @property "+ (missingProperty[1] != null ? missingProperty[1] : "") + " $" + missingProperty[0];
                 if (missingProperty.length > 2 && missingProperty[2] != null) {
                     propertyText += " " + missingProperty[2];
                 }
