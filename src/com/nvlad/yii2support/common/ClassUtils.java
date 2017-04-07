@@ -76,9 +76,8 @@ public class ClassUtils {
         while (methodRef != null) {
             PhpExpression expr = methodRef.getClassReference();
             if (expr instanceof ClassReference) {
-                return (PhpClass) ((ClassReference)expr).resolve();
-            }
-            else if (expr instanceof MethodReference) {
+                return (PhpClass) ((ClassReference) expr).resolve();
+            } else if (expr instanceof MethodReference) {
                 methodRef = (MethodReference) expr;
             } else if (expr instanceof Variable) {
                 PhpType type = expr.getType();
@@ -86,8 +85,9 @@ public class ClassUtils {
                 int index1 = strType.indexOf('\\');
                 int index2 = strType.indexOf('.');
                 if (index2 == -1)
-                    index2 = strType.length() - index1;;
-                if (index1 >= 0 && index2 >= 0){
+                    index2 = strType.length() - index1;
+                ;
+                if (index1 >= 0 && index2 >= 0) {
                     String className = strType.substring(index1, index2);
                     return ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), className);
                 } else {
@@ -145,7 +145,7 @@ public class ClassUtils {
         if (el == null)
             return null;
         else if (el.getParent() instanceof MethodReference)
-            return (MethodReference)el.getParent();
+            return (MethodReference) el.getParent();
         else if (recursionLimit <= 0)
             return null;
         else
@@ -190,7 +190,7 @@ public class ClassUtils {
             for (Method method : methods) {
                 String methodName = method.getName();
                 int pCount = method.getParameters().length;
-                if (methodName.length() > 3 && ((methodName.startsWith("set") && pCount == 1) || (methodName.startsWith("get") && pCount == 0))  &&
+                if (methodName.length() > 3 && ((methodName.startsWith("set") && pCount == 1) || (methodName.startsWith("get") && pCount == 0)) &&
                         Character.isUpperCase(methodName.charAt(3))) {
                     String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
                     if (propertyName.equals(fieldName))
@@ -210,7 +210,6 @@ public class ClassUtils {
             return null;
         fieldName = ClassUtils.removeQuotes(fieldName);
 
-
         final Collection<Field> fields = phpClass.getFields();
         final Collection<Method> methods = phpClass.getMethods();
 
@@ -228,9 +227,8 @@ public class ClassUtils {
                     continue;
                 }
 
-
-                if (field instanceof PhpDocProperty) {
-                    if (isReadonlyProperty(methods, (PhpDocProperty)field)) break;
+                if (field instanceof PhpDocProperty && isReadonlyProperty(phpClass, (PhpDocProperty) field)) {
+                    break;
                 }
 
                 return field;
@@ -247,7 +245,6 @@ public class ClassUtils {
                     String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
                     if (propertyName.equals(fieldName))
                         return method;
-
                 }
             }
         }
@@ -275,7 +272,6 @@ public class ClassUtils {
         final HashSet<Field> result = new HashSet<>();
 
         final Collection<Field> fields = phpClass.getFields();
-        final Collection<Method> methods = phpClass.getMethods();
         for (Field field : fields) {
             if (field.isConstant()) {
                 continue;
@@ -286,8 +282,8 @@ public class ClassUtils {
                 continue;
             }
 
-            if (field instanceof PhpDocProperty) {
-                if (isReadonlyProperty(methods, (PhpDocProperty)field)) continue;
+            if (field instanceof PhpDocProperty && isReadonlyProperty(phpClass, (PhpDocProperty) field)) {
+                continue;
             }
 
             result.add(field);
@@ -295,29 +291,9 @@ public class ClassUtils {
         return result;
     }
 
-    public static boolean isReadonlyProperty(Collection<Method> methods, PhpDocProperty field) {
-        final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-        Boolean setterExist = false;
-        for (Method method : methods) {
-            if (method.getName().equals(setter)) {
-                setterExist = true;
-                break;
-            }
-        }
-        if (!setterExist) {
-            String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-            Boolean getterExist = false;
-            for (Method method : methods) {
-                if (method.getName().equals(getter)) {
-                    getterExist = true;
-                    break;
-                }
-            }
-            if (getterExist) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isReadonlyProperty(PhpClass clazz, PhpDocProperty field) {
+        final String fieldName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+        return clazz.findMethodByName("set" + fieldName) == null && clazz.findMethodByName("get" + fieldName) != null;
     }
 
 
