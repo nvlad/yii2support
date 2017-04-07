@@ -101,7 +101,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                         addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                     }
                     /*---  Query & Command -----*/
-                } else if (activeRecordClass == null &&
+                } else if (activeRecordClass == null && method.getParameters().length > paramPosition &&
                         (method.getParameters()[paramPosition].getName().equals("condition") ||
                                 method.getParameters()[paramPosition].getName().startsWith("column") ||
                                 method.getParameters()[paramPosition].getName().startsWith("refColumn") ||

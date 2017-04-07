@@ -7,6 +7,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -151,11 +152,59 @@ public class ClassUtils {
             return getMethodRef(el.getParent(), recursionLimit - 1);
     }
 
-    public static String removeQuotes(String str) {
+    public static String removeQuotes(@NotNull String str) {
         return str.replace("\"", "").replace("\'", "");
     }
 
-    public static PhpClassMember findField(PhpClass phpClass, String fieldName) {
+    public static boolean isFieldExists(PhpClass phpClass, String fieldName, boolean excludePhpDoc) {
+        if (phpClass == null || fieldName == null)
+            return false;
+        fieldName = ClassUtils.removeQuotes(fieldName);
+
+        final Collection<Field> fields = phpClass.getFields();
+        final Collection<Method> methods = phpClass.getMethods();
+
+        if (fields != null) {
+            for (Field field : fields) {
+                if (excludePhpDoc && field instanceof PhpDocProperty)
+                    continue;
+
+                if (!field.getName().equals(fieldName))
+                    continue;
+
+                if (field.isConstant()) {
+                    continue;
+                }
+
+                final PhpModifier modifier = field.getModifier();
+                if (!modifier.isPublic() || modifier.isStatic()) {
+                    continue;
+                }
+
+                return true;
+            }
+        }
+
+
+        if (methods != null) {
+            for (Method method : methods) {
+                String methodName = method.getName();
+                int pCount = method.getParameters().length;
+                if (methodName.length() > 3 && ((methodName.startsWith("set") && pCount == 1) || (methodName.startsWith("get") && pCount == 0))  &&
+                        Character.isUpperCase(methodName.charAt(3))) {
+                    String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+                    if (propertyName.equals(fieldName))
+                        return true;
+
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Nullable
+    public static PhpClassMember findWritableField(PhpClass phpClass, String fieldName) {
 
         if (phpClass == null || fieldName == null)
             return null;
@@ -181,28 +230,7 @@ public class ClassUtils {
 
 
                 if (field instanceof PhpDocProperty) {
-                    final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                    Boolean setterExist = false;
-                    for (Method method : methods) {
-                        if (method.getName().equals(setter)) {
-                            setterExist = true;
-                            break;
-                        }
-                    }
-                    if (!setterExist) {
-                        String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                        Boolean getterExist = false;
-                        for (Method method : methods) {
-                            if (method.getName().equals(getter)) {
-                                getterExist = true;
-                                break;
-                            }
-                        }
-                        if (getterExist) {
-                            continue;
-                        }
-                    }
-
+                    if (isReadonlyProperty(methods, (PhpDocProperty)field)) break;
                 }
 
                 return field;
@@ -224,7 +252,6 @@ public class ClassUtils {
             }
         }
 
-
         return null;
     }
 
@@ -242,7 +269,7 @@ public class ClassUtils {
     }
 
 
-    public static Collection<Field> getClassFields(PhpClass phpClass) {
+    public static Collection<Field> getWritableClassFields(PhpClass phpClass) {
         if (phpClass == null)
             return null;
         final HashSet<Field> result = new HashSet<>();
@@ -260,36 +287,38 @@ public class ClassUtils {
             }
 
             if (field instanceof PhpDocProperty) {
-                final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                Boolean setterExist = false;
-                for (Method method : methods) {
-                    if (method.getName().equals(setter)) {
-                        setterExist = true;
-                        break;
-                    }
-                }
-                if (!setterExist) {
-                    String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                    Boolean getterExist = false;
-                    for (Method method : methods) {
-                        if (method.getName().equals(getter)) {
-                            getterExist = true;
-                            break;
-                        }
-                    }
-                    if (getterExist) {
-                        continue;
-                    }
-                }
+                if (isReadonlyProperty(methods, (PhpDocProperty)field)) continue;
             }
 
             result.add(field);
         }
-
-
-
-
         return result;
     }
+
+    public static boolean isReadonlyProperty(Collection<Method> methods, PhpDocProperty field) {
+        final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+        Boolean setterExist = false;
+        for (Method method : methods) {
+            if (method.getName().equals(setter)) {
+                setterExist = true;
+                break;
+            }
+        }
+        if (!setterExist) {
+            String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+            Boolean getterExist = false;
+            for (Method method : methods) {
+                if (method.getName().equals(getter)) {
+                    getterExist = true;
+                    break;
+                }
+            }
+            if (getterExist) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

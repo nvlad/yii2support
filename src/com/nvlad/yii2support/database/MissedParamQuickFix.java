@@ -38,7 +38,9 @@ public class MissedParamQuickFix  implements LocalQuickFix {
         if (method != null) {
           Parameter[] parameters = method.getParameters();
           if (parameters.length > 1 &&
-                  (parameters[0].getName().equals("condition") && parameters[0].getName().equals("expression")) &&
+                  (parameters[0].getName().equals("condition")
+                          || parameters[0].getName().equals("expression")
+                          || parameters[0].getName().equals("sql")) &&
                   parameters[1].getName().equals("params") &&
                   methodReference.getParameters().length > 0) {
               String condition = methodReference.getParameters()[0].getText();

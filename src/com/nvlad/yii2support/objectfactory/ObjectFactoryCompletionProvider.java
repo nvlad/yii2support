@@ -46,7 +46,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
 
         PhpExpression position = (PhpExpression) completionParameters.getPosition().getParent();
         if (phpClass != null) {
-            for (Field field : ClassUtils.getClassFields(phpClass)) {
+            for (Field field : ClassUtils.getWritableClassFields(phpClass)) {
                 uniqTracker.put(field.getName(), field);
                 LookupElementBuilder lookupBuilder = buildLookup(field, position);
                 completionResultSet.addElement(lookupBuilder);

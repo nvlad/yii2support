@@ -27,37 +27,37 @@ public class ParamsCompletionProvider extends CompletionProvider<CompletionParam
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
             if (paramPosition > 0 && method.getParameters().length > paramPosition) {
                 if (method.getParameters()[paramPosition].getName().equals("params") &&
-                        method.getParameters()[paramPosition - 1].getName().equals("condition")) {
+                        ( method.getParameters()[paramPosition - 1].getName().equals("condition") ||
+                                method.getParameters()[paramPosition - 1].getName().equals("sql") ||
+                                method.getParameters()[paramPosition - 1].getName().equals("expression") )) {
                     PsiElement element = methodRef.getParameters()[paramPosition - 1];
-                    if (element instanceof StringLiteralExpression) {
-                        String condition = ((StringLiteralExpression) element).getContents();
-                        String[] result = DatabaseUtils.extractParamsFromCondition(condition);
-                        ArrayList<String> usedItems = new ArrayList<>();
-                        if (position.getParent().getParent().getParent() instanceof ArrayCreationExpression)
-                        {
-                            ArrayCreationExpression array = (ArrayCreationExpression)position.getParent().getParent().getParent();
-                            for (ArrayHashElement elem : array.getHashElements()) {
-                                usedItems.add(ClassUtils.removeQuotes(elem.getKey().getText()));
-                            }
-                        }
-
-                        for (String resultItem: result) {
-                            if (! usedItems.contains(resultItem)) {
-                                LookupElementBuilder builder = LookupElementBuilder.create(resultItem).withInsertHandler((insertionContext, lookupElement) -> {
-
-                                    Document document = insertionContext.getDocument();
-                                    int insertPosition = insertionContext.getSelectionEndOffset();
-
-                                    if (position.getParent().getParent().getParent() instanceof ArrayCreationExpression) {
-                                        document.insertString(insertPosition + 1, " => ");
-                                        insertPosition += 5;
-                                        insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
-                                    }
-                                });
-                                completionResultSet.addElement(builder);
-                            }
+                    String condition = element.getText();
+                    String[] result = DatabaseUtils.extractParamsFromCondition(condition);
+                    ArrayList<String> usedItems = new ArrayList<>();
+                    if (position.getParent().getParent().getParent() instanceof ArrayCreationExpression) {
+                        ArrayCreationExpression array = (ArrayCreationExpression) position.getParent().getParent().getParent();
+                        for (ArrayHashElement elem : array.getHashElements()) {
+                            usedItems.add(ClassUtils.removeQuotes(elem.getKey().getText()));
                         }
                     }
+
+                    for (String resultItem : result) {
+                        if (!usedItems.contains(resultItem)) {
+                            LookupElementBuilder builder = LookupElementBuilder.create(resultItem).withInsertHandler((insertionContext, lookupElement) -> {
+
+                                Document document = insertionContext.getDocument();
+                                int insertPosition = insertionContext.getSelectionEndOffset();
+
+                                if (position.getParent().getParent().getParent() instanceof ArrayCreationExpression) {
+                                    document.insertString(insertPosition + 1, " => ");
+                                    insertPosition += 5;
+                                    insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
+                                }
+                            });
+                            completionResultSet.addElement(builder);
+                        }
+                    }
+
 
                 }
             }

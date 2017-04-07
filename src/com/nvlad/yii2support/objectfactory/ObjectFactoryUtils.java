@@ -180,7 +180,7 @@ public class ObjectFactoryUtils {
             String fieldName = hashElement.getKey() != null ? hashElement.getKey().getText() : null;
             if (fieldName == null)
                 return null;
-            PhpClassMember field = ClassUtils.findField(phpClass, fieldName);
+            PhpClassMember field = ClassUtils.findWritableField(phpClass, fieldName);
             if (field == null)
                 return null;
             Set<String> types = field.getType().getTypes();
