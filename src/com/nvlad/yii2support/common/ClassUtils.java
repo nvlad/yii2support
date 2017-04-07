@@ -86,7 +86,7 @@ public class ClassUtils {
                 int index2 = strType.indexOf('.');
                 if (index2 == -1)
                     index2 = strType.length() - index1;
-                ;
+
                 if (index1 >= 0 && index2 >= 0) {
                     String className = strType.substring(index1, index2);
                     return ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), className);
@@ -137,7 +137,6 @@ public class ClassUtils {
         }
 
         return result;
-
     }
 
     @Nullable
@@ -161,46 +160,21 @@ public class ClassUtils {
             return false;
         fieldName = ClassUtils.removeQuotes(fieldName);
 
-        final Collection<Field> fields = phpClass.getFields();
-        final Collection<Method> methods = phpClass.getMethods();
-
-        if (fields != null) {
-            for (Field field : fields) {
-                if (excludePhpDoc && field instanceof PhpDocProperty)
-                    continue;
-
-                if (!field.getName().equals(fieldName))
-                    continue;
-
-                if (field.isConstant()) {
-                    continue;
-                }
-
+        final Field field = phpClass.findFieldByName(fieldName, false);
+        if (field != null) {
+            if (excludePhpDoc && !(field instanceof PhpDocProperty)) {
                 final PhpModifier modifier = field.getModifier();
-                if (!modifier.isPublic() || modifier.isStatic()) {
-                    continue;
-                }
-
-                return true;
+                return !(!modifier.isPublic() || modifier.isStatic());
             }
         }
 
-
-        if (methods != null) {
-            for (Method method : methods) {
-                String methodName = method.getName();
-                int pCount = method.getParameters().length;
-                if (methodName.length() > 3 && ((methodName.startsWith("set") && pCount == 1) || (methodName.startsWith("get") && pCount == 0)) &&
-                        Character.isUpperCase(methodName.charAt(3))) {
-                    String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-                    if (propertyName.equals(fieldName))
-                        return true;
-
-                }
-            }
+        final String methodName = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+        Method method = phpClass.findMethodByName("set" + methodName);
+        if (method != null && !method.isStatic() && method.getAccess().isPublic() && method.getParameters().length == 1) {
+            return true;
         }
-
-        return false;
+        method = phpClass.findMethodByName("get" + methodName);
+        return method != null && !method.isStatic() && method.getAccess().isPublic() && method.getParameters().length == 0;
     }
 
     @Nullable
