@@ -77,15 +77,13 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                                     completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression ) &&
                             paramPosition > 0
                             ) {
-                        if (methodRef.getParameters()[paramPosition- 1] instanceof StringLiteralExpression) {
+
+                        if ( methodRef.getParameters()[paramPosition -1 ] instanceof  StringLiteralExpression) {
                             activeRecordClass = null;
                             tableName = ClassUtils.removeQuotes( methodRef.getParameters()[paramPosition- 1].getText() );
 
-                        } else if (methodRef.getParameters()[paramPosition- 1] instanceof MethodReference) {
-                            PhpExpression phpRef = ((MethodReference) methodRef.getParameters()[paramPosition - 1]).getClassReference();
-                            if (phpRef != null && phpRef.getReference() != null) {
-                                activeRecordClass = (PhpClass) phpRef.getReference().resolve();
-                            }
+                        } else {
+                            activeRecordClass = ClassUtils.getPhpClassUniversal(project,(PhpPsiElement) methodRef.getParameters()[paramPosition- 1]);
                         }
 
                     }

@@ -38,6 +38,13 @@ namespace test {
             return 'person';
         }
     }
+
+    class AddressModel extends ActiveRecord {
+        public static function tableName()
+        {
+            return 'address';
+        }
+    }
 }
 
 

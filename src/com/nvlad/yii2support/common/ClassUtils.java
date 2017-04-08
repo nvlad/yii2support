@@ -21,7 +21,7 @@ public class ClassUtils {
 
     @Nullable
     public static PhpClass getPhpClassUniversal(Project project, PhpPsiElement value) {
-        if (value instanceof MethodReference && value.getName().equals("className")) {
+        if (value instanceof MethodReference && (value.getName().equals("className") || value.getName().equals("tableName"))) {
             MethodReference methodRef = (MethodReference) value;
             return getPhpClass(methodRef.getClassReference());
 
