@@ -63,9 +63,36 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                         method.getParameters().length > paramPosition &&
                         method.getParameters().length > 0 &&
                         (method.getParameters()[paramPosition].getName().equals("condition") ||
+                                method.getParameters()[paramPosition].getName().equals("link") ||
+                                method.getParameters()[paramPosition].getName().equals("sql") ||
+                                method.getParameters()[paramPosition].getName().equals("attributes") ||
                                 method.getParameters()[paramPosition].getName().startsWith("column"))) {
 
-                    String tableName = getTable(prefix, activeRecordClass);
+
+                    String tableName = null;
+                    // Override activeRecord and tableName for hasOne, hasMany and viaTable method
+                    if ((method.getName().equals("hasOne") || method.getName().equals("hasMany") ||  method.getName().equals("viaTable"))
+                            && method.getParameters()[paramPosition].getName().equals("link")
+                            &&  (completionParameters.getPosition().getParent().getParent().toString().equals("Array key") ||
+                                    completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression ) &&
+                            paramPosition > 0
+                            ) {
+                        if (methodRef.getParameters()[paramPosition- 1] instanceof StringLiteralExpression) {
+                            activeRecordClass = null;
+                            tableName = ClassUtils.removeQuotes( methodRef.getParameters()[paramPosition- 1].getText() );
+
+                        } else if (methodRef.getParameters()[paramPosition- 1] instanceof MethodReference) {
+                            PhpExpression phpRef = ((MethodReference) methodRef.getParameters()[paramPosition - 1]).getClassReference();
+                            if (phpRef != null && phpRef.getReference() != null) {
+                                activeRecordClass = (PhpClass) phpRef.getReference().resolve();
+                            }
+                        }
+
+                    }
+
+                    if (activeRecordClass != null)
+                        tableName = getTable(prefix, activeRecordClass);
+
                     if (tableName == null || tableName.isEmpty())
                         return;
 
@@ -186,10 +213,12 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
         addAllElementsWithPriority(lookups, completionResultSet, priority, false);
     }
 
-    private void addAllElementsWithPriority(ArrayList<LookupElementBuilder> lookups, @NotNull CompletionResultSet completionResultSet, double priority, boolean bold) {
-        for (LookupElementBuilder element : lookups) {
-            element = element.withBoldness(bold);
-            completionResultSet.addElement(PrioritizedLookupElement.withPriority(element, priority));
+    private void addAllElementsWithPriority(@Nullable ArrayList<LookupElementBuilder> lookups, @NotNull CompletionResultSet completionResultSet, double priority, boolean bold) {
+        if (lookups != null) {
+            for (LookupElementBuilder element : lookups) {
+                element = element.withBoldness(bold);
+                completionResultSet.addElement(PrioritizedLookupElement.withPriority(element, priority));
+            }
         }
     }
 

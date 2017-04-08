@@ -162,10 +162,13 @@ public class ClassUtils {
 
         final Field field = phpClass.findFieldByName(fieldName, false);
         if (field != null) {
-            if (excludePhpDoc && !(field instanceof PhpDocProperty)) {
+            if ((field instanceof PhpDocProperty) && excludePhpDoc) {
+                // skip DocProperty if excludePhpDoc = true
+            } else {
                 final PhpModifier modifier = field.getModifier();
                 return !(!modifier.isPublic() || modifier.isStatic());
             }
+
         }
 
         final String methodName = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);

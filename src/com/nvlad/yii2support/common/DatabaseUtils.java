@@ -132,7 +132,8 @@ public class DatabaseUtils {
             DasTable table = (DasTable) field;
             DasObject tableSchema = table.getDbParent();
             if (tableSchema != null) {
-                builder = builder.withTypeText(((DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getParent()).getName(), true);
+                if (tableSchema instanceof DbNamespaceImpl)
+                    builder = builder.withTypeText(((DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getParent()).getName(), true);
             }
             if (showSchema && tableSchema != null)
                 builder = builder.withTailText(" (" + table.getDbParent().getName() + ")", true);
