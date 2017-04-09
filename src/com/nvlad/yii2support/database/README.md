@@ -14,7 +14,7 @@ Code completion for migrations
 Condition parameters code completion  
 Condition parameters inspection  
 ## Properties
-Synchronize roperties with database  
+Synchronize properties with database  
 Unused properties inspection  
 
 Beta version 0.4.17.0 (2017-04-09)
