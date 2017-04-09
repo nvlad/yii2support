@@ -18,6 +18,7 @@ Synchronize properties with database
 Unused properties inspection  
 
 Beta version 0.4.17.0 (2017-04-09)
+https://www.dropbox.com/s/30b8qbumsz0xbnc/yii2support_0_4_17_0.jar?dl=0
 
 
 
