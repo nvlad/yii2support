@@ -199,15 +199,35 @@ public class DatabaseUtils {
         return null;
     }
 
+    public static boolean isTableExists(String table, Project project) {
+        if(table == null)
+            return false;
+        DbPsiFacade facade = DbPsiFacade.getInstance(project);
+        List<DbDataSource> dataSources = facade.getDataSources();
+        table = ClassUtils.removeQuotes(table);
+
+        for (DbDataSource source : dataSources) {
+            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
+                   return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static ArrayList<String> getColumnsByTable(String table, Project project) {
 
         DbPsiFacade facade = DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
 
         ArrayList<String> list = new ArrayList<>();
+        if(table == null)
+            return list;
+        table = ClassUtils.removeQuotes(table);
         for (DbDataSource source : dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                table = ClassUtils.removeQuotes(table);
+
                 if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
                     TableInfo tableInfo = new TableInfo((DbTable) item);
                     for (DasColumn column : tableInfo.getColumns()) {

@@ -116,6 +116,12 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.UndetectableTableInspection"/>
 
+        <localInspection language="PHP" shortName="MissingActiveRecordInActiveQueryInspection"
+                         displayName="Can not find connected ActiveRecord class."
+                         groupName="Database" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.database.MissingActiveRecordInActiveQueryInspection"/>
+
     </extensions>
 
     <actions>

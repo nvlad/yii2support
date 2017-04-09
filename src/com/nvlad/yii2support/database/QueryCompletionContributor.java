@@ -30,7 +30,7 @@ public class QueryCompletionContributor extends com.intellij.codeInsight.complet
                         PhpIndex index = PhpIndex.getInstance(method.getProject());
                         if (ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\Query")) ||
                                 ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) ||
-                                ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")) ||
+                                ClassUtils.isClassInherit((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")) ||
                                 ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
                                 ) {
                             return true;

@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.DatabaseUtils;
@@ -43,23 +42,23 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                 return;
 
             PhpIndex index = PhpIndex.getInstance(method.getProject());
-            if ( (ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Query"))
-                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\QueryTrait"))
-                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))
-                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Connection"))
-                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command"))
-                    || ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
+            if ( (ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\db\\Query", index)
+                    || ClassUtils.isClassInheritsOrEqual(phpClass,"\\yii\\db\\QueryTrait", index)
+                    || ClassUtils.isClassInherit(phpClass, "\\yii\\db\\BaseActiveRecord", index)
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\db\\Connection", index)
+                    || ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\db\\Command", index)
+                    || ClassUtils.isClassInheritsOrEqual(phpClass,"\\yii\\db\\Migration", index)
                 )) {
 
 
                 PhpClass activeRecordClass = null;
                 PhpClass possibleActiveRecordClass = ClassUtils.getPhpClassByCallChain(methodRef);
-                if ( ClassUtils.isClassInheritsOrEqual(possibleActiveRecordClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")))
+                if ( ClassUtils.isClassInherit(possibleActiveRecordClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")))
                     activeRecordClass = possibleActiveRecordClass;
                 // Calls inside ActiveQuery paired with ActiveRecord
                 else if (ClassUtils.isClassInheritsOrEqual(possibleActiveRecordClass, ClassUtils.getClass(index, "\\yii\\db\\ActiveQuery"))) {
                     if (possibleActiveRecordClass.getDocComment() != null) {
-                        activeRecordClass = findClassInSeeTags(index, activeRecordClass, possibleActiveRecordClass);
+                        activeRecordClass = ClassUtils.findClassInSeeTags(index, possibleActiveRecordClass, "\\yii\\db\\BaseActiveRecord");
                     }
                 }
 
@@ -165,22 +164,6 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
             }
         }
 
-    }
-
-    private PhpClass findClassInSeeTags(PhpIndex index, PhpClass activeRecordClass, PhpClass possibleActiveRecordClass) {
-        PhpDocTag[] tags = possibleActiveRecordClass.getDocComment().getTagElementsByName("@see");
-        for (PhpDocTag tag: tags) {
-            String className = tag.getText().replace(tag.getName(), "").trim();
-            if (className.indexOf('\\') == -1 ) {
-                className = possibleActiveRecordClass.getNamespaceName() + className;
-            }
-            PhpClass classInSee =  ClassUtils.getClass(index, className);
-            if (ClassUtils.isClassInheritsOrEqual(classInSee, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))) {
-                activeRecordClass = classInSee;
-                break;
-            }
-        }
-        return activeRecordClass;
     }
 
     @Nullable

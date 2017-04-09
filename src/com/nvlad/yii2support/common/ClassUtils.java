@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
+import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
@@ -103,16 +104,35 @@ public class ClassUtils {
         return null;
     }
 
+    public static boolean isClassInheritsOrEqual(PhpClass classObject, String className, PhpIndex index) {
+        PhpClass phpClass = ClassUtils.getClass(index, className);
+        return isClassInheritsOrEqual(classObject, phpClass);
+    }
+
     public static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
         if (classObject == null || superClass == null)
             return false;
-        if (classObject != null) {
-            if (classObject.isEquivalentTo(superClass))
-                return true;
-            else
-                return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
-        }
-        return false;
+
+        if (classObject.isEquivalentTo(superClass))
+            return true;
+        else
+            return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
+
+    }
+
+    public static boolean isClassInherit(PhpClass classObject, String className, PhpIndex index) {
+        PhpClass phpClass = ClassUtils.getClass(index, className);
+        return isClassInherit(classObject, phpClass);
+    }
+
+    public static boolean isClassInherit(PhpClass classObject, PhpClass superClass) {
+        if (classObject == null || superClass == null)
+            return false;
+        PhpClass clazz = classObject.getSuperClass();
+        if (classObject.isEquivalentTo(superClass))
+            return true;
+        else
+            return isClassInherit(classObject.getSuperClass(), superClass);
     }
 
     public static String getAsPropertyName(Method method) {
@@ -274,4 +294,23 @@ public class ClassUtils {
     }
 
 
+    @Nullable
+    public static PhpClass findClassInSeeTags(PhpIndex index, PhpClass phpClass, String searchClassFQN) {
+        if (phpClass.getDocComment() == null)
+            return null;
+        PhpClass activeRecordClass = null;
+        PhpDocTag[] tags = phpClass.getDocComment().getTagElementsByName("@see");
+        for (PhpDocTag tag : tags) {
+            String className = tag.getText().replace(tag.getName(), "").trim();
+            if (className.indexOf('\\') == -1) {
+                className = phpClass.getNamespaceName() + className;
+            }
+            PhpClass classInSee = getClass(index, className);
+            if (isClassInheritsOrEqual(classInSee, getClass(index, searchClassFQN))) {
+                activeRecordClass = classInSee;
+                break;
+            }
+        }
+        return activeRecordClass;
+    }
 }
