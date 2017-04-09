@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.3.17.3</version>
+    <version>0.4.17.0</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
