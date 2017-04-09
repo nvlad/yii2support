@@ -1,19 +1,19 @@
-Database connection is required
+**Database connection is required**
 
-##ActiveQuery
+## ActiveQuery
 Code completion for ActiveQuery (ActiveRecord::find()->where for example)  
 Code completion inside ActiveQuery linked to ActiveRecord  
 Inspection in case if ActiveQuery not linked to ActiveRecord  
-##ActiveRecord
+## ActiveRecord
 Code completion for ActiveRecord findAll(), findOne() and so on methods  
 Undetectable ActiveRecord table inspection  
 Code completion in relations methods  
-##Migrations
+## Migrations
 Code completion for migrations  
-##Condition parameters
+## Condition parameters
 Condition parameters code completion  
 Condition parameters inspection  
-##Properties
+## Properties
 Synchronize roperties with database  
 Unused properties inspection  
 
