@@ -41,6 +41,12 @@ public class PhpUtil {
                     }
                 }
             }
+            if (phpPsiElement instanceof MethodReference && phpPsiElement.getFirstPsiChild() instanceof ParenthesizedExpression) {
+                final ClassReference classReference = ((NewExpression) ((ParenthesizedExpression) phpPsiElement.getFirstChild()).unparenthesize()).getClassReference();
+                if (classReference != null) {
+                    return (PhpClass) classReference.resolve();
+                }
+            }
 
             phpPsiElement = (PhpPsiElement) phpPsiElement.getParent();
         }

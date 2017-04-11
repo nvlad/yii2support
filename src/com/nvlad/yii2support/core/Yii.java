@@ -22,7 +22,7 @@ public class Yii {
     static HashSet<Application> applications;
 
     public static Set<Application> applications(Project project) {
-        if (applications == null) {
+        if (applications == null || applications.isEmpty()) {
             applications = new HashSet<>();
 
             PhpIndex index = PhpIndex.getInstance(project);
@@ -31,24 +31,44 @@ public class Yii {
             for (PhpClass aClass : classes) {
                 aClass.getFQN();
             }
-            final PsiFile[] indexFiles = FilenameIndex.getFilesByName(project, "index.php", GlobalSearchScope.projectScope(project));
-            for (PsiFile file : indexFiles) {
-                if (file.getContainingDirectory().getName().equals("web")) {
-                    Collection<MethodReference> references = PsiTreeUtil.findChildrenOfType(file, MethodReference.class);
+            PsiFile[] indexFiles = FilenameIndex.getFilesByName(project, "index.php", GlobalSearchScope.projectScope(project));
+            findApplications(indexFiles);
+            indexFiles = FilenameIndex.getFilesByName(project, "yii", GlobalSearchScope.projectScope(project));
+            findApplications(indexFiles);
 
-                    for (MethodReference reference : references) {
-                        if (Objects.equals(reference.getName(), "run")) {
-                            PhpClass phpClass = PhpUtil.getPhpClass(reference);
-                            if (phpClass != null) {
+            return applications;
+        }
+
+        return applications;
+    }
+
+    public static void clear() {
+        applications.clear();
+    }
+
+    public static boolean frameworkDetected() {
+        return applications != null && !applications.isEmpty();
+    }
+
+    private static void findApplications(PsiFile[] files) {
+        for (PsiFile file : files) {
+            if (file.getContainingDirectory().getName().equals("web")) {
+                Collection<MethodReference> references = PsiTreeUtil.findChildrenOfType(file, MethodReference.class);
+
+                for (MethodReference reference : references) {
+                    if (Objects.equals(reference.getName(), "run")) {
+                        PhpClass phpClass = PhpUtil.getPhpClass(reference);
+                        if (phpClass != null) {
+                            if (!reference.getContainingFile().getVirtualFile().getCanonicalPath().contains("/environments/")) {
+                                Application application = new Application(reference.getContainingFile());
+                                applications.add(application);
+                                System.out.print(application.getPath() + ": ");
                                 System.out.println(phpClass.getFQN());
                             }
                         }
                     }
                 }
             }
-            return applications;
         }
-
-        return applications;
     }
 }

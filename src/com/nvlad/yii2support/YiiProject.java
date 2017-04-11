@@ -21,7 +21,7 @@ public class YiiProject implements ProjectComponent {
 
     @Override
     public void projectClosed() {
-
+        Yii.clear();
     }
 
     @Override
