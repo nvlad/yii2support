@@ -30,7 +30,7 @@ public class UndetectableTableInspection extends PhpInspection {
                     if (table == null || ! DatabaseUtils.isTableExists(table, problemsHolder.getProject())) {
                         if (table == null)
                             table = "unknown";
-                        problemsHolder.registerProblem(clazz.getFirstChild(), "Can not detect database table for class (current table is " + table + ")" + clazz.getFQN(), ProblemHighlightType.WEAK_WARNING);
+                        problemsHolder.registerProblem(clazz.getFirstChild(), "Can not detect database table (current table is " + table + ") for class " + clazz.getFQN(), ProblemHighlightType.WEAK_WARNING);
                     }
                 }
                 super.visitPhpClass(clazz);

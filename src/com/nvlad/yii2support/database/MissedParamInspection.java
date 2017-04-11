@@ -40,7 +40,7 @@ public class MissedParamInspection extends PhpInspection {
 
                         PsiElement element = reference.getParameters()[0];
 
-                        String condition = element.getText();
+                        String condition = ClassUtils.getStringByElement(element);
                         String[] conditionParams = DatabaseUtils.extractParamsFromCondition(condition);
 
                         if (conditionParams.length > 0) {

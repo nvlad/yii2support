@@ -25,13 +25,13 @@ public class ParamsCompletionProvider extends CompletionProvider<CompletionParam
         if (methodRef != null) {
             Method method = (Method) methodRef.resolve();
             int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
-            if (paramPosition > 0 && method.getParameters().length > paramPosition) {
+            if (method != null && paramPosition > 0 && method.getParameters().length > paramPosition) {
                 if (method.getParameters()[paramPosition].getName().equals("params") &&
                         ( method.getParameters()[paramPosition - 1].getName().equals("condition") ||
                                 method.getParameters()[paramPosition - 1].getName().equals("sql") ||
                                 method.getParameters()[paramPosition - 1].getName().equals("expression") )) {
                     PsiElement element = methodRef.getParameters()[paramPosition - 1];
-                    String condition = element.getText();
+                    String condition = ClassUtils.getStringByElement(element);
                     String[] result = DatabaseUtils.extractParamsFromCondition(condition);
                     ArrayList<String> usedItems = new ArrayList<>();
                     if (position.getParent().getParent().getParent() instanceof ArrayCreationExpression) {

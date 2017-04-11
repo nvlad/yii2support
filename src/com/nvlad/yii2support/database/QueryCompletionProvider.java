@@ -71,6 +71,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                         (method.getParameters()[paramPosition].getName().equals("condition") ||
                                 method.getParameters()[paramPosition].getName().equals("link") ||
                                 method.getParameters()[paramPosition].getName().equals("sql") ||
+                                method.getParameters()[paramPosition].getName().equals("on") ||
                                 method.getParameters()[paramPosition].getName().equals("attributes") ||
                                 method.getParameters()[paramPosition].getName().startsWith("column"))) {
 
@@ -122,7 +123,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                     // cancel codecompletion in case of "table" have ,
                     if (method.getParameters()[paramPosition].getName().equals("table") && methodRef.getParameters().length > paramPosition) {
                         PsiElement element = methodRef.getParameters()[paramPosition];
-                        String content = element.getText();
+                        String content = ClassUtils.getStringByElement(element);
                         if (content.indexOf(',') >= 0)
                             return;
                     }

@@ -171,6 +171,14 @@ public class ClassUtils {
             return getMethodRef(el.getParent(), recursionLimit - 1);
     }
 
+    @NotNull
+    public static String getStringByElement(PsiElement element) {
+        if (element instanceof StringLiteralExpression || element instanceof ConcatenationExpression) {
+            return element.getText();
+        } else
+            return "";
+    }
+
     public static String removeQuotes(@NotNull String str) {
         return str.replace("\"", "").replace("\'", "");
     }

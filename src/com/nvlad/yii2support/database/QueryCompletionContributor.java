@@ -21,7 +21,7 @@ public class QueryCompletionContributor extends com.intellij.codeInsight.complet
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
         if ((typeChar == '\'' || typeChar == '"' || typeChar == '.')  ) {
-            MethodReference methodRef = ClassUtils.getMethodRef(position, 2);
+            MethodReference methodRef = ClassUtils.getMethodRef(position, 10);
             if (methodRef != null) {
                 Method method = (Method)methodRef.resolve();
                 if (method != null) {
