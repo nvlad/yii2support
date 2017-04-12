@@ -37,7 +37,7 @@ public class ObjectFactoryMissedFieldInspection extends PhpInspection {
                                 &&  ! keyName.equals("class")
                                 &&  ! keyName.startsWith("as ")
                                 &&  ! keyName.startsWith("on ")
-                                && ClassUtils.findField(phpClass,  keyName) == null) {
+                                && ClassUtils.findWritableField(phpClass,  keyName) == null) {
                             final String descriptionTemplate = "Field '"+keyName+"' not exists in referenced class "+phpClass.getFQN();
                             problemsHolder.registerProblem(elem, descriptionTemplate);
                         }

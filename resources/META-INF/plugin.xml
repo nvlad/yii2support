@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.3.17.9</version>
+    <version>0.4.17.1</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -97,14 +97,31 @@
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
         <!-- Database -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.QueryCompletionContributor"/>
-        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.MigrationCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ParamsCompletionContributor"/>
 
         <localInspection language="PHP" shortName="MissedParamInspection"
-                         displayName="Wrong database parameterS"
+                         displayName="Wrong database parameters"
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissedParamInspection"/>
+
+        <localInspection language="PHP" shortName="MissingProperyInspection"
+                         displayName="Missing property"
+                         groupName="Database" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.database.PropertiesInspection"/>
+
+        <localInspection language="PHP" shortName="CanNotDetectTableInspection"
+                         displayName="Undetectable table for ActiveRecord"
+                         groupName="Database" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.database.UndetectableTableInspection"/>
+
+        <localInspection language="PHP" shortName="MissingActiveRecordInActiveQueryInspection"
+                         displayName="Can not find connected ActiveRecord class."
+                         groupName="Database" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.nvlad.yii2support.database.MissingActiveRecordInActiveQueryInspection"/>
 
     </extensions>
 

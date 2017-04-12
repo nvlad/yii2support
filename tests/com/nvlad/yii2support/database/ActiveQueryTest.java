@@ -11,12 +11,9 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by oleg on 03.04.2017.
+ * Created by oleg on 05.04.2017.
  */
-public class QueryTests  extends LightCodeInsightFixtureTestCase {
-
-
-
+public class ActiveQueryTest  extends LightCodeInsightFixtureTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -36,96 +33,98 @@ public class QueryTests  extends LightCodeInsightFixtureTestCase {
         return new File(this.getClass().getResource("fixtures").getFile()).getAbsolutePath();
     }
 
-    public void testQuery_Empty() {
+    public void testActiveQuery_Empty() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('<caret>')\n" +
-                ";");
+                "\\test\\PersonModel::find()->where('<caret>');");
         myFixture.completeBasic();
-        assertEquals(2, myFixture.getLookupElementStrings().toArray().length);
+        assertEquals(5, myFixture.getLookupElementStrings().size());
     }
 
-    public void testQuery_Quoting() {
+    public void testActiveQuery_Prefix() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('{{<caret>')\n" +
-                ";");
-        myFixture.completeBasic();
-        assertEquals(2, myFixture.getLookupElementStrings().toArray().length);
-    }
-
-    public void testQuery_QuotingDbPrefix() {
-
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('{{%<caret>')\n" +
-                ";");
-        myFixture.completeBasic();
-        assertEquals(2, myFixture.getLookupElementStrings().size());
-    }
-
-    public void testQuery_Prefix() {
-
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('per<caret>');");
+                " \\test\\PersonModel::find()->where('per<caret>');");
         myFixture.complete(CompletionType.BASIC);
         assertEquals("'person'", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
     }
 
-    public void testQuery_SuffixQuotingDbPrefix() {
+    public void testActiveQuery_SuffixQuotingDbPrefix() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('{{%per<caret>');");
+                " \\test\\PersonModel::find()->where('{{%per<caret>');");
         myFixture.completeBasic();
         assertEquals("'{{%person'", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
     }
 
-    public void testQuery_Columns() {
+    public void testActiveQuery_Columns() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('person.<caret>");
+                " \\test\\PersonModel::find()->where('person.<caret>");
         myFixture.completeBasic();
         assertEquals(3, myFixture.getLookupElementStrings().size());
     }
 
-    public void testQuery_ColumnPrefix() {
+    public void testActiveQuery_ColumnPrefix() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('person.na<caret>");
+                " \\test\\PersonModel::find()->where('person.na<caret>");
         myFixture.completeBasic();
 
         assertEquals("name", myFixture.getLookupElementStrings().get(0));
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
-    public void testQuery_ColumnPrefixWithPrevCondition() {
+    public void testActiveQuery_TableCompletionWithPrevCondition() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('person.surname AND person.na<caret>");
+                " \\test\\PersonModel::find()->where('person.name AND per<caret>");
+        myFixture.completeBasic();
+
+        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
+
+    }
+
+    public void testActiveQuery_TableCompletion() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " \\test\\PersonModel::find()->where('<caret>");
+        myFixture.completeBasic();
+
+        assertEquals(5, myFixture.getLookupElementStrings().size());
+
+    }
+
+    public void testActiveQuery_ColumnPrefixWithPrevCondition() {
+
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " \\test\\PersonModel::find()->where('person.surname AND person.na<caret>");
         myFixture.completeBasic();
 
         assertEquals("name", myFixture.getLookupElementStrings().get(0));
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
-    public void testQuery_ColumnPrefixTableQuoting() {
+    public void testActiveQuery_ColumnPrefixTableQuoting() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('{{person}}.na<caret>');");
+                "var $query = \\test\\PersonModel::find();" +
+                "$query->where('{{person}}.na<caret>');");
         myFixture.completeBasic();
         assertEquals("name", myFixture.getLookupElementStrings().get(0));
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
-    public void testQuery_ColumnQuotingAndPrefixTableQuoting() {
+    public void testActiveQuery_ColumnQuotingAndPrefixTableQuoting() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " (new \\yii\\db\\Query())->where('{{person}}.[[na<caret>');");
+                " \\test\\PersonModel::find()->where('{{person}}.[[na<caret>');");
         myFixture.completeBasic();
         assertEquals("name", myFixture.getLookupElementStrings().get(0));
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
-    public void testQuery_ColumnQuotingAndPrefixTableQuotingDoubleQuote() {
+    public void testActiveQuery_ColumnQuotingAndPrefixTableQuotingDoubleQuote() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
                 " (new \\yii\\db\\Query())->where(\"{{person}}.[[na<caret>\");");
@@ -134,15 +133,20 @@ public class QueryTests  extends LightCodeInsightFixtureTestCase {
         assertEquals("surname", myFixture.getLookupElementStrings().get(1));
     }
 
-    public void testActiveQuery_TableCompletionWithPrevCondition() {
+    public void testActiveQuery_ColumnArray() {
 
         myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                "(new \\yii\\db\\Query())->where('person.name AND per<caret>");
+                " \\test\\PersonModel::find()->where(['<caret>");
         myFixture.completeBasic();
 
-        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
-
+        assertEquals(5, myFixture.getLookupElementStrings().size());
     }
 
+    public void testActiveQuery_HasOneMethod() {
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " \\test\\PersonModel::find()->hasOne(AddressModel::class, ['<caret'] )");
+        myFixture.completeBasic();
 
+        assertEquals(2, myFixture.getLookupElementStrings().size());
+    }
 }

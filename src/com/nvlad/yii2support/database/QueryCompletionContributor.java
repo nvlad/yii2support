@@ -21,15 +21,18 @@ public class QueryCompletionContributor extends com.intellij.codeInsight.complet
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
         if ((typeChar == '\'' || typeChar == '"' || typeChar == '.')  ) {
-            MethodReference methodRef = ClassUtils.getMethodRef(position, 2);
+            MethodReference methodRef = ClassUtils.getMethodRef(position, 10);
             if (methodRef != null) {
                 Method method = (Method)methodRef.resolve();
                 if (method != null) {
                     Object possibleClass = method.getParent();
                     if (possibleClass instanceof PhpClass) {
                         PhpIndex index = PhpIndex.getInstance(method.getProject());
-                        if (ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass,
-                                ClassUtils.getClass(index, "\\yii\\db\\Query"))) {
+                        if (ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\Query")) ||
+                                ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) ||
+                                ClassUtils.isClassInherit((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")) ||
+                                ClassUtils.isClassInheritsOrEqual((PhpClass)possibleClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
+                                ) {
                             return true;
                         }
                     }
@@ -49,7 +52,9 @@ public class QueryCompletionContributor extends com.intellij.codeInsight.complet
                          // string
                      PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class).withParent(StringLiteralExpression.class),
                          // ["<caret>" => ""]
-                         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class) );
+                         PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class)
+
+                 );
 
 
     }

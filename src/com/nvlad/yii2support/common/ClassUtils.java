@@ -5,8 +5,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
+import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -20,7 +22,7 @@ public class ClassUtils {
 
     @Nullable
     public static PhpClass getPhpClassUniversal(Project project, PhpPsiElement value) {
-        if (value instanceof MethodReference && value.getName().equals("className")) {
+        if (value instanceof MethodReference && (value.getName().equals("className") || value.getName().equals("tableName"))) {
             MethodReference methodRef = (MethodReference) value;
             return getPhpClass(methodRef.getClassReference());
 
@@ -75,9 +77,8 @@ public class ClassUtils {
         while (methodRef != null) {
             PhpExpression expr = methodRef.getClassReference();
             if (expr instanceof ClassReference) {
-                return (PhpClass) ((ClassReference)expr).resolve();
-            }
-            else if (expr instanceof MethodReference) {
+                return (PhpClass) ((ClassReference) expr).resolve();
+            } else if (expr instanceof MethodReference) {
                 methodRef = (MethodReference) expr;
             } else if (expr instanceof Variable) {
                 PhpType type = expr.getType();
@@ -85,8 +86,9 @@ public class ClassUtils {
                 int index1 = strType.indexOf('\\');
                 int index2 = strType.indexOf('.');
                 if (index2 == -1)
-                    index2 = strType.length() - index1;;
-                if (index1 >= 0 && index2 >= 0){
+                    index2 = strType.length() - index1;
+
+                if (index1 >= 0 && index2 >= 0) {
                     String className = strType.substring(index1, index2);
                     return ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), className);
                 } else {
@@ -102,16 +104,35 @@ public class ClassUtils {
         return null;
     }
 
+    public static boolean isClassInheritsOrEqual(PhpClass classObject, String className, PhpIndex index) {
+        PhpClass phpClass = ClassUtils.getClass(index, className);
+        return isClassInheritsOrEqual(classObject, phpClass);
+    }
+
     public static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
         if (classObject == null || superClass == null)
             return false;
-        if (classObject != null) {
-            if (classObject.isEquivalentTo(superClass))
-                return true;
-            else
-                return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
-        }
-        return false;
+
+        if (classObject.isEquivalentTo(superClass))
+            return true;
+        else
+            return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
+
+    }
+
+    public static boolean isClassInherit(PhpClass classObject, String className, PhpIndex index) {
+        PhpClass phpClass = ClassUtils.getClass(index, className);
+        return isClassInherit(classObject, phpClass);
+    }
+
+    public static boolean isClassInherit(PhpClass classObject, PhpClass superClass) {
+        if (classObject == null || superClass == null)
+            return false;
+        PhpClass clazz = classObject.getSuperClass();
+        if (classObject.isEquivalentTo(superClass))
+            return true;
+        else
+            return isClassInherit(classObject.getSuperClass(), superClass);
     }
 
     public static String getAsPropertyName(Method method) {
@@ -136,7 +157,6 @@ public class ClassUtils {
         }
 
         return result;
-
     }
 
     @Nullable
@@ -144,23 +164,56 @@ public class ClassUtils {
         if (el == null)
             return null;
         else if (el.getParent() instanceof MethodReference)
-            return (MethodReference)el.getParent();
+            return (MethodReference) el.getParent();
         else if (recursionLimit <= 0)
             return null;
         else
             return getMethodRef(el.getParent(), recursionLimit - 1);
     }
 
-    public static String removeQuotes(String str) {
+    @NotNull
+    public static String getStringByElement(PsiElement element) {
+        if (element instanceof StringLiteralExpression || element instanceof ConcatenationExpression) {
+            return element.getText();
+        } else
+            return "";
+    }
+
+    public static String removeQuotes(@NotNull String str) {
         return str.replace("\"", "").replace("\'", "");
     }
 
-    public static PhpClassMember findField(PhpClass phpClass, String fieldName) {
+    public static boolean isFieldExists(PhpClass phpClass, String fieldName, boolean excludePhpDoc) {
+        if (phpClass == null || fieldName == null)
+            return false;
+        fieldName = ClassUtils.removeQuotes(fieldName);
+
+        final Field field = phpClass.findFieldByName(fieldName, false);
+        if (field != null) {
+            if ((field instanceof PhpDocProperty) && excludePhpDoc) {
+                // skip DocProperty if excludePhpDoc = true
+            } else {
+                final PhpModifier modifier = field.getModifier();
+                return !(!modifier.isPublic() || modifier.isStatic());
+            }
+
+        }
+
+        final String methodName = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+        Method method = phpClass.findMethodByName("set" + methodName);
+        if (method != null && !method.isStatic() && method.getAccess().isPublic() && method.getParameters().length == 1) {
+            return true;
+        }
+        method = phpClass.findMethodByName("get" + methodName);
+        return method != null && !method.isStatic() && method.getAccess().isPublic() && method.getParameters().length == 0;
+    }
+
+    @Nullable
+    public static PhpClassMember findWritableField(PhpClass phpClass, String fieldName) {
 
         if (phpClass == null || fieldName == null)
             return null;
         fieldName = ClassUtils.removeQuotes(fieldName);
-
 
         final Collection<Field> fields = phpClass.getFields();
         final Collection<Method> methods = phpClass.getMethods();
@@ -179,30 +232,8 @@ public class ClassUtils {
                     continue;
                 }
 
-
-                if (field instanceof PhpDocProperty) {
-                    final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                    Boolean setterExist = false;
-                    for (Method method : methods) {
-                        if (method.getName().equals(setter)) {
-                            setterExist = true;
-                            break;
-                        }
-                    }
-                    if (!setterExist) {
-                        String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                        Boolean getterExist = false;
-                        for (Method method : methods) {
-                            if (method.getName().equals(getter)) {
-                                getterExist = true;
-                                break;
-                            }
-                        }
-                        if (getterExist) {
-                            continue;
-                        }
-                    }
-
+                if (field instanceof PhpDocProperty && isReadonlyProperty(phpClass, (PhpDocProperty) field)) {
+                    break;
                 }
 
                 return field;
@@ -219,11 +250,9 @@ public class ClassUtils {
                     String propertyName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
                     if (propertyName.equals(fieldName))
                         return method;
-
                 }
             }
         }
-
 
         return null;
     }
@@ -242,13 +271,12 @@ public class ClassUtils {
     }
 
 
-    public static Collection<Field> getClassFields(PhpClass phpClass) {
+    public static Collection<Field> getWritableClassFields(PhpClass phpClass) {
         if (phpClass == null)
             return null;
         final HashSet<Field> result = new HashSet<>();
 
         final Collection<Field> fields = phpClass.getFields();
-        final Collection<Method> methods = phpClass.getMethods();
         for (Field field : fields) {
             if (field.isConstant()) {
                 continue;
@@ -259,37 +287,38 @@ public class ClassUtils {
                 continue;
             }
 
-            if (field instanceof PhpDocProperty) {
-                final String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                Boolean setterExist = false;
-                for (Method method : methods) {
-                    if (method.getName().equals(setter)) {
-                        setterExist = true;
-                        break;
-                    }
-                }
-                if (!setterExist) {
-                    String getter = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                    Boolean getterExist = false;
-                    for (Method method : methods) {
-                        if (method.getName().equals(getter)) {
-                            getterExist = true;
-                            break;
-                        }
-                    }
-                    if (getterExist) {
-                        continue;
-                    }
-                }
+            if (field instanceof PhpDocProperty && isReadonlyProperty(phpClass, (PhpDocProperty) field)) {
+                continue;
             }
 
             result.add(field);
         }
-
-
-
-
         return result;
     }
 
+    public static boolean isReadonlyProperty(PhpClass clazz, PhpDocProperty field) {
+        final String fieldName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+        return clazz.findMethodByName("set" + fieldName) == null && clazz.findMethodByName("get" + fieldName) != null;
+    }
+
+
+    @Nullable
+    public static PhpClass findClassInSeeTags(PhpIndex index, PhpClass phpClass, String searchClassFQN) {
+        if (phpClass.getDocComment() == null)
+            return null;
+        PhpClass activeRecordClass = null;
+        PhpDocTag[] tags = phpClass.getDocComment().getTagElementsByName("@see");
+        for (PhpDocTag tag : tags) {
+            String className = tag.getText().replace(tag.getName(), "").trim();
+            if (className.indexOf('\\') == -1) {
+                className = phpClass.getNamespaceName() + className;
+            }
+            PhpClass classInSee = getClass(index, className);
+            if (isClassInheritsOrEqual(classInSee, getClass(index, searchClassFQN))) {
+                activeRecordClass = classInSee;
+                break;
+            }
+        }
+        return activeRecordClass;
+    }
 }
