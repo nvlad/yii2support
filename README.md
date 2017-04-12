@@ -26,14 +26,14 @@ Features
 
 ### Views
 
-- View files completion
-- Add View parameters after completion
-- Inspection missed View files
-- QuickFix for missed files
+- View template names and parameters completion
+- Add view parameters after completion
+- Inspection for missing view templates
+- QuickFix for missing view templates
 - Jump to View file (go to declaration)
-- Inspection by required & unused parameters for View render
-- QuickFix for required & unused parameters
-- Update path to View file on file move
+- Inspection for required and unused template parameters
+- QuickFix for required and unused template parameters
+- Updates path to view template when file is moved
 
 ### i18n
 
@@ -45,15 +45,16 @@ Features
 Code completion for Yii configuration arrays. Works both in configuration files and on object instantiation.
 Following cases are supported:
 
-- Array in $config parameter in yii\base\Object or its descendants constructor
-- Array have "class" key with valid class representation: fully qualified string representation, ClassName::class or Class::className()
-- Array is a value of a key that corresponds to standard Yii classes (like "db", "request", "mailer" and so on), and file with this array located in a directory called "config"
-- WidgetClass::widget() and WidgetClass::begin calls if WidgetClass is a descendant of yii\base\Widget
-- $field->widget() method call on yii\widgets\ActiveField and its descendants
-- Inside array in GridView "columns" key
-- Yii::createObject method
+- Array in `$config` parameter in `yii\base\Object` or its descendants constructor
+- Array has a `class` key with valid class representation: fully qualified name as string, `ClassName::class` or `Class::className()`
+- Array is a value of a key that corresponds to standard Yii classes (like `db`, `request`, `mailer`, and so on), and
+  a file with this array is located within `config` directory
+- `WidgetClass::widget()` and `WidgetClass::begin` calls in case `WidgetClass` is a descendant of `yii\base\Widget`
+- `$field->widget()` method call on `yii\widgets\ActiveField` and its descendants
+- Inside array in `GridView`, `columns` key
+- `Yii::createObject` method
 
-Go To Declaration, Rename, Find usages and Help popup works whenever code completion works.
+Go To Declaration, Rename, Find usages and Help popups work whenever code completion works.
 
 Installation
 ------------
