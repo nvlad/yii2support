@@ -7,9 +7,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.ClassUtils;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -292,5 +294,18 @@ public class ViewsUtil {
         }
 
         return null;
+    }
+
+    public static boolean isValidRenderMethod(MethodReference methodReference) {
+        final PhpClass clazz = ClassUtils.getPhpClassByCallChain(methodReference);
+        if (clazz == null) {
+            return false;
+        }
+        final PhpIndex phpIndex = PhpIndex.getInstance(clazz.getProject());
+
+        return ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Controller", phpIndex)
+                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\View", phpIndex)
+                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Widget", phpIndex)
+                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\mail\\BaseMailer", phpIndex);
     }
 }

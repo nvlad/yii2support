@@ -28,6 +28,10 @@ final public class MissedViewInspection extends PhpInspection {
         return new PhpElementVisitor() {
             @Override
             public void visitPhpMethodReference(MethodReference reference) {
+                if (!ViewsUtil.isValidRenderMethod(reference)) {
+                    return;
+                }
+
                 if (ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
                     if (reference.getParameters().length > 0) {
                         PsiElement pathParameter = reference.getParameters()[0];
