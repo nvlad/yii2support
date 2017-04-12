@@ -2,17 +2,10 @@ package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.ArrayUtil;
-import com.intellij.util.IncorrectOperationException;
-import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.nvlad.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +28,7 @@ public class ObjectFactoryReference extends PsiReferenceBase<PsiElement> {
             PhpClass phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
 
             if (phpClass != null) {
-                PsiElement field = ClassUtils.findField(phpClass, myElement.getText());
+                PsiElement field = ClassUtils.findWritableField(phpClass, myElement.getText());
                 return field;
             }
 
