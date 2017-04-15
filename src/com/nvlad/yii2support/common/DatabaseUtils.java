@@ -145,22 +145,28 @@ public class DatabaseUtils {
 
     @Nullable
     public static String getTableByActiveRecordClass(PhpClass phpClass) {
-        Method method = phpClass.findMethodByName("tableName");
-        Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
-        for (PhpReturn element : returns) {
-            if ((element).getChildren().length > 0) {
-                if ((element).getChildren()[0] instanceof ClassConstantReference) {
-                    PsiElement resolved = ((ClassConstantReference) (element).getChildren()[0]).resolve();
-                    if (resolved != null && resolved instanceof ClassConstImpl) {
-                        ClassConstImpl constant = (ClassConstImpl) resolved;
-                        if (constant.getChildren().length > 0)
-                            return ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();
-                    }
+        Method method = phpClass.findOwnMethodByName("tableName");
+        if (method != null) {
+            Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
+            for (PhpReturn element : returns) {
+                if ((element).getChildren().length > 0) {
+                    if ((element).getChildren()[0] instanceof ClassConstantReference) {
+                        PsiElement resolved = ((ClassConstantReference) (element).getChildren()[0]).resolve();
+                        if (resolved != null && resolved instanceof ClassConstImpl) {
+                            ClassConstImpl constant = (ClassConstImpl) resolved;
+                            if (constant.getChildren().length > 0)
+                                return ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();
+                        }
 
-                } else if ((element).getChildren()[0] instanceof StringLiteralExpression)
-                    return clearTablePrefixTags((element).getChildren()[0].getText());
+                    } else if ((element).getChildren()[0] instanceof StringLiteralExpression)
+                        return clearTablePrefixTags((element).getChildren()[0].getText());
+                }
             }
+        } else {
+           String className = phpClass.getName();
+            return StringUtils.CamelToId(className);
         }
+
 
         return null;
     }
