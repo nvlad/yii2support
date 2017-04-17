@@ -21,7 +21,8 @@ import org.jetbrains.annotations.NotNull;
 public class MissedParamQuickFix  implements LocalQuickFix {
     MethodReference methodReference;
 
-    public MissedParamQuickFix(MethodReference methodRef) {
+
+    public MissedParamQuickFix(MethodReference methodRef ) {
         methodReference = methodRef;
     }
 
@@ -37,18 +38,19 @@ public class MissedParamQuickFix  implements LocalQuickFix {
         Method method = (Method)methodReference.resolve();
         if (method != null) {
           Parameter[] parameters = method.getParameters();
-          if (parameters.length > 1 &&
-                  (parameters[0].getName().equals("condition")
-                          || parameters[0].getName().equals("expression")
-                          || parameters[0].getName().equals("sql")) &&
-                  parameters[1].getName().equals("params") &&
-                  methodReference.getParameters().length > 0) {
-              String condition = methodReference.getParameters()[0].getText();
+          int paramParameterIndex = ClassUtils.getParamIndex(method, "params");
+          int conditionParameterIndex = ClassUtils.getParamIndex(method, new String[]{ "condition", "expression", "sql"});
+
+          if (paramParameterIndex > -1
+                  && conditionParameterIndex > -1
+                  && conditionParameterIndex == paramParameterIndex - 1
+                  && methodReference.getParameters().length > conditionParameterIndex) {
+              String condition = methodReference.getParameters()[conditionParameterIndex].getText();
               String[] conditionParams = DatabaseUtils.extractParamsFromCondition(condition);
 
               ArrayCreationExpression array = null;
-              if (methodReference.getParameters().length > 1) {
-                  PsiElement paramParameter = methodReference.getParameters()[1];
+              if (methodReference.getParameters().length > paramParameterIndex) {
+                  PsiElement paramParameter = methodReference.getParameters()[paramParameterIndex];
                   if (paramParameter instanceof ArrayCreationExpression)
                       array = (ArrayCreationExpression)paramParameter;
                   paramParameter.delete();
@@ -62,7 +64,7 @@ public class MissedParamQuickFix  implements LocalQuickFix {
               PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
               Template template = templateManager.createTemplate("", "");
               template.setToReformat(true);
-              buildParamArray(template, conditionParams, array);
+              buildParamArray(template, conditionParams, array, conditionParameterIndex);
 
               PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
               templateManager.startTemplate(editor, template);
@@ -71,8 +73,10 @@ public class MissedParamQuickFix  implements LocalQuickFix {
 
     }
 
-    private Template buildParamArray(Template template, String[] conditionParams, ArrayCreationExpression array) {
-        if (! methodReference.getParameterList().getLastChild().getText().equals(","))
+    private Template buildParamArray(Template template, String[] conditionParams, ArrayCreationExpression array, int conditionParameterIndex) {
+        if (methodReference.getParameterList() != null
+                && (methodReference.getParameterList().getParameters()[conditionParameterIndex].getNextSibling() == null ||
+                ! methodReference.getParameterList().getParameters()[conditionParameterIndex].getNextSibling().getText().equals(",")))
             template.addTextSegment(", ");
 
         template.addTextSegment("[");

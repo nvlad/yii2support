@@ -19,6 +19,24 @@ import java.util.HashSet;
  */
 public class ClassUtils {
 
+    public static int getParamIndex(Method method, String[] paramNames) {
+        for (String name: paramNames) {
+            int index = getParamIndex(method, name);
+            if (index > -1)
+                return index;
+        }
+        return -1;
+    }
+
+    public static int getParamIndex(Method method, String paramName) {
+        int index = -1;
+        for (Parameter param: method.getParameters()) {
+            index++;
+            if (param.getName().equals(paramName))
+                return index;
+        }
+        return index;
+    }
 
     @Nullable
     public static PhpClass getPhpClassUniversal(Project project, PhpPsiElement value) {

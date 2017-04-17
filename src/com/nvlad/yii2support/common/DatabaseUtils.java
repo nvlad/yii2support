@@ -96,7 +96,7 @@ public class DatabaseUtils {
 
     public static String[] extractParamsFromCondition(String condition) {
         LinkedHashSet<String> matches = new LinkedHashSet<>();
-        String pattern = "[^:\\w]?(:\\w+)";
+        String pattern = "(?<!:)(:\\w+)";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(condition);
         while (m.find()) {
