@@ -29,13 +29,12 @@ public class ClassUtils {
     }
 
     public static int getParamIndex(Method method, String paramName) {
-        int index = -1;
-        for (Parameter param: method.getParameters()) {
-            index++;
+        for (int i = 0; i < method.getParameters().length; i++) {
+            Parameter param =  method.getParameters()[i];
             if (param.getName().equals(paramName))
-                return index;
+                return i;
         }
-        return index;
+        return -1;
     }
 
     @Nullable
