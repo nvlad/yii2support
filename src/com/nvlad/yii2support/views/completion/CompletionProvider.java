@@ -26,6 +26,10 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             return;
         }
 
+        if (!ViewsUtil.isValidRenderMethod(method)) {
+            return;
+        }
+
         PsiElement parameter = psiElement;
         while (!(parameter.getParent() instanceof ParameterList)) {
             parameter = parameter.getParent();
