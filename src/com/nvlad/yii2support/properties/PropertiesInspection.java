@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.database;
+package com.nvlad.yii2support.properties;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by oleg on 06.04.2017.

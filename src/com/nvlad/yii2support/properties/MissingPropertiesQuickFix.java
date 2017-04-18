@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.database;
+package com.nvlad.yii2support.properties;
 
 import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
