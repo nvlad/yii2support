@@ -31,10 +31,10 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         }
 
         PsiElement parameter = psiElement;
-        while (!(parameter.getParent() instanceof ParameterList)) {
+        while (parameter != null && !(parameter.getParent() instanceof ParameterList)) {
             parameter = parameter.getParent();
         }
-        if (!parameter.equals(method.getParameters()[0])) {
+        if (parameter == null || !parameter.equals(method.getParameters()[0])) {
             return;
         }
 
