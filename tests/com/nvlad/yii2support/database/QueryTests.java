@@ -140,7 +140,7 @@ public class QueryTests  extends LightCodeInsightFixtureTestCase {
                 "(new \\yii\\db\\Query())->where('person.name AND per<caret>");
         myFixture.completeBasic();
 
-        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
+        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset() - 1).getText());
 
     }
 

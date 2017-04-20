@@ -42,7 +42,6 @@ public class ClassUtils {
         if (value instanceof MethodReference && (value.getName().equals("className") || value.getName().equals("tableName"))) {
             MethodReference methodRef = (MethodReference) value;
             return getPhpClass(methodRef.getClassReference());
-
         }
         if (value instanceof ClassConstantReference) {
             ClassConstantReference classRef = (ClassConstantReference) value;

@@ -81,7 +81,7 @@ public class ActiveQueryTest  extends LightCodeInsightFixtureTestCase {
                 " \\test\\PersonModel::find()->where('person.name AND per<caret>");
         myFixture.completeBasic();
 
-        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent().getText());
+        assertEquals("person.name AND person", myFixture.getFile().findElementAt(myFixture.getCaretOffset() - 1).getText());
 
     }
 
@@ -142,11 +142,4 @@ public class ActiveQueryTest  extends LightCodeInsightFixtureTestCase {
         assertEquals(5, myFixture.getLookupElementStrings().size());
     }
 
-    public void testActiveQuery_HasOneMethod() {
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
-                " \\test\\PersonModel::find()->hasOne(AddressModel::class, ['<caret'] )");
-        myFixture.completeBasic();
-
-        assertEquals(2, myFixture.getLookupElementStrings().size());
-    }
 }
