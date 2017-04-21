@@ -18,7 +18,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>>ActiveQuery, Query and migrations (database connection is required) support</li>
+            <li>ActiveQuery, Query and migrations (database connection is required) support</li>
         </ul>
     ]]>
     </change-notes>
