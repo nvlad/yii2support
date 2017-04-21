@@ -18,7 +18,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Ignore method and function(except "compact") calls as second parameter for render* functions</li>
+            <li>>ActiveQuery, Query and migrations (database connection is required) support</li>
         </ul>
     ]]>
     </change-notes>
