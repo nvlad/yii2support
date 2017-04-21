@@ -1,42 +1,19 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.4.17.2</version>
+    <version>0.4.17.3</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
-
-      <b>Views</b>
-      <ul>
-          <li>View files completion</li>
-          <li>Add View parameters after completion</li>
-          <li>Inspection missed View files</li>
-          <li>QuickFix for missed files</li>
-          <li>Jump to View file (go to declaration)</li>
-          <li>Inspection by required &amp; unused parameters for View render</li>
-          <li>QuickFix for required &amp; unused parameters</li>
-          <li>Update path to View file on file move</li>
-      </ul>
-
-      <b>i18n</b>
-      <ul>
-          <li>Code completion</li>
-          <li>Generate params array</li>
-      </ul>
-
-      <b>Configuration arrays</b>
-      <p>Code completion for Yii configuration arrays. Works both in configuration files and on object instantiation.<br/>
-          Following cases are supported:</p>
-      <ul>
-          <li>Array in $config parameter in yii\base\Object or its descendants constructor</li>
-          <li>Array have "class" key with valid class representation: fully qualified string representation, ClassName::class or Class::className()</li>
-          <li>Array is a value of a key that corresponds to standard Yii classes (like "db", "request", "mailer" and so on), and file with this array located in a directory called "config"</li>
-          <li>WidgetClass::widget() and WidgetClass::begin calls if WidgetClass is a descendant of yii\base\Widget</li>
-          <li>$field->widget() method call on yii\widgets\ActiveField and its descendants</li>
-          <li>Inside array in GridView "columns" key</li>
-           <li>Yii::createObject method</li>
-      </ul>
-      <p>Go To Declaration, Rename, Find usages and Help popup works whenever code completion works.</p>
+       <b>Plugin contains the following functionality</b><br/>
+       <ul>
+       <li>render() methods for views</li>
+       <li>i18n</li>
+       <li>Configuration arrays for object instantiation</li>
+       <li>ActiveQuery, Query and migrations (database connection is required)</li>
+       </ul>
+       <br/>
+       Detailed information can be found in source code in README.md files located in folders of modules
     ]]></description>
 
     <change-notes><![CDATA[
