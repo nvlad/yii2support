@@ -92,5 +92,5 @@ or by sending pull requests.
 Acknowledging and or citing the plugin is as important as direct contributions.
 
 If you are giving a presentation or talk we suggest using
-[our logo](https://github.com/nvlad/yii2support/blob/master/yii2support.png).
+[our logo](https://github.com/nvlad/yii2support/raw/master/img/logo.png?raw=true).
 
