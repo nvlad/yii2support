@@ -13,7 +13,7 @@
        <li>ActiveQuery, Query and migrations (database connection is required)</li>
        </ul>
        <br/>
-       Detailed information can be found in source code in README.md files located in folders of modules
+       Detailed information can be in [README.md](https://github.com/nvlad/yii2support/blob/master/README.md)
     ]]></description>
 
     <change-notes><![CDATA[
