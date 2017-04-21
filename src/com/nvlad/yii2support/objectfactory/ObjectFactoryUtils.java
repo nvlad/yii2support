@@ -187,7 +187,7 @@ public class ObjectFactoryUtils {
             PhpClass resultClass = null;
             for (String type : types) {
                 resultClass = ClassUtils.getClass(PhpIndex.getInstance(field.getProject()), type);
-                if (resultClass != null) {
+                if (resultClass != null && ! resultClass.getName().equals("Closure") ) {
                     return resultClass;
                 }
             }
