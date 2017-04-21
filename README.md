@@ -18,12 +18,6 @@ and [IntelliJ IDEA](https://www.jetbrains.com/idea/).
 Features
 --------
 
-![](img/s1.png?raw=true)
-
-![](img/s2.png?raw=true)
-
-![](img/s3.png?raw=true)
-
 ### Views
 
 - View template names and parameters completion
@@ -60,20 +54,20 @@ Go To Declaration, Rename, Find usages and Help popups work whenever code comple
 
 **Database connection is required**
 
-## ActiveQuery
+#### ActiveQuery
 Code completion for ActiveQuery (ActiveRecord::find()->where for example)  
 Code completion inside ActiveQuery linked to ActiveRecord  
 Inspection in case if ActiveQuery not linked to ActiveRecord  
-## ActiveRecord
+#### ActiveRecord
 Code completion for ActiveRecord findAll(), findOne() and so on methods  
 Undetectable ActiveRecord table inspection  
 Code completion in relations methods  
-## Migrations
+#### Migrations
 Code completion for migrations  
-## Condition parameters
+#### Condition parameters
 Condition parameters code completion  
 Condition parameters inspection  
-## Properties
+#### Properties
 Synchronize properties with database  
 Unused properties inspection  
 
