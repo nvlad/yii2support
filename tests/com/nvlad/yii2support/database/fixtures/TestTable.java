@@ -354,6 +354,7 @@ public class TestTable implements DbTable {
     }
 
     @Override
+    @Deprecated
     public void checkAdd(@NotNull PsiElement psiElement) throws IncorrectOperationException {
 
     }
@@ -379,6 +380,7 @@ public class TestTable implements DbTable {
     }
 
     @Override
+    @Deprecated
     public void checkDelete() throws IncorrectOperationException {
 
     }

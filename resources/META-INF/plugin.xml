@@ -13,12 +13,12 @@
        <li>ActiveQuery, Query and migrations (database connection is required)</li>
        </ul>
        <br/>
-       Detailed information can be in [README.md](https://github.com/nvlad/yii2support/blob/master/README.md)
+       Detailed information can be in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a>
     ]]></description>
 
     <change-notes><![CDATA[
         <ul>
-            <li>ActiveQuery, Query and migrations (database connection is required) support</li>
+            <li>Database support (database connection required)</li>
         </ul>
     ]]>
     </change-notes>
