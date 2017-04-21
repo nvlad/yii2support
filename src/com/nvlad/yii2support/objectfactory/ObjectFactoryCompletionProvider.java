@@ -8,6 +8,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Hashtable;
@@ -45,7 +46,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
 
         PhpExpression position = (PhpExpression) completionParameters.getPosition().getParent();
         if (phpClass != null) {
-            for (Field field : ClassUtils.getClassFields(phpClass)) {
+            for (Field field : ClassUtils.getWritableClassFields(phpClass)) {
                 uniqTracker.put(field.getName(), field);
                 LookupElementBuilder lookupBuilder = buildLookup(field, position);
                 completionResultSet.addElement(lookupBuilder);

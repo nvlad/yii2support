@@ -35,6 +35,10 @@ public class RequireParameterInspection extends PhpInspection {
         return new PhpElementVisitor() {
             @Override
             public void visitPhpMethodReference(MethodReference reference) {
+                if (!ViewsUtil.isValidRenderMethod(reference)) {
+                    return;
+                }
+
                 final String name = reference.getName();
                 if (name == null || !ArrayUtil.contains(name, ViewsUtil.renderMethods)) {
                     return;

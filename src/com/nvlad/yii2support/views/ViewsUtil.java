@@ -7,11 +7,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.ClassUtils;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -112,6 +115,7 @@ public class ViewsUtil {
         return new ArrayList<>(result);
     }
 
+    @Nullable
     public static PsiFile getViewFile(PsiElement element) {
         final MethodReference reference = PsiTreeUtil.getParentOfType(element, MethodReference.class);
         if (reference == null) {
@@ -221,6 +225,7 @@ public class ViewsUtil {
         return file.getUserData(VIEWS_CONTEXT_DIRECTORY);
     }
 
+    @Nullable
     private static PsiDirectory findDirectory(PsiElement element) {
         final PhpClass phpClass = PsiTreeUtil.getParentOfType(element, PhpClass.class);
         final PsiFile file = element.getContainingFile();
@@ -229,18 +234,23 @@ public class ViewsUtil {
         }
 
         PsiDirectory context = file.getOriginalFile().getContainingDirectory();
-        PsiDirectory root = context.getParentDirectory();
-        while (root != null && !root.getName().equals("views")) {
-            root = root.getParentDirectory();
+        if (context != null) {
+            PsiDirectory root = context.getParentDirectory();
+            while (root != null && !root.getName().equals("views")) {
+                root = root.getParentDirectory();
+            }
+
+            file.putUserData(VIEWS_CONTEXT_DIRECTORY, context);
+            file.putUserData(VIEWS_DIRECTORY, root);
+            file.putUserData(VIEWS_DIRECTORY_MODIFIED, file.getModificationStamp());
+
+            return root;
         }
 
-        file.putUserData(VIEWS_CONTEXT_DIRECTORY, context);
-        file.putUserData(VIEWS_DIRECTORY, root);
-        file.putUserData(VIEWS_DIRECTORY_MODIFIED, file.getModificationStamp());
-
-        return root;
+        return null;
     }
 
+    @Nullable
     private static PsiDirectory findClassDirectory(PhpClass phpClass, PsiFile file) {
         if (phpClass != null) {
             Method getViewPath = phpClass.findMethodByName("getViewPath");
@@ -292,5 +302,18 @@ public class ViewsUtil {
         }
 
         return null;
+    }
+
+    public static boolean isValidRenderMethod(MethodReference methodReference) {
+        final PhpClass clazz = ClassUtils.getPhpClassByCallChain(methodReference);
+        if (clazz == null) {
+            return false;
+        }
+        final PhpIndex phpIndex = PhpIndex.getInstance(clazz.getProject());
+
+        return ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Controller", phpIndex)
+                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\View", phpIndex)
+                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Widget", phpIndex)
+                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\mail\\BaseMailer", phpIndex);
     }
 }
