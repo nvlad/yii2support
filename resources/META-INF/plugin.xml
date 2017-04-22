@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.4.17.3</version>
+    <version>0.4.28.1</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -19,6 +19,7 @@
     <change-notes><![CDATA[
         <ul>
             <li>Database support (database connection required)</li>
+            <li>Fix false-positive inspections for non Yii2 render() methods</li>
         </ul>
     ]]>
     </change-notes>
@@ -37,10 +38,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
-        <completion.contributor language="PHP"
-                                implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
-        <psi.referenceContributor language="PHP"
-                                  implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
         <renamePsiElementProcessor implementation="com.nvlad.yii2support.views.refactor.RenameViewProcessor"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"
@@ -59,10 +58,8 @@
                          implementationClass="com.nvlad.yii2support.views.inspections.UnusedParameterInspection"/>
 
         <!-- Object Factory -->
-        <completion.contributor language="PHP"
-                                implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
-        <psi.referenceContributor language="PHP"
-                                  implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
         <localInspection language="PHP" shortName="MissedFieldInspection"
                          displayName="Missed field"
                          groupName="Object Factory" groupPath="PHP,Framework,Yii2"
@@ -81,25 +78,21 @@
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissedParamInspection"/>
-
         <localInspection language="PHP" shortName="PropertiesInspection"
                          displayName="Missing property"
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.properties.PropertiesInspection"/>
-
         <localInspection language="PHP" shortName="UndetectableTableInspection"
                          displayName="Undetectable table for ActiveRecord"
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.UndetectableTableInspection"/>
-
         <localInspection language="PHP" shortName="MissingActiveRecordInActiveQueryInspection"
                          displayName="Can not find connected ActiveRecord class."
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissingActiveRecordInActiveQueryInspection"/>
-
     </extensions>
 
     <actions>
