@@ -27,10 +27,11 @@ public class UndetectableTableInspection extends PhpInspection {
                 if (DatabaseUtils.HasConnections(problemsHolder.getProject()) &&
                         ClassUtils.isClassInheritsOrEqual(clazz, ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord"))) {
                     String table = DatabaseUtils.getTableByActiveRecordClass(clazz);
-                    if (table == null || ! DatabaseUtils.isTableExists(table, problemsHolder.getProject())) {
-                        if (table == null)
-                            table = "unknown";
-                        problemsHolder.registerProblem(clazz.getFirstChild(), "Can not detect database table (current table is " + table + ") for class " + clazz.getFQN(), ProblemHighlightType.WEAK_WARNING);
+                    if (table == null) {
+                        problemsHolder.registerProblem(clazz.getFirstChild(), "Can not detect database table for class " + clazz.getFQN(), ProblemHighlightType.WEAK_WARNING);
+                    } else if (! DatabaseUtils.isTableExists(table, problemsHolder.getProject())) {
+                        problemsHolder.registerProblem(clazz.getFirstChild(), "Table '" + table + "' not found in database connections", ProblemHighlightType.WEAK_WARNING);
+
                     }
                 }
                 super.visitPhpClass(clazz);
