@@ -71,6 +71,7 @@
 
         <!-- i18n -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.i18n.CompletionContributor"/>
+
         <!-- Database -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.QueryCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ParamsCompletionContributor"/>
@@ -81,13 +82,13 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissedParamInspection"/>
 
-        <localInspection language="PHP" shortName="MissingProperyInspection"
+        <localInspection language="PHP" shortName="PropertiesInspection"
                          displayName="Missing property"
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.properties.PropertiesInspection"/>
 
-        <localInspection language="PHP" shortName="CanNotDetectTableInspection"
+        <localInspection language="PHP" shortName="UndetectableTableInspection"
                          displayName="Undetectable table for ActiveRecord"
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
