@@ -163,6 +163,9 @@ public class ObjectFactoryUtils {
         if (phpClass == null) {
             phpClass = getPhpClassInGridColumns(arrayCreation);
         }
+        if (phpClass == null) {
+            phpClass = getClassByParameterType(arrayCreation);
+        }
         if (phpClass == null && arrayCreation.getParent().getParent() instanceof ArrayHashElement) {
             phpClass = getPhpClassByHash((ArrayHashElement) arrayCreation.getParent().getParent(), dir);
         }
@@ -170,6 +173,35 @@ public class ObjectFactoryUtils {
             phpClass = getPhpClassInConfig(dir, arrayCreation);
         }
         return phpClass;
+    }
+
+    /**
+     * Find class if array is parameter
+     * @return Class
+     */
+    @Nullable
+    private static PhpClass getClassByParameterType(ArrayCreationExpression arrayCreation) {
+        if (arrayCreation.getParent() instanceof ParameterList) {
+            int index = ClassUtils.paramIndexForElement(arrayCreation);
+            if (index > -1) {
+                PsiElement possibleMethodRef = arrayCreation.getParent().getParent();
+                if (possibleMethodRef instanceof MethodReference) {
+                    Method method = (Method)((MethodReference) possibleMethodRef).resolve();
+                    if (method != null) {
+                        Parameter parameter = method.getParameters()[index];
+                        Set<String> types = parameter.getType().getTypes();
+                        PhpClass resultClass = null;
+                        for (String type : types) {
+                            resultClass = ClassUtils.getClass(PhpIndex.getInstance(parameter.getProject()), type);
+                            if (resultClass != null && ! resultClass.getName().equals("Closure") ) {
+                                return resultClass;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private static PhpClass getPhpClassByHash(ArrayHashElement hashElement, PsiDirectory dir) {

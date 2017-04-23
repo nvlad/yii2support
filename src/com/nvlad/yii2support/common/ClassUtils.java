@@ -273,6 +273,11 @@ public class ClassUtils {
         return null;
     }
 
+    /**
+     * Get index for PsiElement which is child in ArrayCreationExpression
+     * @param psiElement
+     * @return
+     */
     public static int paramIndexForElement(PsiElement psiElement) {
         PsiElement parent = psiElement.getParent();
         if (parent == null) {
