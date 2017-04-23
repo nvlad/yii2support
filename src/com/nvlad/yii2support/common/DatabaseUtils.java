@@ -145,7 +145,7 @@ public class DatabaseUtils {
 
     @Nullable
     public static String getTableByActiveRecordClass(PhpClass phpClass) {
-        Method method = phpClass.findOwnMethodByName("tableName");
+        Method method = phpClass.findMethodByName("tableName");
         if (method != null) {
             Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
             for (PhpReturn element : returns) {
