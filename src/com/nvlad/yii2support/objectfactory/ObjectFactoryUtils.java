@@ -189,14 +189,8 @@ public class ObjectFactoryUtils {
                     Method method = (Method)((MethodReference) possibleMethodRef).resolve();
                     if (method != null) {
                         Parameter parameter = method.getParameters()[index];
-                        Set<String> types = parameter.getType().getTypes();
-                        PhpClass resultClass = null;
-                        for (String type : types) {
-                            resultClass = ClassUtils.getClass(PhpIndex.getInstance(parameter.getProject()), type);
-                            if (resultClass != null && ! resultClass.getName().equals("Closure") ) {
-                                return resultClass;
-                            }
-                        }
+                        PhpClass resultClass = getElementType(parameter);
+                        if (resultClass != null) return resultClass;
                     }
                 }
             }
@@ -215,11 +209,39 @@ public class ObjectFactoryUtils {
             PhpClassMember field = ClassUtils.findWritableField(phpClass, fieldName);
             if (field == null)
                 return null;
-            Set<String> types = field.getType().getTypes();
-            PhpClass resultClass = null;
-            for (String type : types) {
-                resultClass = ClassUtils.getClass(PhpIndex.getInstance(field.getProject()), type);
-                if (resultClass != null && ! resultClass.getName().equals("Closure") ) {
+            PhpClass resultClass = getElementType(field);
+            if (resultClass != null) return resultClass;
+        }
+        return null;
+    }
+
+    @Nullable
+    private static PhpClass getElementType(PhpNamedElement param) {
+        Set<String> types = param.getType().getTypes();
+        PhpClass resultClass = null;
+        for (String type : types) {
+            // inherited phpdoc type
+            // Example of type value: #A#M#C\yii\data\BaseDataProvider.setSort.0
+            if (type.indexOf("#A#M#C") != -1) {
+                String ref = type.substring(6);
+                String[] parts = ref.split("\\.");
+                if (parts.length == 3) {
+                    resultClass = ClassUtils.getClass(PhpIndex.getInstance(param.getProject()), parts[0]);
+                    if (resultClass != null) {
+                        Method method = resultClass.findMethodByName(parts[1]);
+                        try {
+                            int index = Integer.parseInt(parts[2]);
+                            if (method != null && method.getParameters().length > index) {
+                                return getElementType(method.getParameters()[index]);
+                            }
+                        } catch (NumberFormatException ex) {
+                            // pass
+                        }
+                    }
+                }
+            } else {
+                resultClass = ClassUtils.getClass(PhpIndex.getInstance(param.getProject()), type);
+                if (resultClass != null && !resultClass.getName().equals("Closure")) {
                     return resultClass;
                 }
             }
