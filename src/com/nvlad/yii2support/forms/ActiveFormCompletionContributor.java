@@ -33,6 +33,8 @@ public class ActiveFormCompletionContributor extends com.intellij.codeInsight.co
                 if (mRef == null)
                     return;
                 int paramIndex = ClassUtils.indexForElementInParameterList(position);
+                if (paramIndex < 1)
+                    return;
                 Method method = (Method) mRef.resolve();
                 if (method == null)
                     return;
@@ -40,10 +42,7 @@ public class ActiveFormCompletionContributor extends com.intellij.codeInsight.co
                     return;
                 if (! method.getParameters()[paramIndex].getName().equals("attribute"))
                     return;
-                int modelIndex = ClassUtils.getParamIndex(method, "model");
-                if (modelIndex == -1)
-                    return;
-                PsiElement possibleVariable = mRef.getParameters()[modelIndex];
+                PsiElement possibleVariable = mRef.getParameters()[paramIndex - 1];
                 if (! (possibleVariable instanceof Variable) )
                     return;
                 Variable modelVar = (Variable)possibleVariable;
@@ -52,9 +51,7 @@ public class ActiveFormCompletionContributor extends com.intellij.codeInsight.co
                 if (modelClass == null)
                     return;
 
-                PhpClass clazz = ClassUtils.getPhpClassByCallChain(mRef);
-                if (ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\widgets\\ActiveForm", PhpIndex.getInstance(position.getProject()))
-                        && ClassUtils.isClassInherit(modelClass, "\\yii\\base\\Model", PhpIndex.getInstance(position.getProject()))) {
+                if ( ClassUtils.isClassInherit(modelClass, "\\yii\\base\\Model", PhpIndex.getInstance(position.getProject()))) {
                     for (Field field : ClassUtils.getClassFields(modelClass)) {
                         LookupElementBuilder lookupBuilder = buildLookup(field, position);
                         completionResultSet.addElement(lookupBuilder);
