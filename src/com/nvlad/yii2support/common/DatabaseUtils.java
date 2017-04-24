@@ -162,13 +162,9 @@ public class DatabaseUtils {
                         return clearTablePrefixTags((element).getChildren()[0].getText());
                 }
             }
-        } else {
-           String className = phpClass.getName();
-            return StringUtils.CamelToId(className);
         }
-
-
-        return null;
+       String className = phpClass.getName();
+       return StringUtils.CamelToId(className);
     }
 
     public static String clearTablePrefixTags(String str) {
