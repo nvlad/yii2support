@@ -69,7 +69,10 @@ Go To Declaration, Rename, Find usages and Help popups work whenever code comple
 - Condition parameters inspection  
 #### Properties
 - Synchronize properties with database  
-- Unused properties inspection  
+- Unused properties inspection
+  
+### Form support
+- Complete model attribute for `$form->field($model, ...)` & `Html::active*($model, ...)` methods
 
 Installation
 ------------
