@@ -186,7 +186,7 @@ public class ObjectFactoryUtils {
                 PsiElement possibleMethodRef = arrayCreation.getParent().getParent();
                 if (possibleMethodRef instanceof MethodReference) {
                     Method method = (Method)((MethodReference) possibleMethodRef).resolve();
-                    if (method != null) {
+                    if (method != null && method.getParameters().length > index) {
                         Parameter parameter = method.getParameters()[index];
                         PhpClass resultClass = ClassUtils.getElementType(parameter);
                         if (resultClass != null) return resultClass;
