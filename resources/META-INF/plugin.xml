@@ -1,7 +1,7 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.4.28.2</version>
+    <version>0.4.30.2</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -18,8 +18,9 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Database support (database connection required)</li>
-            <li>Fix false-positive inspections for non Yii2 render() methods</li>
+            <li>Completion for $form->field($model, 'attribute')</li>
+            <li>Completion for setters $activeDataProvider->setSort([...])</li>
+            <li>Fix exceptions</li>
         </ul>
     ]]>
     </change-notes>
@@ -93,6 +94,7 @@
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissingActiveRecordInActiveQueryInspection"/>
+
         <!-- Forms -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.forms.ActiveFormCompletionContributor"/>
 

@@ -105,7 +105,7 @@ public class ClassUtils {
                 if (index2 == -1)
                     index2 = strType.length() - index1;
 
-                if (index1 >= 0 && index2 >= 0) {
+                if (index1 >= 0 && index2 >= 0 && index2 > index1) {
                     String className = strType.substring(index1, index2);
                     return ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), className);
                 } else {
