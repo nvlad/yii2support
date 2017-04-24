@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by NVlad on 11.01.2017.
@@ -274,11 +275,11 @@ public class ClassUtils {
     }
 
     /**
-     * Get index for PsiElement which is child in ArrayCreationExpression
+     * Get index for PsiElement which is child in ArrayCreationExpression or Method
      * @param psiElement
      * @return
      */
-    public static int paramIndexForElement(PsiElement psiElement) {
+    public static int indexForElementInParameterList(PsiElement psiElement) {
         PsiElement parent = psiElement.getParent();
         if (parent == null) {
             return -1;
@@ -288,7 +289,7 @@ public class ClassUtils {
             return ArrayUtil.indexOf(((ParameterList) parent).getParameters(), psiElement);
         }
 
-        return paramIndexForElement(parent);
+        return indexForElementInParameterList(parent);
     }
 
 
@@ -312,6 +313,26 @@ public class ClassUtils {
                 continue;
             }
 
+            result.add(field);
+        }
+        return result;
+    }
+
+    public static Collection<Field> getClassFields(PhpClass phpClass) {
+        if (phpClass == null)
+            return null;
+        final HashSet<Field> result = new HashSet<>();
+
+        final Collection<Field> fields = phpClass.getFields();
+        for (Field field : fields) {
+            if (field.isConstant()) {
+                continue;
+            }
+
+            final PhpModifier modifier = field.getModifier();
+            if (!modifier.isPublic() || modifier.isStatic()) {
+                continue;
+            }
             result.add(field);
         }
         return result;
@@ -341,5 +362,39 @@ public class ClassUtils {
             }
         }
         return activeRecordClass;
+    }
+
+    @Nullable
+    public static PhpClass getElementType(PhpNamedElement param) {
+        Set<String> types = param.getType().getTypes();
+        PhpClass resultClass = null;
+        for (String type : types) {
+            // inherited phpdoc type
+            // Example of type value: #A#M#C\yii\data\BaseDataProvider.setSort.0
+            if (type.indexOf("#A#M#C") != -1) {
+                String ref = type.substring(6);
+                String[] parts = ref.split("\\.");
+                if (parts.length == 3) {
+                    resultClass = getClass(PhpIndex.getInstance(param.getProject()), parts[0]);
+                    if (resultClass != null) {
+                        Method method = resultClass.findMethodByName(parts[1]);
+                        try {
+                            int index = Integer.parseInt(parts[2]);
+                            if (method != null && method.getParameters().length > index) {
+                                return getElementType(method.getParameters()[index]);
+                            }
+                        } catch (NumberFormatException ex) {
+                            // pass
+                        }
+                    }
+                }
+            } else {
+                resultClass = getClass(PhpIndex.getInstance(param.getProject()), type);
+                if (resultClass != null && !resultClass.getName().equals("Closure")) {
+                    return resultClass;
+                }
+            }
+        }
+        return null;
     }
 }

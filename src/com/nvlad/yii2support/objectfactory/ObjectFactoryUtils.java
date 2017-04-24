@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Created by oleg on 14.03.2017.
@@ -54,7 +53,7 @@ public class ObjectFactoryUtils {
                 PhpExpression methodClass = method.getClassReference();
                 if (methodClass != null && methodClass.getName() != null && methodClass.getName().equals("Yii")) {
                     PsiElement[] pList = method.getParameters();
-                    if (pList.length == 2 && ClassUtils.paramIndexForElement(arrayCreation) == 1) { // \Yii::createObject takes 2 paramters
+                    if (pList.length == 2 && ClassUtils.indexForElementInParameterList(arrayCreation) == 1) { // \Yii::createObject takes 2 paramters
                         phpClass = ClassUtils.getPhpClassUniversal(method.getProject(), (PhpPsiElement) pList[0]);
                     }
                 }
@@ -88,12 +87,12 @@ public class ObjectFactoryUtils {
                 Method method = (Method) methodRef.resolve();
 
                 PhpExpression ref = methodRef.getClassReference();
-                if (ref != null && ref instanceof ClassReference && ClassUtils.paramIndexForElement(arrayCreation) == 0) {
+                if (ref != null && ref instanceof ClassReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 0) {
                     PhpClass callingClass = (PhpClass) ((ClassReference) ref).resolve();
                     PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "\\yii\\base\\Widget");
                     if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass))
                         return callingClass;
-                } else if (method != null && ref != null && ref instanceof MethodReference && ClassUtils.paramIndexForElement(arrayCreation) == 1) {
+                } else if (method != null && ref != null && ref instanceof MethodReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 1) {
                     // This code process
                     // $form->field($model, 'username')->widget(\Class::className())
                     PhpClass callingClass = method.getContainingClass();
@@ -182,14 +181,14 @@ public class ObjectFactoryUtils {
     @Nullable
     private static PhpClass getClassByParameterType(ArrayCreationExpression arrayCreation) {
         if (arrayCreation.getParent() instanceof ParameterList) {
-            int index = ClassUtils.paramIndexForElement(arrayCreation);
+            int index = ClassUtils.indexForElementInParameterList(arrayCreation);
             if (index > -1) {
                 PsiElement possibleMethodRef = arrayCreation.getParent().getParent();
                 if (possibleMethodRef instanceof MethodReference) {
                     Method method = (Method)((MethodReference) possibleMethodRef).resolve();
                     if (method != null) {
                         Parameter parameter = method.getParameters()[index];
-                        PhpClass resultClass = getElementType(parameter);
+                        PhpClass resultClass = ClassUtils.getElementType(parameter);
                         if (resultClass != null) return resultClass;
                     }
                 }
@@ -209,42 +208,8 @@ public class ObjectFactoryUtils {
             PhpClassMember field = ClassUtils.findWritableField(phpClass, fieldName);
             if (field == null)
                 return null;
-            PhpClass resultClass = getElementType(field);
+            PhpClass resultClass = ClassUtils.getElementType(field);
             if (resultClass != null) return resultClass;
-        }
-        return null;
-    }
-
-    @Nullable
-    private static PhpClass getElementType(PhpNamedElement param) {
-        Set<String> types = param.getType().getTypes();
-        PhpClass resultClass = null;
-        for (String type : types) {
-            // inherited phpdoc type
-            // Example of type value: #A#M#C\yii\data\BaseDataProvider.setSort.0
-            if (type.indexOf("#A#M#C") != -1) {
-                String ref = type.substring(6);
-                String[] parts = ref.split("\\.");
-                if (parts.length == 3) {
-                    resultClass = ClassUtils.getClass(PhpIndex.getInstance(param.getProject()), parts[0]);
-                    if (resultClass != null) {
-                        Method method = resultClass.findMethodByName(parts[1]);
-                        try {
-                            int index = Integer.parseInt(parts[2]);
-                            if (method != null && method.getParameters().length > index) {
-                                return getElementType(method.getParameters()[index]);
-                            }
-                        } catch (NumberFormatException ex) {
-                            // pass
-                        }
-                    }
-                }
-            } else {
-                resultClass = ClassUtils.getClass(PhpIndex.getInstance(param.getProject()), type);
-                if (resultClass != null && !resultClass.getName().equals("Closure")) {
-                    return resultClass;
-                }
-            }
         }
         return null;
     }
@@ -271,7 +236,7 @@ public class ObjectFactoryUtils {
                     return null;
 
                 Parameter[] parameterList = constructor.getParameters();
-                if (parameterList.length > 0 && parameterList[0].getName().equals("config") && ClassUtils.paramIndexForElement(element) == 0)
+                if (parameterList.length > 0 && parameterList[0].getName().equals("config") && ClassUtils.indexForElementInParameterList(element) == 0)
                     return phpClass;
 
             }
