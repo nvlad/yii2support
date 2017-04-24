@@ -18,9 +18,9 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Completion for $form->field($model, 'attribute')</li>
-            <li>Completion for setters $activeDataProvider->setSort([...])</li>
-            <li>Fix exceptions</li>
+            <li>Complete attributes for <code>$form->field($model, ...)</code> & <code>Html::active*($model, ...)</code> methods</li>
+            <li>Completion for setters <code>$activeDataProvider->setSort([...])</code></li>
+            <li>Fix minor bugs</li>
         </ul>
     ]]>
     </change-notes>
