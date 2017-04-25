@@ -54,7 +54,7 @@ public class MissedParamInspection extends PhpInspection {
                                     }
                                     if (!Arrays.equals(paramString.toArray(), conditionParams)) {
                                         MissedParamQuickFix qFix = new MissedParamQuickFix(reference);
-                                        problemsHolder.registerProblem(reference.getParameters()[paramParameterIndex], "Condition parameters does not conform to the condition", qFix);
+                                        problemsHolder.registerProblem(reference.getParameters()[paramParameterIndex], "Condition parameters do not conform to the condition", qFix);
                                     }
                                 }
                             } else {
