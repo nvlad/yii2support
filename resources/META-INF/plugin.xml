@@ -98,6 +98,9 @@
         <!-- Forms -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.forms.ActiveFormCompletionContributor"/>
 
+        <!-- Url -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
+
     </extensions>
 
     <actions>
