@@ -95,12 +95,19 @@ public class DatabaseUtils {
     }
 
     public static String[] extractParamsFromCondition(String condition) {
+        return extractParamsFromCondition(condition, true);
+    }
+
+    public static String[] extractParamsFromCondition(String condition, boolean includeColon) {
         LinkedHashSet<String> matches = new LinkedHashSet<>();
-        String pattern = "(?<!:)(:\\w+)";
+        String pattern = "(?<![:\\[])(:\\w+)";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(condition);
         while (m.find()) {
-            matches.add(m.group(1));
+            String param = m.group(1);
+            if (! includeColon)
+                param = param.replace(":", "");
+            matches.add(param);
         }
         return (String[]) matches.toArray(new String[0]);
     }
