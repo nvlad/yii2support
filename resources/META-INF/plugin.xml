@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.4.30.3</version>
+    <version>0.4.30.4</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -18,9 +18,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Complete attributes for <code>$form->field($model, ...)</code> & <code>Html::active*($model, ...)</code> methods</li>
-            <li>Completion for setters <code>$activeDataProvider->setSort([...])</code></li>
-            <li>Fix minor bugs</li>
+            <li>Better detection of condition parameters</li>
+            <li>Exception fix</li>
         </ul>
     ]]>
     </change-notes>
