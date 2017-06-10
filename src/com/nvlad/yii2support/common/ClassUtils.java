@@ -48,6 +48,14 @@ public class ClassUtils {
             ClassConstantReference classRef = (ClassConstantReference) value;
             return getPhpClass(classRef);
         }
+        if (value instanceof ConstantReference) {
+            //ConstantReference classRef = (ConstantReference) value;
+            //return getPhpClass(ClassUtils.);
+        }
+        if (value instanceof ConstantReference) {
+            ConstantReference classRef = (ConstantReference) value;
+            return getPhpClass(classRef);
+        }
         if (value instanceof StringLiteralExpression) {
             StringLiteralExpression str = (StringLiteralExpression) value;
             PhpIndex phpIndex = PhpIndex.getInstance(project);
