@@ -6,7 +6,10 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
+import com.jetbrains.php.lang.parser.parsing.classes.ClassConstant;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
+import com.jetbrains.php.lang.psi.elements.impl.ConstantImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -405,4 +408,28 @@ public class ClassUtils {
         }
         return null;
     }
+
+    @Nullable
+    public static String getConstantValue(PsiElement ref) {
+        if (ref != null) {
+            if (ref instanceof ClassConstantReference) {
+                PsiElement val = ((ClassConstantReference)ref).resolve();
+                if (val != null && val instanceof ClassConstImpl) {
+                    String value = ((ClassConstImpl) val).getDefaultValuePresentation();
+                    if (value != null)
+                        return value;
+                }
+            } else if (ref instanceof ConstantReference) {
+                PsiElement val = ((ConstantReference)ref).resolve();
+                if (val != null && val instanceof PhpDefine) {
+                    String value = ((PhpDefine) val).getValuePresentation();
+                    if (value != null)
+                        return value;
+                }
+            }
+        }
+        return null;
+    }
+
+
 }
