@@ -3,6 +3,7 @@ package com.nvlad.yii2support.typeprovider;
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
@@ -32,26 +33,36 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
             if (resolved != null && resolved instanceof Method) {
                 MethodReference referenceMethod = (MethodReference) psiElement;
                 Method classMethod = (Method)resolved;
-                classMethod = classMethod;
-                if (classMethod.getFQN().equals("\\yii\\BaseYii.createObject") && referenceMethod.getParameters().length > 0) {
+                if (classMethod.getName().equals("createObject") && classMethod.getContainingClass() != null &&
+                        (classMethod.getContainingClass().getName().equals("BaseYii")
+                                || classMethod.getContainingClass().getName().equals("Yii"))
+                        && referenceMethod.getParameters().length > 0) {
+                    //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
                     PhpPsiElement firstParam = (PhpPsiElement)referenceMethod.getParameters()[0];
                     if (firstParam instanceof ArrayCreationExpression) {
                         for (ArrayHashElement elem : ((ArrayCreationExpression) firstParam).getHashElements()  ) {
                             if (elem.getKey() != null && elem.getKey().getText() != null &&
                                     ClassUtils.removeQuotes(elem.getKey().getText()).equals("class")) {
-                                PhpClass phpClass = ClassUtils.getPhpClassUniversal(psiElement.getProject(), elem.getValue());
+                                PhpClass phpClass = getClass(elem.getValue());
+                                //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
                                 return new PhpType().add(phpClass);
                             }
                         }
                     } else {
-                        PhpClass phpClass = ClassUtils.getPhpClassUniversal(psiElement.getProject(), firstParam);
+                        PhpClass phpClass = getClass(firstParam);
+                        //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
                         return new PhpType().add(phpClass);
                     }
 
                 }
             }
-           psiElement = psiElement;
         }
+        return null;
+    }
+
+    private PhpClass getClass(PhpPsiElement elem) {
+        if (elem != null)
+            return  ClassUtils.getPhpClassUniversal(elem.getProject(), elem);
         return null;
     }
 
