@@ -32,13 +32,9 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
             if (phpClass != null) {
                 RulePositionEnum getPosition = getPosition(position);
                 if (getPosition.equals(RulePositionEnum.FIELD)) {
-                    Hashtable<String, Object> uniqTracker = new Hashtable<>();
-
                     ArrayList<LookupElementBuilder> items = DatabaseUtils.getLookupItemsByAnnotations(phpClass, (PhpExpression) completionParameters.getPosition().getParent());
-
-
                     for (Field field : ClassUtils.getWritableClassFields(phpClass)) {
-                        uniqTracker.put(field.getName(), field);
+
                         LookupElementBuilder lookupBuilder = buildLookup(field, phpExpression, false);
                         completionResultSet.addElement(lookupBuilder);
                     }
@@ -56,7 +52,6 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 } else if (getPosition.equals(RulePositionEnum.OPTIONS)) {
                     ArrayCreationExpression arrayCreation = (ArrayCreationExpression)PsiUtil.getSuperParent(position, ArrayCreationExpression.class, 4);
                     if (arrayCreation != null) {
-                        arrayCreation = arrayCreation;
 
                         if (arrayCreation.getChildren().length > 2) {
                             PsiElement elem = arrayCreation.getChildren()[1];
