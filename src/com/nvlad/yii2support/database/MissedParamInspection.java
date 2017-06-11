@@ -1,10 +1,8 @@
 package com.nvlad.yii2support.database;
 
-import com.google.common.collect.Lists;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiErrorElement;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
@@ -12,9 +10,7 @@ import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.DatabaseUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by oleg on 30.03.2017.
@@ -23,6 +19,7 @@ public class MissedParamInspection extends PhpInspection {
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean isOnTheFly) {
+
         return new PhpElementVisitor() {
 
             @Override
@@ -32,21 +29,21 @@ public class MissedParamInspection extends PhpInspection {
                     Method method = (Method) reference.resolve();
                     if (method == null)
                         return;
-                    if (method.getParameters().length > 1 &&
-                            method.getParameters()[1].getName().equals("params") &&
-                            (method.getParameters()[0].getName().equals("condition")
-                                    || method.getParameters()[0].getName().equals("sql")
-                                    || method.getParameters()[0].getName().equals("expression"))) {
+                    int paramParameterIndex = ClassUtils.getParamIndex(method, "params");
+                    int conditionParameterIndex = ClassUtils.getParamIndex(method, new String[]{ "condition", "expression", "sql"});
 
-                        PsiElement element = reference.getParameters()[0];
+                    if (paramParameterIndex > -1 && conditionParameterIndex > -1 && reference.getParameters().length > conditionParameterIndex &&
+                            conditionParameterIndex == paramParameterIndex - 1) {
+
+                        PsiElement element = reference.getParameters()[conditionParameterIndex];
 
                         String condition = ClassUtils.getStringByElement(element);
                         String[] conditionParams = DatabaseUtils.extractParamsFromCondition(condition);
+                        String[] conditionParamsWithoutColon = DatabaseUtils.extractParamsFromCondition(condition, false);
 
                         if (conditionParams.length > 0) {
-                            boolean isError = true;
-                            if (reference.getParameters().length > 1) {
-                                PsiElement paramParam = reference.getParameters()[1];
+                            if (reference.getParameters().length > paramParameterIndex) {
+                                PsiElement paramParam = reference.getParameters()[paramParameterIndex];
                                 if (paramParam instanceof ArrayCreationExpression) {
                                     ArrayCreationExpression array = (ArrayCreationExpression) paramParam;
                                     ArrayList<String> paramString = new ArrayList<>();
@@ -54,21 +51,24 @@ public class MissedParamInspection extends PhpInspection {
                                         if (elem.getKey() != null && elem.getKey().getText() != null)
                                             paramString.add(ClassUtils.removeQuotes(elem.getKey().getText()).trim());
                                     }
-                                    if (Arrays.equals(paramString.toArray(), conditionParams))
-                                        isError = false;
+                                    if (!Arrays.equals(paramString.toArray(), conditionParams) && !Arrays.equals(paramString.toArray(), conditionParamsWithoutColon)) {
+                                        MissedParamQuickFix qFix = new MissedParamQuickFix(reference);
+                                        problemsHolder.registerProblem(reference.getParameters()[paramParameterIndex], "Condition parameters do not conform to the condition", qFix);
+                                    }
                                 }
+                            } else {
+                                    MissedParamQuickFix qFix = new MissedParamQuickFix(reference);
+                                    problemsHolder.registerProblem(reference.getParameters()[conditionParameterIndex], "Condition parameters must be defined", qFix);
+
                             }
-                            if (isError) {
-                                MissedParamQuickFix qFix = new MissedParamQuickFix(reference);
-                                problemsHolder.registerProblem(reference.getParameters()[0], "Condition parameters must be defined", qFix);
-                            }
+
                         }
 
                     }
                 }
                 super.visitPhpMethodReference(reference);
             }
-
+/*
             @Override
             public void visitPhpArrayCreationExpression(ArrayCreationExpression expression) {
                 MethodReference methodRef = ClassUtils.getMethodRef(expression, 10);
@@ -76,7 +76,7 @@ public class MissedParamInspection extends PhpInspection {
                     Method method = (Method) methodRef.resolve();
                     if (method == null)
                         return;
-                    int paramPosition = ClassUtils.paramIndexForElement(expression);
+                    int paramPosition = ClassUtils.indexForElementInParameterList(expression);
                     if (paramPosition > 0 && method.getParameters().length > paramPosition) {
                         if (method.getParameters()[paramPosition].getName().equals("params") &&
                                 (method.getParameters()[paramPosition - 1].getName().equals("condition") ||
@@ -106,7 +106,9 @@ public class MissedParamInspection extends PhpInspection {
                 }
 
                 super.visitPhpArrayCreationExpression(expression);
-            }
+            } */
         };
+
     }
+
 }

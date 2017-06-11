@@ -6,9 +6,15 @@ namespace yii\db {
         {
 
         }
+
+
     }
 
     class BaseActiveRecord {
+
+        /**
+         * @return Query
+         */
         public static function find()
         {
             return new Query();
@@ -46,5 +52,4 @@ namespace test {
         }
     }
 }
-
 

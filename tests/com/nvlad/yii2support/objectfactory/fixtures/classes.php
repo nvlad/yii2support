@@ -30,8 +30,6 @@ namespace  yii\base {
     class TestWidget extends Widget
     {
         public $test2;
-
-
     }
 }
 
@@ -74,6 +72,11 @@ namespace yii {
 namespace yii\grid {
     class GridView {
         public $column;
+
+        public function setColumn(DataColumn $column)
+        {
+
+        }
     }
 
     class DataColumn {

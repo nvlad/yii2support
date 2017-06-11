@@ -80,8 +80,8 @@ public class TestModel implements DasModel {
         table1.addColumn(new TestColumn("birth_date", project));
         list.add(table1);
         TestTable table2 = new TestTable("address", namespace, project);
-        table1.addColumn(new TestColumn("street", project));
-        table1.addColumn(new TestColumn("city", project));
+        table2.addColumn(new TestColumn("street", project));
+        table2.addColumn(new TestColumn("city", project));
         list.add(table2);
         return new JBTreeTraverser<>(dasObject -> () -> new Iterator<DasObject>() {
             int current = 0;

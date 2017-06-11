@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.database;
+package com.nvlad.yii2support.properties;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -16,7 +16,7 @@ import com.nvlad.yii2support.common.VirtualProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Created by oleg on 06.04.2017.
@@ -39,9 +39,9 @@ public class PropertiesInspection extends PhpInspection {
 
                     PhpClass phpClass = DatabaseUtils.getClassByClassPhpDoc(docComment);
                     if (phpClass != null && ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))) {
-                        List<PhpDocPropertyTag> propertyTags = docComment.getPropertyTags();
+                        Collection<Field> fields = phpClass.getFields();
                         String table = DatabaseUtils.getTableByActiveRecordClass(phpClass);
-                        ArrayList<VirtualProperty> notDeclaredColumns = DatabaseUtils.getNotDeclaredColumns(table, propertyTags, element.getProject());
+                        ArrayList<VirtualProperty> notDeclaredColumns = DatabaseUtils.getNotDeclaredColumns(table, fields, element.getProject());
                         if (notDeclaredColumns.size() > 0) {
                             MissingPropertiesQuickFix qFix = new MissingPropertiesQuickFix(notDeclaredColumns, docComment);
                             String str1 = notDeclaredColumns.size() > 1 ? "properties" : "property";
@@ -49,7 +49,7 @@ public class PropertiesInspection extends PhpInspection {
                                     " is missing " + notDeclaredColumns.size() + " " + str1 + " that corresponds to database columns", ProblemHighlightType.WEAK_WARNING, qFix);
                         }
 
-                        ArrayList<PhpDocPropertyTag> unusedProperties = DatabaseUtils.getUnusedProperties(table, propertyTags, phpClass);
+                        ArrayList<PhpDocPropertyTag> unusedProperties = DatabaseUtils.getUnusedProperties(table, docComment.getPropertyTags(), phpClass);
                         if (unusedProperties.size() > 0) {
                             for (PhpDocPropertyTag tag: unusedProperties) {
                                 problemsHolder.registerProblem(tag, "Property is unused in class " + phpClass.getFQN(), ProblemHighlightType.LIKE_UNUSED_SYMBOL);

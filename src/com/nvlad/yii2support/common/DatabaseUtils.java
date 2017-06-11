@@ -95,12 +95,19 @@ public class DatabaseUtils {
     }
 
     public static String[] extractParamsFromCondition(String condition) {
+        return extractParamsFromCondition(condition, true);
+    }
+
+    public static String[] extractParamsFromCondition(String condition, boolean includeColon) {
         LinkedHashSet<String> matches = new LinkedHashSet<>();
-        String pattern = "[^:\\w]?(:\\w+)";
+        String pattern = "(?<![:\\[])(:\\w+)";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(condition);
         while (m.find()) {
-            matches.add(m.group(1));
+            String param = m.group(1);
+            if (! includeColon)
+                param = param.replace(":", "");
+            matches.add(param);
         }
         return (String[]) matches.toArray(new String[0]);
     }
@@ -146,23 +153,25 @@ public class DatabaseUtils {
     @Nullable
     public static String getTableByActiveRecordClass(PhpClass phpClass) {
         Method method = phpClass.findMethodByName("tableName");
-        Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
-        for (PhpReturn element : returns) {
-            if ((element).getChildren().length > 0) {
-                if ((element).getChildren()[0] instanceof ClassConstantReference) {
-                    PsiElement resolved = ((ClassConstantReference) (element).getChildren()[0]).resolve();
-                    if (resolved != null && resolved instanceof ClassConstImpl) {
-                        ClassConstImpl constant = (ClassConstImpl) resolved;
-                        if (constant.getChildren().length > 0)
-                            return ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();
-                    }
+        if (method != null) {
+            Collection<PhpReturn> returns = PsiTreeUtil.findChildrenOfType(method, PhpReturn.class);
+            for (PhpReturn element : returns) {
+                if ((element).getChildren().length > 0) {
+                    if ((element).getChildren()[0] instanceof ClassConstantReference) {
+                        PsiElement resolved = ((ClassConstantReference) (element).getChildren()[0]).resolve();
+                        if (resolved != null && resolved instanceof ClassConstImpl) {
+                            ClassConstImpl constant = (ClassConstImpl) resolved;
+                            if (constant.getChildren().length > 0)
+                                return ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();
+                        }
 
-                } else if ((element).getChildren()[0] instanceof StringLiteralExpression)
-                    return clearTablePrefixTags((element).getChildren()[0].getText());
+                    } else if ((element).getChildren()[0] instanceof StringLiteralExpression)
+                        return clearTablePrefixTags((element).getChildren()[0].getText());
+                }
             }
         }
-
-        return null;
+       String className = phpClass.getName();
+       return StringUtils.CamelToId(className);
     }
 
     public static String clearTablePrefixTags(String str) {
@@ -263,7 +272,7 @@ public class DatabaseUtils {
         return unusedProperties;
     }
 
-    public static ArrayList<VirtualProperty> getNotDeclaredColumns(String table, List<PhpDocPropertyTag> propertyTags, Project project) {
+    public static ArrayList<VirtualProperty> getNotDeclaredColumns(String table, Collection<Field> fields, Project project) {
 
         DbPsiFacade facade = DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
@@ -280,20 +289,19 @@ public class DatabaseUtils {
                     for (DasColumn column : tableInfo.getColumns()) {
                         boolean found = false;
                         PhpDocProperty prevProperty = null;
-                        for (PhpDocPropertyTag tag : propertyTags) {
-                            PhpDocProperty property = tag.getProperty();
-                            if (property != null && property.getName().equals(column.getName())) {
+                        for (Field field : fields) {
+
+                            if (field != null && field.getName().equals(column.getName())) {
                                 found = true;
                                 break;
-                            } else
-                                prevProperty = property;
+                            }
                         }
                         if (!found) {
                             VirtualProperty newItem = new VirtualProperty(column.getName(),
                                     column.getDataType().typeName,
                                     column.getDataType().toString(),
                                     column.getComment(),
-                                    prevProperty != null ? prevProperty.getName() : null);
+                                     null);
                             result.add(newItem);
                         }
                     }

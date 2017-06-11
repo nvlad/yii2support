@@ -35,7 +35,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                 return;
             }
 
-            int paramPosition = ClassUtils.paramIndexForElement(completionParameters.getPosition());
+            int paramPosition = ClassUtils.indexForElementInParameterList(completionParameters.getPosition());
 
             PhpClass phpClass = method.getContainingClass();
             if (phpClass == null)

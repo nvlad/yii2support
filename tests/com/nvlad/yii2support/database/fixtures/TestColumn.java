@@ -139,7 +139,7 @@ public class TestColumn implements DbColumn, DasColumn {
     @Override
     public DataType getDataType() {
         Set<DataType.Feature> features = new ArrayListSet<>();
-        return new DataType("type", "type", 1,1, LengthUnit.BYTE, "a", "a", true, false, null, features, 0);
+        return new DataType("type", "type", 1,1, LengthUnit.BYTE, true, "a",  "a", false, null, features, 0);
     }
 
     @Nullable

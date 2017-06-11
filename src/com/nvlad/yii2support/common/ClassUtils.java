@@ -6,36 +6,56 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
+import com.jetbrains.php.lang.parser.parsing.classes.ClassConstant;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
+import com.jetbrains.php.lang.psi.elements.impl.ConstantImpl;
+import com.jetbrains.php.lang.psi.elements.impl.PhpDefineImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by NVlad on 11.01.2017.
  */
 public class ClassUtils {
 
+    public static int getParamIndex(Method method, String[] paramNames) {
+        for (String name: paramNames) {
+            int index = getParamIndex(method, name);
+            if (index > -1)
+                return index;
+        }
+        return -1;
+    }
+
+    public static int getParamIndex(Method method, String paramName) {
+        for (int i = 0; i < method.getParameters().length; i++) {
+            Parameter param =  method.getParameters()[i];
+            if (param.getName().equals(paramName))
+                return i;
+        }
+        return -1;
+    }
 
     @Nullable
     public static PhpClass getPhpClassUniversal(Project project, PhpPsiElement value) {
         if (value instanceof MethodReference && (value.getName().equals("className") || value.getName().equals("tableName"))) {
             MethodReference methodRef = (MethodReference) value;
             return getPhpClass(methodRef.getClassReference());
+        }
+        if (value instanceof ClassConstantReference || value instanceof ConstantReference) {
+            return getPhpClass(value);
+        }
 
-        }
-        if (value instanceof ClassConstantReference) {
-            ClassConstantReference classRef = (ClassConstantReference) value;
-            return getPhpClass(classRef);
-        }
         if (value instanceof StringLiteralExpression) {
             StringLiteralExpression str = (StringLiteralExpression) value;
             PhpIndex phpIndex = PhpIndex.getInstance(project);
-            PhpClass classRef = getClass(phpIndex, str.getContents());
-            return classRef;
+            return getClass(phpIndex, str.getContents());
         }
         return null;
     }
@@ -49,13 +69,20 @@ public class ClassUtils {
     @Nullable
     public static PhpClass getPhpClass(PhpPsiElement phpPsiElement) {
         while (phpPsiElement != null) {
-            if (phpPsiElement instanceof ClassConstantReference) {
-                phpPsiElement = ((ClassConstantReference) phpPsiElement).getClassReference();
+            if (phpPsiElement instanceof ClassConstantReference || phpPsiElement instanceof ConstantReference) {
+                if (phpPsiElement.getName() != null && phpPsiElement.getName().equals("class")) {
+                    phpPsiElement = ((ClassConstantReference) phpPsiElement).getClassReference();
+                } else {
+                    String className = ClassUtils.getConstantValue(phpPsiElement);
+                    if (className != null) {
+                        return getClass(PhpIndex.getInstance(phpPsiElement.getProject()), ClassUtils.removeQuotes( className));
+
+                    }
+                }
             }
             if (phpPsiElement instanceof ClassReference) {
                 return (PhpClass) ((ClassReference) phpPsiElement).resolve();
             }
-
             if (phpPsiElement instanceof NewExpression) {
                 ClassReference classReference = ((NewExpression) phpPsiElement).getClassReference();
                 if (classReference != null) {
@@ -65,7 +92,8 @@ public class ClassUtils {
                     }
                 }
             }
-            phpPsiElement = (PhpPsiElement) phpPsiElement.getParent();
+            if (phpPsiElement.getParent() instanceof  PhpPsiElement)
+                phpPsiElement = (PhpPsiElement) phpPsiElement.getParent();
         }
 
         return null;
@@ -88,7 +116,7 @@ public class ClassUtils {
                 if (index2 == -1)
                     index2 = strType.length() - index1;
 
-                if (index1 >= 0 && index2 >= 0) {
+                if (index1 >= 0 && index2 >= 0 && index2 > index1) {
                     String className = strType.substring(index1, index2);
                     return ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), className);
                 } else {
@@ -257,7 +285,12 @@ public class ClassUtils {
         return null;
     }
 
-    public static int paramIndexForElement(PsiElement psiElement) {
+    /**
+     * Get index for PsiElement which is child in ArrayCreationExpression or Method
+     * @param psiElement
+     * @return
+     */
+    public static int indexForElementInParameterList(PsiElement psiElement) {
         PsiElement parent = psiElement.getParent();
         if (parent == null) {
             return -1;
@@ -267,7 +300,7 @@ public class ClassUtils {
             return ArrayUtil.indexOf(((ParameterList) parent).getParameters(), psiElement);
         }
 
-        return paramIndexForElement(parent);
+        return indexForElementInParameterList(parent);
     }
 
 
@@ -291,6 +324,26 @@ public class ClassUtils {
                 continue;
             }
 
+            result.add(field);
+        }
+        return result;
+    }
+
+    public static Collection<Field> getClassFields(PhpClass phpClass) {
+        if (phpClass == null)
+            return null;
+        final HashSet<Field> result = new HashSet<>();
+
+        final Collection<Field> fields = phpClass.getFields();
+        for (Field field : fields) {
+            if (field.isConstant()) {
+                continue;
+            }
+
+            final PhpModifier modifier = field.getModifier();
+            if (!modifier.isPublic() || modifier.isStatic()) {
+                continue;
+            }
             result.add(field);
         }
         return result;
@@ -321,4 +374,64 @@ public class ClassUtils {
         }
         return activeRecordClass;
     }
+
+    @Nullable
+    public static PhpClass getElementType(PhpNamedElement param) {
+        Set<String> types = param.getType().getTypes();
+        PhpClass resultClass = null;
+        for (String type : types) {
+            // inherited phpdoc type
+            // Example of type value: #A#M#C\yii\data\BaseDataProvider.setSort.0
+            if (type.indexOf("#A#M#C") != -1) {
+                String ref = type.substring(6);
+                String[] parts = ref.split("\\.");
+                if (parts.length == 3) {
+                    resultClass = getClass(PhpIndex.getInstance(param.getProject()), parts[0]);
+                    if (resultClass != null) {
+                        Method method = resultClass.findMethodByName(parts[1]);
+                        try {
+                            int index = Integer.parseInt(parts[2]);
+                            if (method != null && method.getParameters().length > index) {
+                                return getElementType(method.getParameters()[index]);
+                            }
+                        } catch (NumberFormatException ex) {
+                            // pass
+                        }
+                    }
+                }
+            } else {
+                resultClass = getClass(PhpIndex.getInstance(param.getProject()), type);
+                if (resultClass != null && !resultClass.getName().equals("Closure") && !resultClass.getName().equals("Expression")) {
+                    return resultClass;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String getConstantValue(PsiElement ref) {
+        if (ref != null) {
+            if (ref instanceof ClassConstantReference) {
+                PsiElement val = ((ClassConstantReference)ref).resolve();
+                if (val != null && val instanceof ClassConstImpl) {
+                    PsiElement value = ((ClassConstImpl) val).getDefaultValue();
+                    if (value != null && value.getText() != null)
+                    {
+                        return ClassUtils.removeQuotes(value.getText());
+                    }
+                }
+            } else if (ref instanceof ConstantReference) {
+                PsiElement val = ((ConstantReference)ref).resolve();
+                if (val != null && val instanceof PhpDefine) {
+                    PhpPsiElement value = ((PhpDefineImpl) val).getValue();
+                    if (value != null )
+                        return value.getText() ;
+                }
+            }
+        }
+        return null;
+    }
+
+
 }

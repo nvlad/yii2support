@@ -86,4 +86,11 @@ public class ObjectFactoryTests  extends LightCodeInsightFixtureTestCase {
         assertEquals(myFixture.getLookupElementStrings().size(), 2);
     }
 
+    public void testCompletionYii_arrayAsTypedParam() {
+        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+                " (new \\yii\\grid\\GridView())->setColumn(['<caret>']) ");
+        myFixture.completeBasic();
+        assertEquals(myFixture.getLookupElementStrings().size(), 2);
+    }
+
 }
