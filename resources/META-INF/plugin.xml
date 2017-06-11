@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.4.30.4</version>
+    <version>0.5.32.0</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -18,8 +18,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Better detection of condition parameters</li>
-            <li>Exception fix</li>
+            <li>Validators autocompletion</li>
+            <li>Yii::createObject type provider</li>
         </ul>
     ]]>
     </change-notes>
