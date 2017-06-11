@@ -36,6 +36,10 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
 
+    <extensions defaultExtensionNs="com.jetbrains.php">
+        <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
+    </extensions>
+
     <extensions defaultExtensionNs="com.intellij">
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
@@ -96,6 +100,10 @@
 
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
+
+
+
+
 
 
     </extensions>
