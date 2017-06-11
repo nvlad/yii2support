@@ -65,6 +65,20 @@ public class PsiUtil {
         return elem;
     }
 
+    @Nullable
+    public static PsiElement getSuperParent(PsiElement elem, Class cls, int maxDepth) {
+        PsiElement parent = elem.getParent();
+        while (maxDepth > 0) {
+            if (cls.isInstance(parent))
+                return parent;
+            else {
+                parent = parent.getParent();
+                maxDepth--;
+            }
+        }
+        return null;
+    }
+
     public static int getValueIndexInArray(PsiElement arrayValue, ArrayCreationExpression array) {
         for (int i = 0; i < array.getChildren().length; i++) {
             if (array.getChildren()[i] == arrayValue)
