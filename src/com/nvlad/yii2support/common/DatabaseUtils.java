@@ -80,7 +80,7 @@ public class DatabaseUtils {
         return list;
     }
 
-    public static ArrayList<LookupElementBuilder> getLookupItemsByAnnotations(PhpClass phpClass, PhpExpression position) {
+    public static ArrayList<LookupElementBuilder> getLookupItemsByProperties(PhpClass phpClass, PhpExpression position) {
         if (phpClass == null)
             return null;
         final ArrayList<LookupElementBuilder> result = new ArrayList<>();
