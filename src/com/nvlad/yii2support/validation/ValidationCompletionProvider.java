@@ -50,6 +50,8 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                     for (Map.Entry<String, PhpPsiElement> entry: validators.entrySet()) {
                         if (entry.getValue() instanceof PhpClass)
                             completionResultSet.addElement(buildLookup((PhpClass)entry.getValue() , phpExpression));
+                        if (entry.getValue() instanceof Method)
+                            completionResultSet.addElement(buildLookup((Method)entry.getValue() , phpExpression));
                     }
                 } else if (getPosition.equals(RulePositionEnum.OPTIONS)) {
                     ArrayCreationExpression arrayCreation = (ArrayCreationExpression)PsiUtil.getSuperParent(position, ArrayCreationExpression.class, 4);
@@ -84,9 +86,18 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         for (PhpClass validatorClass : validatorClasses) {
             validators.put(validatorClass.getName().replace("Validator", "").toLowerCase(), validatorClass);
         }
+
+        Collection<Method> methods = phpClass.getMethods();
+        for (Method method: methods) {
+            if (method.getName().startsWith("validate") && method.getName().length() > "validate".length() ) {
+                validators.put(method.getName().replace("validate", "").toLowerCase(), method);
+            }
+        }
+
         return validators;
 
     }
+
 
     @NotNull
     private LookupElementBuilder buildLookup(PhpClassMember field, PhpExpression position, boolean autoValue) {
@@ -108,6 +119,18 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         if (field instanceof Field) {
             builder = builder.withTypeText(field.getType().toString());
         }
+        return builder;
+    }
+
+    @NotNull
+    private LookupElementBuilder buildLookup(Method method, PhpExpression position) {
+        String lookupString = method.getName().replace("validate", "").toLowerCase();
+        LookupElementBuilder builder = LookupElementBuilder.create(method, lookupString).withIcon(method.getIcon())
+                .withInsertHandler((insertionContext, lookupElement) -> {
+                });
+
+        builder = builder.withTypeText(method.getFQN());
+
         return builder;
     }
 
