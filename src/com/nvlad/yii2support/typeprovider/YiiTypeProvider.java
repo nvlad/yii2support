@@ -31,29 +31,20 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
     public PhpType getType(PsiElement psiElement) {
         if (psiElement instanceof MethodReference) {
             MethodReference referenceMethod = (MethodReference)psiElement;
-            PhpExpression classReference = ((MethodReferenceImpl) psiElement).getClassReference();
             if (referenceMethod.getName() != null && referenceMethod.getName().equals("createObject")
                     && referenceMethod.getParameters().length > 0) {
+                PhpExpression classReference = ((MethodReferenceImpl) psiElement).getClassReference();
                 if (classReference != null && classReference.getName() != null && classReference.getName().equals("Yii")) {
-
-                    //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
                     PhpPsiElement firstParam = (PhpPsiElement) referenceMethod.getParameters()[0];
                     if (firstParam instanceof ArrayCreationExpression) {
                         for (ArrayHashElement elem : ((ArrayCreationExpression) firstParam).getHashElements()) {
                             if (elem.getKey() != null && elem.getKey().getText() != null &&
                                     ClassUtils.removeQuotes(elem.getKey().getText()).equals("class")) {
-                                PhpType phpType = getClass(elem.getValue());
-
-                                //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
-                                if (phpType != null)
-                                    return new PhpType().add(phpType);
+                                return getClass(elem.getValue());
                             }
                         }
                     } else {
-                        PhpType phpType = getClass(firstParam);
-                        //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
-                        if (phpType != null)
-                            return new PhpType().add(phpType);
+                        return getClass(firstParam);
                     }
 
                 }
