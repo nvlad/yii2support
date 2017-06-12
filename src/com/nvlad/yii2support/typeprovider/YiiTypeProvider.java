@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
@@ -29,29 +30,30 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
     @Override
     public PhpType getType(PsiElement psiElement) {
         if (psiElement instanceof MethodReference) {
-            PsiElement resolved = ((MethodReference)psiElement).resolve();
-            if (resolved != null && resolved instanceof Method) {
-                MethodReference referenceMethod = (MethodReference) psiElement;
-                Method classMethod = (Method)resolved;
-                if (classMethod.getName().equals("createObject") && classMethod.getContainingClass() != null &&
-                        (classMethod.getContainingClass().getName().equals("BaseYii")
-                                || classMethod.getContainingClass().getName().equals("Yii"))
-                        && referenceMethod.getParameters().length > 0) {
+            MethodReference referenceMethod = (MethodReference)psiElement;
+            PhpExpression classReference = ((MethodReferenceImpl) psiElement).getClassReference();
+            if (referenceMethod.getName() != null && referenceMethod.getName().equals("createObject")
+                    && referenceMethod.getParameters().length > 0) {
+                if (classReference != null && classReference.getName() != null && classReference.getName().equals("Yii")) {
+
                     //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
-                    PhpPsiElement firstParam = (PhpPsiElement)referenceMethod.getParameters()[0];
+                    PhpPsiElement firstParam = (PhpPsiElement) referenceMethod.getParameters()[0];
                     if (firstParam instanceof ArrayCreationExpression) {
-                        for (ArrayHashElement elem : ((ArrayCreationExpression) firstParam).getHashElements()  ) {
+                        for (ArrayHashElement elem : ((ArrayCreationExpression) firstParam).getHashElements()) {
                             if (elem.getKey() != null && elem.getKey().getText() != null &&
                                     ClassUtils.removeQuotes(elem.getKey().getText()).equals("class")) {
-                                PhpClass phpClass = getClass(elem.getValue());
+                                PhpType phpType = getClass(elem.getValue());
+
                                 //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
-                                return new PhpType().add(phpClass);
+                                if (phpType != null)
+                                    return new PhpType().add(phpType);
                             }
                         }
                     } else {
-                        PhpClass phpClass = getClass(firstParam);
+                        PhpType phpType = getClass(firstParam);
                         //System.out.print("getType" + (System.currentTimeMillis() % 1000) + "\n");
-                        return new PhpType().add(phpClass);
+                        if (phpType != null)
+                            return new PhpType().add(phpType);
                     }
 
                 }
@@ -60,9 +62,18 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
         return null;
     }
 
-    private PhpClass getClass(PhpPsiElement elem) {
-        if (elem != null)
-            return  ClassUtils.getPhpClassUniversal(elem.getProject(), elem);
+    private PhpType getClass(PhpPsiElement elem) {
+        if (elem instanceof ClassConstantReference) {
+            if (elem.getName() != null && elem.getName().equals("class")
+                    && ((ClassConstantReference) elem).getClassReference() != null)
+                return ((ClassConstantReference) elem).getClassReference().getType();
+        }
+        if (elem instanceof MethodReference) {
+            if (elem.getName() != null && elem.getName().equals("className")
+                    && ((MethodReference) elem).getClassReference() != null)
+                return ((MethodReference) elem).getClassReference().getType();
+        }
+
         return null;
     }
 
