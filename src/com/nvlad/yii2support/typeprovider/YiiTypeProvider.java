@@ -11,6 +11,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.Nullable;
+import org.mozilla.javascript.ast.VariableDeclaration;
 
 
 import java.util.Collection;
@@ -36,6 +37,16 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                 PhpExpression classReference = ((MethodReferenceImpl) psiElement).getClassReference();
                 if (classReference != null && classReference.getName() != null && classReference.getName().equals("Yii")) {
                     PhpPsiElement firstParam = (PhpPsiElement) referenceMethod.getParameters()[0];
+                    if (firstParam instanceof Variable  && ((VariableImpl) firstParam).getDeclaredType().getTypes().contains("\\array") ) {
+                        PsiElement variableDecl = ((VariableImpl) firstParam).resolve();
+                        if (variableDecl != null && variableDecl.getParent() != null && variableDecl.getParent().getChildren().length > 1) {
+                            PsiElement array = variableDecl.getParent().getChildren()[1];
+                            if (array instanceof ArrayCreationExpression) {
+                                firstParam = (ArrayCreationExpression)array;
+                            }
+                        }
+
+                    }
                     if (firstParam instanceof ArrayCreationExpression) {
                         for (ArrayHashElement elem : ((ArrayCreationExpression) firstParam).getHashElements()) {
                             if (elem.getKey() != null && elem.getKey().getText() != null &&
@@ -43,7 +54,8 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                                 return getClass(elem.getValue());
                             }
                         }
-                    } else {
+                    }
+                    else {
                         return getClass(firstParam);
                     }
 
