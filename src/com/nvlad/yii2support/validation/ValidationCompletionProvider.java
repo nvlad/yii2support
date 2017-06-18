@@ -87,7 +87,6 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                                 }
                             }
 
-
                         }
                     }
                 }
