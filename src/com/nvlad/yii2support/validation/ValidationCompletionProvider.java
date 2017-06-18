@@ -80,18 +80,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                             if (validator == null && validatorIdentifier instanceof PhpPsiElement) {
                                 validator = ClassUtils.getPhpClassUniversal(phpClass.getProject(), (PhpPsiElement)validatorIdentifier);
                             }
-/*
-                            HashMap<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
-                            PsiElement validator = validators.get(ClassUtils.removeQuotes(value));
 
-                            if (validator == null) {
-                                PhpIndex phpIndex = PhpIndex.getInstance(phpClass.getProject());
-                                Collection<PhpClass> classesByFQN = phpIndex.getClassesByFQN(ClassUtils.removeQuotes(value));
-                                if (!classesByFQN.isEmpty()) {
-                                    validator = classesByFQN.iterator().next();
-                                }
-                            }
-*/
                             if (validator != null) {
                                 for (Field field : ClassUtils.getClassFields((PhpClass) validator)) {
                                     completionResultSet.addElement(buildLookup(field, phpExpression, true));
