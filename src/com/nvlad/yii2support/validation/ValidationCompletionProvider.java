@@ -224,16 +224,23 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
         PsiElement validationParameter = null;
 
-        PsiElement possibleReturn = PsiUtil.getSuperParent(position, 6);
-        if (possibleReturn != null && possibleReturn instanceof PhpReturnImpl)
+
+        ArrayCreationExpression arrayCreationExpression = null;
+        PsiElement currentElement = position.getParent();
+        int limit = 15;
+        while (limit > 0 && ! (currentElement instanceof Method )) {
+            if (currentElement instanceof ArrayCreationExpression)
+                arrayCreationExpression = (ArrayCreationExpression)currentElement;
+            currentElement = currentElement.getParent();
+            limit--;
+        }
+
+        if (position.getParent().getParent().getParent() == arrayCreationExpression) {
             validationParameter = position.getParent().getParent();
-        else {
-            possibleReturn = PsiUtil.getSuperParent(position, 8);
-            if (possibleReturn != null && possibleReturn instanceof PhpReturnImpl) {
-                validationParameter = position.getParent().getParent().getParent().getParent();
-            } else {
-                return RulePositionEnum.UNKNOWN;
-            }
+        } else if (position.getParent().getParent().getParent().getParent().getParent() == arrayCreationExpression) {
+            validationParameter = position.getParent().getParent().getParent().getParent();
+        } else {
+            return RulePositionEnum.UNKNOWN;
         }
 
         if (validationParameter.toString().equals("Array value") && validationParameter.getParent() instanceof ArrayCreationExpression) {
