@@ -100,7 +100,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
         for (PhpClass validatorClass : validatorClasses) {
             if (validatorClass.getSuperFQN() == null || !validatorClass.getFQN().startsWith("\\yii")) {
-                validators.put(validatorClass.getFQN(), validatorClass);
+                validators.put(validatorClass.getFQN().replaceFirst("^\\\\", ""), validatorClass);
             }
         }
         return validators;
@@ -226,19 +226,28 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
 
         ArrayCreationExpression arrayCreationExpression = null;
+        List<ArrayCreationExpression> arrayCreationExpressionList = new ArrayList<>();
         PsiElement currentElement = position.getParent();
         int limit = 15;
         while (limit > 0 && ! (currentElement instanceof Method )) {
             if (currentElement instanceof ArrayCreationExpression)
-                arrayCreationExpression = (ArrayCreationExpression)currentElement;
+                arrayCreationExpressionList.add ((ArrayCreationExpression)currentElement);
             currentElement = currentElement.getParent();
             limit--;
         }
+        if (arrayCreationExpressionList.size() < 2)
+            return RulePositionEnum.UNKNOWN;
+        else
+            arrayCreationExpression = arrayCreationExpressionList.get(arrayCreationExpressionList.size() - 2);
+
+
+        Boolean innerArray = false;
 
         if (position.getParent().getParent().getParent() == arrayCreationExpression) {
             validationParameter = position.getParent().getParent();
         } else if (position.getParent().getParent().getParent().getParent().getParent() == arrayCreationExpression) {
             validationParameter = position.getParent().getParent().getParent().getParent();
+            innerArray = true;
         } else {
             return RulePositionEnum.UNKNOWN;
         }
@@ -247,9 +256,9 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
             int index = PsiUtil.getValueIndexInArray(validationParameter, (ArrayCreationExpression) validationParameter.getParent());
             if (index == 0)
                 return RulePositionEnum.FIELD;
-            else if (index == 1)
+            else if (index == 1 && !innerArray)
                 return RulePositionEnum.TYPE;
-            else if (index > 1)
+            else if (index > 1 && ! innerArray)
                 return RulePositionEnum.OPTIONS;
             else
                 return RulePositionEnum.UNKNOWN;
