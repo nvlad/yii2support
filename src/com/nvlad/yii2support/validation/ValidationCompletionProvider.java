@@ -11,7 +11,6 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.elements.impl.PhpReturnImpl;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.DatabaseUtils;
 import com.nvlad.yii2support.common.PsiUtil;
@@ -36,20 +35,22 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 if (getPosition.equals(RulePositionEnum.FIELD)) {
                     ArrayList<LookupElementBuilder> items = DatabaseUtils.getLookupItemsByAnnotations(phpClass, (PhpExpression) completionParameters.getPosition().getParent());
                     for (Field field : ClassUtils.getWritableClassFields(phpClass)) {
-
                         LookupElementBuilder lookupBuilder = buildLookup(field, phpExpression, false);
                         completionResultSet.addElement(lookupBuilder);
                     }
-
 
                     completionResultSet.addAllElements(items);
                 } else if (getPosition.equals(RulePositionEnum.TYPE)) {
                     // Put class validators
                     HashMap<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
-                    validators.putAll(getCustomValidators(phpClass));
                     for (Map.Entry<String, PhpPsiElement> entry : validators.entrySet()) {
                         completionResultSet.addElement(buildLookup(entry.getKey(), (PhpClass) entry.getValue(), phpExpression));
                     }
+                    HashMap<String, PhpPsiElement> customValidators = getCustomValidators(phpClass);
+                    for (Map.Entry<String, PhpPsiElement> entry : customValidators.entrySet()) {
+                        completionResultSet.addElement(buildLookup((PhpClass) entry.getValue(), phpExpression));
+                    }
+
                     // Put method validators
                     HashMap<String, PhpPsiElement> methodValidators = getMethodValidators(phpClass);
                     for (Map.Entry<String, PhpPsiElement> entry : methodValidators.entrySet()) {
@@ -100,7 +101,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
         for (PhpClass validatorClass : validatorClasses) {
             if (validatorClass.getSuperFQN() == null || !validatorClass.getFQN().startsWith("\\yii")) {
-                validators.put(validatorClass.getFQN().replaceFirst("^\\\\", ""), validatorClass);
+                validators.put(validatorClass.getName(), validatorClass);
             }
         }
         return validators;
@@ -173,18 +174,30 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
         builder = builder.withTypeText(method.getFQN());
 
+
         return builder;
     }
 
     @NotNull
-    private LookupElementBuilder buildLookup(String validatorName, PhpClass phpClass, PhpExpression position) {
-        LookupElementBuilder builder = LookupElementBuilder.create(phpClass, validatorName).withIcon(phpClass.getIcon())
+    private LookupElementBuilder buildLookup(PhpClass phpClass, PhpExpression position) {
+        String lookupString = phpClass.getFQN();
+        lookupString = lookupString.replaceAll("^\\\\", "");
+        LookupElementBuilder builder = LookupElementBuilder.create(phpClass, lookupString).withIcon(phpClass.getIcon())
+                .withInsertHandler((insertionContext, lookupElement) -> {
+                })
+                .withTypeText(phpClass.getNamespaceName().replaceAll("^\\\\", "").replaceAll("\\\\$", ""), true)
+                .withPresentableText(phpClass.getName());
+
+        return builder;
+    }
+
+    @NotNull
+    private LookupElementBuilder buildLookup(String lookupString, PhpClass phpClass, PhpExpression position) {
+        LookupElementBuilder builder = LookupElementBuilder.create(phpClass, lookupString).withIcon(phpClass.getIcon())
                 .withInsertHandler((insertionContext, lookupElement) -> {
                 });
 
-        if (!validatorName.contains("\\")) {
-            builder = builder.withTypeText(phpClass.getFQN());
-        }
+        builder = builder.withTypeText(phpClass.getFQN(), true);
 
         return builder;
     }
