@@ -5,11 +5,13 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.debugger.VariableImpl;
 
 import java.util.Hashtable;
 
@@ -21,12 +23,28 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
         if (!(completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
-                !(completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression)) {
+                !(completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
+                ! (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayAccessExpression)) {
             return;
         }
         ArrayCreationExpression arrayCreation = null;
+        
+        if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayAccessExpression) {
+            ArrayAccessExpression arrayAccess = (ArrayAccessExpression)completionParameters.getPosition().getParent().getParent().getParent();
+            PhpPsiElement value = arrayAccess.getValue();
 
-        if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) {
+            if (value instanceof Variable) {
+                PsiElement arrayDecl = ((Variable) value).resolve();
+                if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1 ) {
+                    PsiElement psiElement = arrayDecl.getParent().getChildren()[1];
+                    if (psiElement instanceof ArrayCreationExpression)
+                        arrayCreation = (ArrayCreationExpression)psiElement;
+                    else
+                        return;
+                } else
+                    return;
+            }
+        } else if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) {
             arrayCreation = (ArrayCreationExpression) completionParameters.getPosition().getParent().getParent().getParent();
         } else if (completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression &&
                 completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayHashElement &&
