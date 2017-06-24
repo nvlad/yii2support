@@ -34,6 +34,8 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
                         && activeClass.getSuperFQN().equals("\\yii\\db\\ActiveRecord")) {
                     if (methodReference.getName().equals("one")) {
                         return activeClass.getType();
+                    } else if (methodReference.getName().equals("all")) {
+                        return new PhpType().add(activeClass.getFQN() + "[]");
                     }
                 }
             }
