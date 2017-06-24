@@ -28,6 +28,14 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
             if (methodReference.getName() == null)
                 return null;
             if (methodReference.getName().equals("one") || methodReference.getName().equals("all")) {
+                PsiElement elem = methodReference.resolve();
+                if (elem instanceof Method ) {
+                   if (! ((Method) elem).getType().getTypes().contains("\\yii\\db\\ActiveRecord[]") &&
+                           !((Method) elem).getType().getTypes().contains("\\yii\\db\\ActiveRecord")) {
+                       return null;
+                   }
+                } else
+                    return null;
                 PhpClass activeClass = findClassByMethodReference(methodReference);
                 if (activeClass != null
                         && activeClass.getSuperFQN() != null
