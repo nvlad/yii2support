@@ -28,6 +28,7 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
             if (methodReference.getName() == null)
                 return null;
             if (methodReference.getName().equals("one") || methodReference.getName().equals("all")) {
+                /*
                 PsiElement elem = methodReference.resolve();
                 if (elem instanceof Method ) {
                    if (! ((Method) elem).getType().getTypes().contains("\\yii\\db\\ActiveRecord[]") &&
@@ -36,6 +37,7 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
                    }
                 } else
                     return null;
+                    */
                 PhpClass activeClass = findClassByMethodReference(methodReference);
                 if (activeClass != null
                         && activeClass.getSuperFQN() != null
@@ -49,11 +51,12 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
             }
         }
         return null;
+
     }
 
     @Nullable
     public PhpClass findClassByMethodReference(MethodReference methodReference) {
-        int limit = 40;
+        int limit = 15;
         while (limit > 0) {
             PhpExpression expr = methodReference.getClassReference();
             if (expr == null)

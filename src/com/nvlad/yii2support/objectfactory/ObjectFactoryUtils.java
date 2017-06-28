@@ -150,6 +150,8 @@ public class ObjectFactoryUtils {
 
     @Nullable
     static PhpClass findClassByArrayCreation(ArrayCreationExpression arrayCreation, PsiDirectory dir) {
+        if (arrayCreation == null)
+            return null;
         PhpClass phpClass;
         phpClass = findClassByArray(arrayCreation);
         if (phpClass == null) {
