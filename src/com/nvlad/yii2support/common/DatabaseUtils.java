@@ -100,7 +100,7 @@ public class DatabaseUtils {
 
     public static String[] extractParamsFromCondition(String condition, boolean includeColon) {
         LinkedHashSet<String> matches = new LinkedHashSet<>();
-        String pattern = "(?<![:\\[])(:\\w+)";
+        String pattern = "(?<![:\\[])(:[^\\W\\d]\\w+)";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(condition);
         while (m.find()) {
