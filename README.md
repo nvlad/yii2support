@@ -75,7 +75,7 @@ Go To Declaration, Rename, Find usages and Help popups work whenever code comple
 - Complete model attribute for `$form->field($model, ...)` & `Html::active*($model, ...)` methods
 
 ### Validators support
-- Autocomplete for arrays in model's rules method
+- Autocomplete for arrays in model's rules() method
 
 ### Type resolution
 - Yii::createMethod()
