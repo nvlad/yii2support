@@ -403,7 +403,8 @@ public class ClassUtils {
                 resultClass = getClass(PhpIndex.getInstance(param.getProject()), type);
                 if (resultClass != null
                         && !resultClass.getName().equals("Closure")
-                        && !resultClass.getName().equals("ArrayAccess")
+                        && !resultClass.getFQN().equals("\\ArrayAccess")
+                        && !resultClass.getFQN().equals("\\Error")
                         && !resultClass.getName().equals("Expression")) {
                     return resultClass;
                 }
