@@ -175,7 +175,11 @@ public class ObjectFactoryUtils {
         if (phpClass == null) {
             phpClass = getPhpClassInConfig(dir, arrayCreation);
         }
-        return phpClass;
+        if (ClassUtils.isClassInherit(phpClass, "\\yii\\base\\Object", PhpIndex.getInstance(arrayCreation.getProject())))
+            return phpClass;
+        else
+            return null;
+
     }
 
     /**
