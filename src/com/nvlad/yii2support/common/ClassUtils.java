@@ -401,7 +401,10 @@ public class ClassUtils {
                 }
             } else {
                 resultClass = getClass(PhpIndex.getInstance(param.getProject()), type);
-                if (resultClass != null && !resultClass.getName().equals("Closure") && !resultClass.getName().equals("Expression")) {
+                if (resultClass != null
+                        && !resultClass.getName().equals("Closure")
+                        && !resultClass.getName().equals("ArrayAccess")
+                        && !resultClass.getName().equals("Expression")) {
                     return resultClass;
                 }
             }
