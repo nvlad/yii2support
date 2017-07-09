@@ -138,7 +138,6 @@ public class ObjectFactoryUtils {
                         if (callingClass != null && callingClass.getFQN().equals("\\yii\\grid\\GridView")) {
                             return ClassUtils.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\grid\\DataColumn");
                         }
-
                     }
                 }
 
