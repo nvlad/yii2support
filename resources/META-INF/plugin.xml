@@ -20,8 +20,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Autocomplete in model's rules method</li>
-            <li>Calculates return type for Yii::createObject call and one/all method call of model</li>
+            <li>Issues #115, #126. Now inspections does not work for classes in root namespace to avoid collision with standard classes.</li>
         </ul>
     ]]>
     </change-notes>
