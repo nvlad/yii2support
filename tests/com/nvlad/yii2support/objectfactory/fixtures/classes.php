@@ -49,7 +49,7 @@ namespace  yii\web {
      * @property $test1 string
      * @package yii\web\Request
      */
-    class SubObject {
+    class SubObject extends Object{
         var $test2;
         function setTest3($value) {
 
@@ -70,7 +70,10 @@ namespace yii {
 }
 
 namespace yii\grid {
-    class GridView {
+
+    use yii\base\Object;
+
+    class GridView extends Object {
         public $column;
 
         public function setColumn(DataColumn $column)
@@ -79,7 +82,7 @@ namespace yii\grid {
         }
     }
 
-    class DataColumn {
+    class DataColumn extends Object{
         public $test1;
         public $test2;
     }
