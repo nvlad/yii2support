@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.5.33.10</version>
+    <version>0.5.33.11</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,7 +20,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>ActiveRecord type provider was disabled due limitations of access to index (Issue #129).</li>
+            <li>ActiveRecord type provider was disabled due to performance issues  (Issue #129).</li>
+            <li>TypeProvider for Yii::createObject disabled for case when parameter is variable   (Issue #129).</li>
         </ul>
     ]]>
     </change-notes>
@@ -101,11 +102,6 @@
 
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
-
-
-
-
-
 
     </extensions>
 
