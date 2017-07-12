@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.5.33.8</version>
+    <version>0.5.33.10</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,7 +20,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Issues #115, #126. Now inspections does not work for classes in root namespace to avoid collision with standard classes.</li>
+            <li>ActiveRecord type provider was disabled due limitations of access to index (Issue #129).</li>
         </ul>
     ]]>
     </change-notes>
@@ -39,7 +39,6 @@
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
-        <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.ActiveRecordTypeProvider"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

@@ -56,8 +56,9 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
 
     @Nullable
     public PhpClass findClassByMethodReference(MethodReference methodReference) {
+
         int limit = 15;
-        while (limit > 0) {
+        while (false && limit > 0) { //Disabled issue #
             PhpExpression expr = methodReference.getClassReference();
             if (expr == null)
                 return null;
