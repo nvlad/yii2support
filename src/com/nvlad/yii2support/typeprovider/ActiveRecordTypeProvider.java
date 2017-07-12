@@ -28,24 +28,12 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
             if (methodReference.getName() == null)
                 return null;
             if (methodReference.getName().equals("one") || methodReference.getName().equals("all")) {
-                /*
-                PsiElement elem = methodReference.resolve();
-                if (elem instanceof Method ) {
-                   if (! ((Method) elem).getType().getTypes().contains("\\yii\\db\\ActiveRecord[]") &&
-                           !((Method) elem).getType().getTypes().contains("\\yii\\db\\ActiveRecord")) {
-                       return null;
-                   }
-                } else
-                    return null;
-                    */
-                PhpClass activeClass = findClassByMethodReference(methodReference);
-                if (activeClass != null
-                        && activeClass.getSuperFQN() != null
-                        && activeClass.getSuperFQN().equals("\\yii\\db\\ActiveRecord")) {
+                String activeClass = findClassByMethodReference(methodReference);
+                if (activeClass != null) {
                     if (methodReference.getName().equals("one")) {
-                        return activeClass.getType();
+                        return new PhpType().add(activeClass);
                     } else if (methodReference.getName().equals("all")) {
-                        return new PhpType().add(activeClass.getFQN() + "[]");
+                        return new PhpType().add(activeClass + "[]");
                     }
                 }
             }
@@ -55,10 +43,10 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
     }
 
     @Nullable
-    public PhpClass findClassByMethodReference(MethodReference methodReference) {
+    public String findClassByMethodReference(MethodReference methodReference) {
 
-        int limit = 15;
-        while (false && limit > 0) { //Disabled issue #
+        int limit = 40;
+        while (limit > 0) {
             PhpExpression expr = methodReference.getClassReference();
             if (expr == null)
                 return null;
@@ -66,17 +54,18 @@ public class ActiveRecordTypeProvider extends CompletionContributor implements P
                 methodReference = (MethodReference)expr;
                 limit--;
             } else if (expr instanceof ClassReference) {
-                 PsiElement elem = ((ClassReference)expr).resolve();
-                 if (elem instanceof PhpClass)
-                     return (PhpClass)elem;
-                 else
-                     return null;
+                PsiElement elem = ((ClassReference)expr).resolve();
+                if (elem instanceof PhpClass)
+                    return ((PhpClass)elem).getFQN();
+                else
+                    return null;
             } else {
                 return null;
             }
         }
         return null;
     }
+
 
     @Override
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {

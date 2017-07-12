@@ -37,6 +37,7 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                 PhpExpression classReference = ((MethodReferenceImpl) psiElement).getClassReference();
                 if (classReference != null && classReference.getName() != null && classReference.getName().equals("Yii")) {
                     PhpPsiElement firstParam = (PhpPsiElement) referenceMethod.getParameters()[0];
+                    /* Accessing index does not allowed in getType
                     if (firstParam instanceof Variable  && ((VariableImpl) firstParam).getDeclaredType().getTypes().contains("\\array") ) {
                         PsiElement variableDecl = ((VariableImpl) firstParam).resolve();
                         if (variableDecl != null && variableDecl.getParent() != null && variableDecl.getParent().getChildren().length > 1) {
@@ -45,8 +46,7 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                                 firstParam = (ArrayCreationExpression)array;
                             }
                         }
-
-                    }
+                    } */
                     if (firstParam instanceof ArrayCreationExpression) {
                         for (ArrayHashElement elem : ((ArrayCreationExpression) firstParam).getHashElements()) {
                             if (elem.getKey() != null && elem.getKey().getText() != null &&
