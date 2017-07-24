@@ -65,7 +65,7 @@ public class ObjectFactoryTests  extends LightCodeInsightFixtureTestCase {
                 " $test = ['request' => [ 'subobject' => ['<caret>']] ;\n" +
                 ";");
         myFixture.completeBasic();
-        assertEquals(myFixture.getLookupElementStrings().size(), 3);
+        assertEquals(3, myFixture.getLookupElementStrings().size());
     }
 
     public void testCompletionYii_createObject() {

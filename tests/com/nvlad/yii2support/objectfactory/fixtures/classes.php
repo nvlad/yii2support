@@ -39,7 +39,7 @@ namespace  yii\web {
 
     class Request extends Object {
         /**
-         * @var SubObject|string
+         * @var SubObject
          */
         var $subobject;
     }

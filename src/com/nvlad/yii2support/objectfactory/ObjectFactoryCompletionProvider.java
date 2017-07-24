@@ -5,13 +5,12 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.debugger.VariableImpl;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Hashtable;
 
@@ -22,30 +21,30 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
-        if (!(completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
+        if (getArrayCreation(completionParameters) == null &&
                 !(completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
                 ! (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayAccessExpression)) {
             return;
         }
         ArrayCreationExpression arrayCreation = null;
-        
+
+        // access to key of variable declared elsewhere
         if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayAccessExpression) {
             ArrayAccessExpression arrayAccess = (ArrayAccessExpression)completionParameters.getPosition().getParent().getParent().getParent();
             PhpPsiElement value = arrayAccess.getValue();
 
-            if (value instanceof Variable) {
-                PsiElement arrayDecl = ((Variable) value).resolve();
-                if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1 ) {
-                    PsiElement psiElement = arrayDecl.getParent().getChildren()[1];
-                    if (psiElement instanceof ArrayCreationExpression)
-                        arrayCreation = (ArrayCreationExpression)psiElement;
-                    else
-                        return;
-                } else
-                    return;
-            }
-        } else if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) {
-            arrayCreation = (ArrayCreationExpression) completionParameters.getPosition().getParent().getParent().getParent();
+            if (value instanceof Variable)
+                arrayCreation = ObjectFactoryUtils.getArrayCreationByVarRef((Variable) value);
+
+            if (value instanceof FieldReference)
+                arrayCreation = ObjectFactoryUtils.getArrayCreationByFieldRef((FieldReference) value);
+
+            if (arrayCreation == null)
+                return;
+         // get parent array creation from inside of array
+        } else if (getArrayCreation(completionParameters) != null) {
+            arrayCreation = getArrayCreation(completionParameters);
+
         } else if (completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression &&
                 completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayHashElement &&
                 completionParameters.getPosition().getParent().getParent().toString() != "Array value") {
@@ -77,6 +76,14 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
                 }
             }
         }
+    }
+
+    @Nullable
+    private ArrayCreationExpression getArrayCreation(@NotNull CompletionParameters completionParameters) {
+        if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) {
+            return (ArrayCreationExpression) completionParameters.getPosition().getParent().getParent().getParent();
+        }
+        else return null;
     }
 
     @NotNull

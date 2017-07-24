@@ -6,10 +6,8 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
-import com.jetbrains.php.lang.parser.parsing.classes.ClassConstant;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
-import com.jetbrains.php.lang.psi.elements.impl.ConstantImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpDefineImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
@@ -148,8 +146,8 @@ public class ClassUtils {
 
     }
 
-    public static boolean isClassInherit(PhpClass classObject, String className, PhpIndex index) {
-        PhpClass phpClass = ClassUtils.getClass(index, className);
+    public static boolean isClassInherit(PhpClass classObject, String parentClassName, PhpIndex index) {
+        PhpClass phpClass = ClassUtils.getClass(index, parentClassName);
         return isClassInherit(classObject, phpClass);
     }
 

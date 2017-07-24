@@ -270,4 +270,35 @@ public class ObjectFactoryUtils {
         }
         return null;
     }
+
+    @Nullable
+    static ArrayCreationExpression getArrayCreationByVarRef(Variable value) {
+        ArrayCreationExpression arrayCreation;
+        PsiElement arrayDecl = value.resolve();
+        if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1 ) {
+            PsiElement psiElement = arrayDecl.getParent().getLastChild();
+            if (psiElement instanceof ArrayCreationExpression)
+                arrayCreation = (ArrayCreationExpression)psiElement;
+            else
+                return null;
+        } else
+            return null;
+        return arrayCreation;
+    }
+
+    @Nullable
+    static ArrayCreationExpression getArrayCreationByFieldRef(FieldReference value) {
+        ArrayCreationExpression arrayCreation = null;
+        PsiElement arrayDecl = null;
+        arrayDecl = value.resolve();
+        if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1 ) {
+            PsiElement psiElement = arrayDecl.getLastChild();
+            if (psiElement instanceof ArrayCreationExpression)
+                arrayCreation = (ArrayCreationExpression)psiElement;
+            else
+                return null;
+        } else
+            return null;
+        return arrayCreation;
+    }
 }

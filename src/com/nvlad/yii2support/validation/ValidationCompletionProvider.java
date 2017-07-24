@@ -125,6 +125,9 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         if (!classesByFQN.isEmpty()) {
             PhpClass validatorClass = classesByFQN.iterator().next();
             Field builtInValidatorsField = validatorClass.findOwnFieldByName("builtInValidators", false);
+            // Default validators not found
+            if (builtInValidatorsField == null)
+                return null;
             ArrayCreationExpression fieldArray = (ArrayCreationExpression) builtInValidatorsField.getDefaultValue();
             Iterable<ArrayHashElement> hashElements = fieldArray.getHashElements();
             for (ArrayHashElement elem : hashElements) {
