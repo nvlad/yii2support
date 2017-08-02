@@ -16,7 +16,7 @@ Provides [Yii 2 Framework](http://www.yiiframework.com/) support for [PhpStorm](
 and [IntelliJ IDEA](https://www.jetbrains.com/idea/).
 
 Please make donations to support plugin development.  
-[![paypal](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MVG9CP6NZV856)
+[![paypal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MVG9CP6NZV856)
 
 
 Features
