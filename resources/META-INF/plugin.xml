@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.5.33.11</version>
+    <version>0.5.33.12</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,8 +20,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>ActiveRecord type provider was disabled due to performance issues  (Issue #129).</li>
-            <li>TypeProvider for Yii::createObject disabled for case when parameter is variable   (Issue #129).</li>
+            <li>ActiveRecord type provider re-enabled  (Issue #129)</li>
+            <li>Track variables and class fields to provide autocomplete</li>
         </ul>
     ]]>
     </change-notes>
@@ -44,6 +44,10 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
+                                 displayName="Yii2 Support"
+                                 groupId="language"
+                                 id="Yii2Support.SettingsForm"/>
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
@@ -109,5 +113,11 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
+    <application-components>
+        <component>
+            <implementation-class>com.nvlad.yii2support.utils.Yii2SupportSettings</implementation-class>
+        </component>
+
+    </application-components>
 
 </idea-plugin>

@@ -168,7 +168,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
     }
 
     @Nullable
-    private String getTable(String stringToComplete, @Nullable PhpClass activeRecordClass) {
+    private String  getTable(String stringToComplete, @Nullable PhpClass activeRecordClass) {
         if (stringToComplete.length() > 2 && stringToComplete.contains(".")) {
             // match "{{%table}}.[[co", "{{%table}}.[[", "{{%table}}.", "{{%table}}.col", "{{table}}.", "table.[[col",
             // "table.[[", "table.col" and "table." at end of string and return "tn" group with table name
