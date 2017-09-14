@@ -19,6 +19,7 @@ import java.awt.*;
 public class SettingsForm extends JDialog implements Configurable {
     private JPanel mainPanel;
     private JTextField tablePrefixTextbox;
+    private JCheckBox insertTableNamesWithCheckBox;
     private Yii2SupportSettings settings;
 
     public SettingsForm(@NotNull Yii2SupportSettings applicationService) {
@@ -40,12 +41,13 @@ public class SettingsForm extends JDialog implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !tablePrefixTextbox.getText().equals(settings.tablePrefix);
+        return !tablePrefixTextbox.getText().equals(settings.tablePrefix) || insertTableNamesWithCheckBox.isSelected();
     }
 
     @Override
     public void apply() throws ConfigurationException {
         settings.tablePrefix = tablePrefixTextbox.getText();
+        settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
     }
 
     private void createUIComponents() {
@@ -56,6 +58,7 @@ public class SettingsForm extends JDialog implements Configurable {
     @Override
     public void reset() {
         tablePrefixTextbox.setText(settings.tablePrefix);
+        insertTableNamesWithCheckBox.setSelected(settings.insertWithTablePrefix);
     }
 
     {
@@ -74,15 +77,23 @@ public class SettingsForm extends JDialog implements Configurable {
      */
     private void $$$setupUI$$$() {
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayoutManager(2, 4, new Insets(10, 10, 10, 10), -1, -1));
+        mainPanel.setLayout(new GridLayoutManager(4, 5, new Insets(10, 10, 10, 10), -1, -1));
         mainPanel.putClientProperty("html.disable", Boolean.FALSE);
+        mainPanel.setBorder(BorderFactory.createTitledBorder("9"));
         final JLabel label1 = new JLabel();
         label1.setText("Table Prefix");
-        mainPanel.add(label1, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label1, new GridConstraints(2, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
-        mainPanel.add(spacer1, new GridConstraints(1, 1, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        mainPanel.add(spacer1, new GridConstraints(3, 2, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         tablePrefixTextbox = new JTextField();
-        mainPanel.add(tablePrefixTextbox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        mainPanel.add(tablePrefixTextbox, new GridConstraints(2, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        insertTableNamesWithCheckBox = new JCheckBox();
+        insertTableNamesWithCheckBox.setText("Insert table names with prefix");
+        insertTableNamesWithCheckBox.setToolTipText("Insert {{%tableName}}");
+        mainPanel.add(insertTableNamesWithCheckBox, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label2 = new JLabel();
+        label2.setText("Table Prefix Support");
+        mainPanel.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
