@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.5.33.12</version>
+    <version>0.6.34.12</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,8 +20,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>ActiveRecord type provider re-enabled  (Issue #129)</li>
-            <li>Track variables and class fields to provide autocomplete</li>
+            <li>Table prefix support using plugin settings</li>
         </ul>
     ]]>
     </change-notes>
