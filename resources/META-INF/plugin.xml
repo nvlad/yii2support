@@ -43,10 +43,15 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
+
+       <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
+
+        <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
                                  displayName="Yii2 Support"
                                  groupId="language"
-                                 id="Yii2Support.SettingsForm"/>
+                                 id="Yii2Support.SettingsForm"
+                                 nonDefaultProject="true"
+                        />
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
@@ -112,11 +117,14 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
-    <application-components>
+
+    <!--
+    <project-components>
         <component>
             <implementation-class>com.nvlad.yii2support.utils.Yii2SupportSettings</implementation-class>
         </component>
 
-    </application-components>
+    </project-components>
+    -->
 
 </idea-plugin>

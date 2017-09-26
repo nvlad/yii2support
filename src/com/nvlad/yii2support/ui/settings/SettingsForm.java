@@ -2,6 +2,8 @@ package com.nvlad.yii2support.ui.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.SearchableConfigurable;
+import com.intellij.openapi.project.Project;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
@@ -13,18 +15,15 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Created by oleg on 2017-09-06.
- */
-public class SettingsForm extends JDialog implements Configurable {
+public class SettingsForm  implements Configurable {
     private JPanel mainPanel;
     private JTextField tablePrefixTextbox;
     private JCheckBox insertTableNamesWithCheckBox;
     private Yii2SupportSettings settings;
 
-    public SettingsForm(@NotNull Yii2SupportSettings applicationService) {
-        settings = applicationService;
-        setContentPane(mainPanel);
+    public SettingsForm(Project project) {
+        settings = Yii2SupportSettings.getInstance(project);
+
     }
 
     @Nls

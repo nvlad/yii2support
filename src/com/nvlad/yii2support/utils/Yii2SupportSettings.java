@@ -9,27 +9,11 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by oleg on 2017-09-06.
  */
-@State(name = "Yii2 support", storages = @Storage(id = "yii2-support", file = "$APP_CONFIG$/yii2support.xml"))
-public class Yii2SupportSettings implements ApplicationComponent, PersistentStateComponent<Yii2SupportSettings> {
+@State(name = "Yii2 support", storages = @Storage("yii2settings.xml"))
+public class Yii2SupportSettings implements PersistentStateComponent<Yii2SupportSettings> {
 
     public String tablePrefix = "";
     public boolean insertWithTablePrefix = false;
-
-    @Override
-    public void initComponent() {
-
-    }
-
-    @Override
-    public void disposeComponent() {
-
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "Yii2SupportSettings";
-    }
 
     @Nullable
     @Override
@@ -45,4 +29,5 @@ public class Yii2SupportSettings implements ApplicationComponent, PersistentStat
     public static Yii2SupportSettings getInstance(Project project) {
         return ServiceManager.getService(project, Yii2SupportSettings.class);
     }
+
 }
