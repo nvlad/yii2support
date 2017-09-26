@@ -40,7 +40,7 @@ public class SettingsForm  implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !tablePrefixTextbox.getText().equals(settings.tablePrefix) || insertTableNamesWithCheckBox.isSelected();
+        return !tablePrefixTextbox.getText().equals(settings.tablePrefix) || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected();
     }
 
     @Override
