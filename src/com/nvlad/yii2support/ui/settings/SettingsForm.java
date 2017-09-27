@@ -14,6 +14,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class SettingsForm  implements Configurable {
     private JPanel mainPanel;
@@ -24,6 +28,20 @@ public class SettingsForm  implements Configurable {
     public SettingsForm(Project project) {
         settings = Yii2SupportSettings.getInstance(project);
 
+
+        tablePrefixTextbox.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                adjustInputs();
+            }
+        });
+    }
+
+    private void adjustInputs() {
+        if (tablePrefixTextbox.getText().length() > 0)
+            insertTableNamesWithCheckBox.setSelected(true);
+        insertTableNamesWithCheckBox.setEnabled(tablePrefixTextbox.getText().length() == 0);
     }
 
     @Nls
@@ -58,6 +76,7 @@ public class SettingsForm  implements Configurable {
     public void reset() {
         tablePrefixTextbox.setText(settings.tablePrefix);
         insertTableNamesWithCheckBox.setSelected(settings.insertWithTablePrefix);
+        adjustInputs();
     }
 
     {
