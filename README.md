@@ -62,6 +62,8 @@ Go To Declaration, Rename, Find usages and Help popups work whenever code comple
 
 **Database connection is required**
 
+#### Table Prefix support
+Use plugin settings window to set up table prefix
 #### ActiveQuery
 - Code completion for `ActiveQuery` (`ActiveRecord::find()->where` for example)  
 - Code completion inside `ActiveQuery` linked to ActiveRecord  
