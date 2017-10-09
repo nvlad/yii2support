@@ -20,7 +20,6 @@ import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -125,12 +124,15 @@ public class DatabaseUtils {
             return table;
     }
 
+    private static Pattern tablePrefix = Pattern.compile("(\\{\\{(%?[\\w\\-. ]+%?)}}|\\[\\[([\\w\\-. ]+)]])");
     public static String AddTablePrefix(String table, boolean force, Project project) {
         table = ClassUtils.removeQuotes(table);
-        if (force || table.startsWith("{{%"))
-            return Yii2SupportSettings.getInstance(project).tablePrefix + clearTablePrefixTags(table);
-        else
+        Matcher matcher = tablePrefix.matcher(table);
+        if (!matcher.find()) {
             return clearTablePrefixTags(table);
+        }
+        String prefix = Yii2SupportSettings.getInstance(project).tablePrefix;
+        return matcher.group(2).replace("%", prefix);
     }
 
     @NotNull
