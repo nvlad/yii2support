@@ -61,9 +61,15 @@ public class ViewsUtil {
         }
 
         final SearchScope fileScope = psiFile.getUseScope();
+        final HashSet<String> usedBeforeDeclaration = new HashSet<>();
         for (Variable variable : viewVariables) {
             String variableName = variable.getName();
-            if (variable.isDeclaration() && fileScope.equals(variable.getUseScope()) && !(variable.getParent() instanceof PhpUseList)) {
+            if (variable.isDeclaration()
+                    && fileScope.equals(variable.getUseScope())
+                    && !(variable.getParent() instanceof PhpUseList)
+                    && !(variable.getParent() instanceof UnaryExpression)
+                    && !(variable.getParent() instanceof SelfAssignmentExpression)
+                    && !usedBeforeDeclaration.contains(variableName)) {
                 declaredVariables.add(variableName);
             } else {
                 if (!ignoredVariables.contains(variableName)) {
@@ -72,9 +78,11 @@ public class ViewsUtil {
                             Variable inlineVariable = PsiTreeUtil.findChildOfType(variable, Variable.class);
                             if (inlineVariable != null) {
                                 allVariables.add(inlineVariable.getName());
+                                usedBeforeDeclaration.add(variableName);
                             }
                         } else {
                             allVariables.add(variableName);
+                            usedBeforeDeclaration.add(variableName);
                         }
                     }
                 }
