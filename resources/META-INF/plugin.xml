@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.6.34.13</version>
+    <version>0.6.34.16</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,7 +20,9 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Table prefix support using plugin settings</li>
+            <li>Fix table prefix support</li>
+            <li>Fix detection unused variables in Views with Unary or SelfAssignment operators</li>
+            <li>Disabling MissedViewInspection for Controllers & Widgets with overwritten getViewPath method</li>
         </ul>
     ]]>
     </change-notes>
