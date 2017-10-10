@@ -5,10 +5,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ArrayUtil;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.inspections.PhpInspection;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +43,19 @@ final public class MissedViewInspection extends PhpInspection {
                             String path = ((StringLiteralExpression) pathParameter).getContents();
                             if (path.startsWith("//") || path.startsWith("@")) {
                                 return;
+                            }
+                            PhpClass clazz = ClassUtils.getPhpClassByCallChain(reference);
+                            if (clazz != null) {
+                                Method method = clazz.findMethodByName("getViewPath");
+                                PhpIndex phpIndex = PhpIndex.getInstance(reference.getProject());
+                                if (method != null) {
+                                    PhpClass containingClass = method.getContainingClass();
+                                    PhpClass controllerBaseClass = ClassUtils.getClass(phpIndex, "yii\\base\\Controller");
+                                    PhpClass widgetBaseClass = ClassUtils.getClass(phpIndex, "yii\\base\\Widget");
+                                    if (containingClass != controllerBaseClass && containingClass != widgetBaseClass) {
+                                        return;
+                                    }
+                                }
                             }
 
                             PsiFile file = ViewsUtil.getViewFile(pathParameter);
