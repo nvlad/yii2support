@@ -212,8 +212,14 @@ public class DatabaseUtils {
                 }
             }
         }
-       String className = phpClass.getName();
-       return AddTablePrefix(StringUtils.CamelToId(className), false, phpClass.getProject());
+
+        String table = StringUtils.CamelToId(phpClass.getName());
+        if (method != null
+                && method.getContainingClass() != null
+                && method.getContainingClass().getFQN().equals("\\yii\\db\\ActiveRecord")) {
+            table = "{{%" + table + "}}";
+        }
+        return AddTablePrefix(table, false, phpClass.getProject());
     }
 
     public static String clearTablePrefixTags(String str) {

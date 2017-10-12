@@ -1,13 +1,13 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.6.34.16</version>
+    <version>0.6.34.17</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
        <b>Plugin contains the following functionality</b><br/>
        <ul>
-       <li>render() methods for views</li>
+       <li>Suggests for render() methods</li>
        <li>i18n</li>
        <li>Configuration arrays for object instantiation</li>
        <li>ActiveQuery, Query and migrations (database connection is required)</li>
@@ -20,9 +20,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Fix table prefix support</li>
-            <li>Fix detection unused variables in Views with Unary or SelfAssignment operators</li>
-            <li>Disabling MissedViewInspection for Controllers & Widgets with overwritten getViewPath method</li>
+            <li>Fix table prefix for base Yii table name</li>
         </ul>
     ]]>
     </change-notes>
