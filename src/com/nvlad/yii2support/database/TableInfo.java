@@ -8,6 +8,7 @@ import com.intellij.database.dataSource.DatabaseDriverManager;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DatabaseSystem;
 import com.intellij.database.psi.DbTable;
+import com.intellij.database.model.DasTable;
 import com.intellij.database.util.DasUtil;
 import com.intellij.database.vfs.DatabaseElementVirtualFileImpl;
 import com.intellij.database.view.DatabaseStructure;
