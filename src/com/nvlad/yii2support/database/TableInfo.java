@@ -1,20 +1,10 @@
 package com.nvlad.yii2support.database;
 
 import com.google.common.collect.Lists;
-import com.intellij.database.DatabaseDataKeys;
-import com.intellij.database.dataSource.DatabaseArtifactManager;
-import com.intellij.database.dataSource.DatabaseDriver;
-import com.intellij.database.dataSource.DatabaseDriverManager;
 import com.intellij.database.model.DasColumn;
-import com.intellij.database.model.DatabaseSystem;
-import com.intellij.database.psi.DbTable;
 import com.intellij.database.model.DasTable;
 import com.intellij.database.util.DasUtil;
-import com.intellij.database.vfs.DatabaseElementVirtualFileImpl;
-import com.intellij.database.view.DatabaseStructure;
-import com.intellij.database.view.editors.DatabaseTableEditor;
 import com.intellij.util.containers.JBIterable;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,13 +17,13 @@ import java.util.Set;
 public class TableInfo {
     private final DasTable tableElement;
 
-    private List<DasColumn> columns = new ArrayList<DasColumn>();
+    private List<DasColumn> columns = new ArrayList<>();
 
-    private List<String> primaryKeys = new ArrayList<String>();
+    private List<String> primaryKeys = new ArrayList<>();
 
     public TableInfo(DasTable tableElement) {
         this.tableElement = tableElement;
-        List<DasColumn> columns = new ArrayList<DasColumn>();
+        List<DasColumn> columns = new ArrayList<>();
 
         JBIterable<? extends DasColumn> columnsIter = DasUtil.getColumns(tableElement);
         List<? extends DasColumn> dasColumns = columnsIter.toList();
@@ -43,7 +33,6 @@ public class TableInfo {
             if (DasUtil.isPrimary(dasColumn)) {
                 primaryKeys.add(dasColumn.getName());
             }
-
         }
 
         this.columns = columns;
@@ -70,12 +59,12 @@ public class TableInfo {
     }
 
     public List<DasColumn> getNonPrimaryColumns() {
-        Set<String> pKNameSet = new HashSet<String>();
+        Set<String> pKNameSet = new HashSet<>();
         for (String pkName : getPrimaryKeys()) {
             pKNameSet.add(pkName);
         }
 
-        List<DasColumn> ret = new ArrayList<DasColumn>();
+        List<DasColumn> ret = new ArrayList<>();
         for (DasColumn column : columns) {
             if (!pKNameSet.contains(column.getName())) {
                 ret.add(column);

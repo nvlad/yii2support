@@ -5,7 +5,6 @@ import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
 import com.intellij.database.model.basic.BasicTable;
-import com.intellij.database.model.impl.BaseModel;
 import com.intellij.database.psi.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
@@ -115,7 +114,7 @@ public class DatabaseUtils {
                 param = param.replace(":", "");
             matches.add(param);
         }
-        return (String[]) matches.toArray(new String[0]);
+        return matches.toArray(new String[0]);
     }
 
     public static String RemoveTablePrefix(String table, Project project) {
