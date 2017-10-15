@@ -24,13 +24,13 @@ import java.util.Set;
  * Created by oleg on 23.03.2017.
  */
 public class TableInfo {
-    private final DbTable tableElement;
+    private final DasTable tableElement;
 
     private List<DasColumn> columns = new ArrayList<DasColumn>();
 
     private List<String> primaryKeys = new ArrayList<String>();
 
-    public TableInfo(DbTable tableElement) {
+    public TableInfo(DasTable tableElement) {
         this.tableElement = tableElement;
         List<DasColumn> columns = new ArrayList<DasColumn>();
 

@@ -56,8 +56,8 @@ public class DatabaseUtils {
 
         for (DbDataSource source : dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                if (item instanceof DbTable && (((DbTable) item).getName().equals(prefixedTable) || ((DbTable) item).getName().equals(table))) {
-                    TableInfo tableInfo = new TableInfo((DbTable) item);
+                if (item instanceof DasTable && (((DasTable) item).getName().equals(prefixedTable) || ((DasTable) item).getName().equals(table))) {
+                    TableInfo tableInfo = new TableInfo((DasTable) item);
                     for (DasColumn column : tableInfo.getColumns()) {
                         list.add(DatabaseUtils.buildLookup(column, true, project));
                     }
@@ -78,7 +78,7 @@ public class DatabaseUtils {
         ArrayList<LookupElementBuilder> list = new ArrayList<>();
         for (DbDataSource source : dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                if (item instanceof DbTable || item instanceof BasicTable) {
+                if (item instanceof DasTable) {
                     list.add(DatabaseUtils.buildLookup(item, true, project));
                 }
             }
@@ -176,8 +176,8 @@ public class DatabaseUtils {
             }
             if (showSchema && tableSchema != null)
                 builder = builder.withTailText(" (" + table.getDbParent().getName() + ")", true);
-            if (table instanceof DbTableImpl)
-                builder = builder.withIcon(((DbTableImpl) table).getIcon());
+            if (table instanceof DbElement)
+                builder = builder.withIcon(((DbElement) table).getIcon());
 
             builder = builder.withInsertHandler((insertionContext, lookupElement) -> {
                 if (Yii2SupportSettings.getInstance(project).insertWithTablePrefix) {
@@ -271,7 +271,7 @@ public class DatabaseUtils {
 
         for (DbDataSource source : dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
+                if (item instanceof DasTable && ((DasTable) item).getName().equals(table)) {
                    return true;
                 }
             }
@@ -292,8 +292,8 @@ public class DatabaseUtils {
         for (DbDataSource source : dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
 
-                if (item instanceof DbTable && ((DbTable) item).getName().equals(prefixedTable)) {
-                    TableInfo tableInfo = new TableInfo((DbTable) item);
+                if (item instanceof DasTable && ((DasTable) item).getName().equals(prefixedTable)) {
+                    TableInfo tableInfo = new TableInfo((DasTable) item);
                     for (DasColumn column : tableInfo.getColumns()) {
                         list.add(ClassUtils.removeQuotes(column.getName()));
                     }
@@ -338,8 +338,8 @@ public class DatabaseUtils {
         for (DbDataSource source : dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
                 table = ClassUtils.removeQuotes(table);
-                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
-                    TableInfo tableInfo = new TableInfo((DbTable) item);
+                if (item instanceof DasTable && ((DasTable) item).getName().equals(table)) {
+                    TableInfo tableInfo = new TableInfo((DasTable) item);
 
                     for (DasColumn column : tableInfo.getColumns()) {
                         boolean found = false;
