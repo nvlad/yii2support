@@ -4,6 +4,8 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
+import com.intellij.database.model.basic.BasicTable;
+import com.intellij.database.model.impl.BaseModel;
 import com.intellij.database.psi.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
@@ -76,7 +78,7 @@ public class DatabaseUtils {
         ArrayList<LookupElementBuilder> list = new ArrayList<>();
         for (DbDataSource source : dataSources) {
             for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                if (item instanceof DbTable) {
+                if (item instanceof DbTable || item instanceof BasicTable) {
                     list.add(DatabaseUtils.buildLookup(item, true, project));
                 }
             }
