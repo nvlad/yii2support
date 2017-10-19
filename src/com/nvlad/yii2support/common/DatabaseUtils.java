@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.containers.JBIterable;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocPropertyTag;
@@ -54,7 +55,7 @@ public class DatabaseUtils {
         String prefixedTable = AddTablePrefix(table, true, project);
 
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
                 if (item instanceof DasTable && (((DasTable) item).getName().equals(prefixedTable) || ((DasTable) item).getName().equals(table))) {
                     TableInfo tableInfo = new TableInfo((DasTable) item);
                     for (DasColumn column : tableInfo.getColumns()) {
@@ -76,7 +77,8 @@ public class DatabaseUtils {
 
         ArrayList<LookupElementBuilder> list = new ArrayList<>();
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+            JBIterable<DasTable> filtered = source.getModel().traverser().filter(DasTable.class);
+             for (Object item : filtered) {
                 if (item instanceof DasTable) {
                     list.add(DatabaseUtils.buildLookup(item, true, project));
                 }
@@ -269,7 +271,7 @@ public class DatabaseUtils {
         table = ClassUtils.removeQuotes(table);
 
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
                 if (item instanceof DasTable && ((DasTable) item).getName().equals(table)) {
                    return true;
                 }
@@ -289,7 +291,7 @@ public class DatabaseUtils {
             return list;
         table = ClassUtils.removeQuotes(prefixedTable);
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
 
                 if (item instanceof DasTable && ((DasTable) item).getName().equals(prefixedTable)) {
                     TableInfo tableInfo = new TableInfo((DasTable) item);
@@ -335,7 +337,7 @@ public class DatabaseUtils {
         if (table == null)
             return result;
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
                 table = ClassUtils.removeQuotes(table);
                 if (item instanceof DasTable && ((DasTable) item).getName().equals(table)) {
                     TableInfo tableInfo = new TableInfo((DasTable) item);
