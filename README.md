@@ -13,7 +13,15 @@ IntelliJ IDEA / PhpStorm Yii2 Support
 
 
 Provides [Yii 2 Framework](http://www.yiiframework.com/) support for [PhpStorm](https://www.jetbrains.com/phpstorm/)
-and [IntelliJ IDEA](https://www.jetbrains.com/idea/).
+and [IntelliJ IDEA](https://www.jetbrains.com/idea/).  
+
+Donate
+--------
+
+Please make donations to support plugin development.  
+[![paypal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MVG9CP6NZV856)  
+Bitcoin: 36TYn22Ch48FsBriJkGmD52Ge8Dqf7Gjkb  
+
 
 Features
 --------
@@ -54,6 +62,8 @@ Go To Declaration, Rename, Find usages and Help popups work whenever code comple
 
 **Database connection is required**
 
+#### Table Prefix support
+Use plugin settings window to set up table prefix
 #### ActiveQuery
 - Code completion for `ActiveQuery` (`ActiveRecord::find()->where` for example)  
 - Code completion inside `ActiveQuery` linked to ActiveRecord  
@@ -73,6 +83,13 @@ Go To Declaration, Rename, Find usages and Help popups work whenever code comple
   
 ### Form support
 - Complete model attribute for `$form->field($model, ...)` & `Html::active*($model, ...)` methods
+
+### Validators support
+- Autocomplete for arrays in model's rules() method
+
+### Type resolution
+- Yii::createMethod()
+- one() and all() methods of ActiveQuery
 
 Installation
 ------------

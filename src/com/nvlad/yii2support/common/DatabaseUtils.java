@@ -4,10 +4,13 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
+import com.intellij.database.model.basic.BasicTable;
 import com.intellij.database.psi.*;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.containers.JBIterable;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocPropertyTag;
@@ -15,6 +18,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl;
 import com.nvlad.yii2support.database.TableInfo;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,12 +52,14 @@ public class DatabaseUtils {
         //dataSources.clear();
         //dataSources.add(new TestDataSource(project));
 
+        String prefixedTable = AddTablePrefix(table, true, project);
+
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
-                    TableInfo tableInfo = new TableInfo((DbTable) item);
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
+                if (item instanceof DasTable && (((DasTable) item).getName().equals(prefixedTable) || ((DasTable) item).getName().equals(table))) {
+                    TableInfo tableInfo = new TableInfo((DasTable) item);
                     for (DasColumn column : tableInfo.getColumns()) {
-                        list.add(DatabaseUtils.buildLookup(column, true));
+                        list.add(DatabaseUtils.buildLookup(column, true, project));
                     }
                 }
             }
@@ -71,9 +77,10 @@ public class DatabaseUtils {
 
         ArrayList<LookupElementBuilder> list = new ArrayList<>();
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                if (item instanceof DbTable) {
-                    list.add(DatabaseUtils.buildLookup(item, true));
+            JBIterable<DasTable> filtered = source.getModel().traverser().filter(DasTable.class);
+             for (Object item : filtered) {
+                if (item instanceof DasTable) {
+                    list.add(DatabaseUtils.buildLookup(item, true, project));
                 }
             }
         }
@@ -87,7 +94,7 @@ public class DatabaseUtils {
         final Field[] fields = phpClass.getOwnFields();
         for (Field field : fields) {
             if (field instanceof PhpDocProperty) {
-                result.add(buildLookup(field, false));
+                result.add(buildLookup(field, false, phpClass.getProject()));
             }
         }
 
@@ -95,21 +102,50 @@ public class DatabaseUtils {
     }
 
     public static String[] extractParamsFromCondition(String condition) {
+        return extractParamsFromCondition(condition, true);
+    }
+
+    public static String[] extractParamsFromCondition(String condition, boolean includeColon) {
         LinkedHashSet<String> matches = new LinkedHashSet<>();
-        String pattern = "(?<!:)(:\\w+)";
+        String pattern = "(?<![:\\[])(:[^\\W\\d]\\w+)";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(condition);
         while (m.find()) {
-            matches.add(m.group(1));
+            String param = m.group(1);
+            if (! includeColon)
+                param = param.replace(":", "");
+            matches.add(param);
         }
-        return (String[]) matches.toArray(new String[0]);
+        return matches.toArray(new String[0]);
+    }
+
+    public static String RemoveTablePrefix(String table, Project project) {
+        String tablePrefix = Yii2SupportSettings.getInstance(project).tablePrefix;
+        if (table.startsWith(tablePrefix))
+            return table.substring(tablePrefix.length());
+        else
+            return table;
+    }
+
+    private static Pattern tablePrefix = Pattern.compile("(\\{\\{(%?[\\w\\-. ]+%?)}}|\\[\\[([\\w\\-. ]+)]])");
+    public static String AddTablePrefix(String table, boolean force, Project project) {
+        table = ClassUtils.removeQuotes(table);
+        Matcher matcher = tablePrefix.matcher(table);
+        if (!matcher.find()) {
+            return clearTablePrefixTags(table);
+        }
+        String prefix = Yii2SupportSettings.getInstance(project).tablePrefix;
+        return matcher.group(2).replace("%", prefix);
     }
 
     @NotNull
-    public static LookupElementBuilder buildLookup(Object field, boolean showSchema) {
+    public static LookupElementBuilder buildLookup(Object field, boolean showSchema, Project project) {
         String lookupString = "-";
-        if (field instanceof DasObject)
+
+        if (field instanceof DasObject) {
             lookupString = ((DasObject) field).getName();
+            lookupString = RemoveTablePrefix(lookupString, project);
+        }
         if (field instanceof Field) {
             lookupString = ((Field) field).getName();
         }
@@ -123,7 +159,7 @@ public class DatabaseUtils {
             DasColumn column = (DasColumn) field;
             builder = builder.withTypeText(column.getDataType().typeName, true);
             if (column.getDbParent() != null && showSchema && column.getDbParent().getDbParent() != null) {
-                builder = builder.withTailText(" (" + column.getDbParent().getDbParent().getName() + "." + column.getDbParent().getName() + ")", true);
+                builder = builder.withTailText(" (" + column.getDbParent().getDbParent().getName() + "." + RemoveTablePrefix(column.getDbParent().getName(), project) + ")", true);
             }
             if (column instanceof DbColumnImpl)
                 builder = builder.withIcon(((DbColumnImpl) column).getIcon());
@@ -132,14 +168,30 @@ public class DatabaseUtils {
             DasTable table = (DasTable) field;
             DasObject tableSchema = table.getDbParent();
             if (tableSchema != null) {
-                if (tableSchema instanceof DbNamespaceImpl)
-                    builder = builder.withTypeText(((DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getParent()).getName(), true);
+                if (tableSchema instanceof DbNamespaceImpl) {
+                    DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getParent();
+                    if (dataSource != null) {
+                        builder = builder.withTypeText(dataSource.getName(), true);
+                    }
+                }
             }
             if (showSchema && tableSchema != null)
                 builder = builder.withTailText(" (" + table.getDbParent().getName() + ")", true);
-            if (table instanceof DbTableImpl)
-                builder = builder.withIcon(((DbTableImpl) table).getIcon());
+            if (table instanceof DbElement)
+                builder = builder.withIcon(((DbElement) table).getIcon());
+
+            builder = builder.withInsertHandler((insertionContext, lookupElement) -> {
+                if (Yii2SupportSettings.getInstance(project).insertWithTablePrefix) {
+                    Document document = insertionContext.getDocument();
+                    int insertPosition = insertionContext.getSelectionEndOffset();
+                    document.insertString(insertPosition - lookupElement.getLookupString().length(), "{{%");
+                    document.insertString(insertPosition + 3, "}}");
+                    insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition + 5);
+                }
+            });
         }
+
+
         return builder;
     }
 
@@ -154,17 +206,27 @@ public class DatabaseUtils {
                         PsiElement resolved = ((ClassConstantReference) (element).getChildren()[0]).resolve();
                         if (resolved != null && resolved instanceof ClassConstImpl) {
                             ClassConstImpl constant = (ClassConstImpl) resolved;
-                            if (constant.getChildren().length > 0)
-                                return ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();
+                            if (constant.getChildren().length > 0) {
+                                String table =  ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();
+                                return AddTablePrefix(table, false, phpClass.getProject());
+                            }
                         }
 
-                    } else if ((element).getChildren()[0] instanceof StringLiteralExpression)
-                        return clearTablePrefixTags((element).getChildren()[0].getText());
+                    } else if ((element).getChildren()[0] instanceof StringLiteralExpression) {
+                        String table = (element).getChildren()[0].getText();
+                        return AddTablePrefix(table, false, phpClass.getProject());
+                    }
                 }
             }
         }
-       String className = phpClass.getName();
-       return StringUtils.CamelToId(className);
+
+        String table = StringUtils.CamelToId(phpClass.getName());
+        if (method != null
+                && method.getContainingClass() != null
+                && method.getContainingClass().getFQN().equals("\\yii\\db\\ActiveRecord")) {
+            table = "{{%" + table + "}}";
+        }
+        return AddTablePrefix(table, false, phpClass.getProject());
     }
 
     public static String clearTablePrefixTags(String str) {
@@ -209,8 +271,8 @@ public class DatabaseUtils {
         table = ClassUtils.removeQuotes(table);
 
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
-                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
+                if (item instanceof DasTable && ((DasTable) item).getName().equals(table)) {
                    return true;
                 }
             }
@@ -219,6 +281,7 @@ public class DatabaseUtils {
     }
 
     public static ArrayList<String> getColumnsByTable(String table, Project project) {
+        String prefixedTable = AddTablePrefix(table, true, project);
 
         DbPsiFacade facade = DbPsiFacade.getInstance(project);
         List<DbDataSource> dataSources = facade.getDataSources();
@@ -226,12 +289,12 @@ public class DatabaseUtils {
         ArrayList<String> list = new ArrayList<>();
         if(table == null)
             return list;
-        table = ClassUtils.removeQuotes(table);
+        table = ClassUtils.removeQuotes(prefixedTable);
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
 
-                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
-                    TableInfo tableInfo = new TableInfo((DbTable) item);
+                if (item instanceof DasTable && ((DasTable) item).getName().equals(prefixedTable)) {
+                    TableInfo tableInfo = new TableInfo((DasTable) item);
                     for (DasColumn column : tableInfo.getColumns()) {
                         list.add(ClassUtils.removeQuotes(column.getName()));
                     }
@@ -274,10 +337,10 @@ public class DatabaseUtils {
         if (table == null)
             return result;
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().children(source.getModel().getCurrentRootNamespace())) {
+            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
                 table = ClassUtils.removeQuotes(table);
-                if (item instanceof DbTable && ((DbTable) item).getName().equals(table)) {
-                    TableInfo tableInfo = new TableInfo((DbTable) item);
+                if (item instanceof DasTable && ((DasTable) item).getName().equals(table)) {
+                    TableInfo tableInfo = new TableInfo((DasTable) item);
 
                     for (DasColumn column : tableInfo.getColumns()) {
                         boolean found = false;

@@ -1,16 +1,18 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.4.30.2</version>
+    <version>0.6.34.17</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
        <b>Plugin contains the following functionality</b><br/>
        <ul>
-       <li>render() methods for views</li>
+       <li>Suggests for render() methods</li>
        <li>i18n</li>
        <li>Configuration arrays for object instantiation</li>
        <li>ActiveQuery, Query and migrations (database connection is required)</li>
+       <li>Autocomplete in model's rules method</li>
+       <li>Calculates return type for Yii::createObject call and one/all method calls of ActiveRecord</li>
        </ul>
        <br/>
        Detailed information can be found in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a>
@@ -18,9 +20,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Complete attributes for <code>$form->field($model, ...)</code> & <code>Html::active*($model, ...)</code> methods</li>
-            <li>Completion for setters <code>$activeDataProvider->setSort([...])</code></li>
-            <li>Fix minor bugs</li>
+            <li>Fix table prefix for base Yii table name</li>
         </ul>
     ]]>
     </change-notes>
@@ -37,7 +37,21 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
 
+    <extensions defaultExtensionNs="com.jetbrains.php">
+        <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
+        <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.ActiveRecordTypeProvider"/>
+    </extensions>
+
     <extensions defaultExtensionNs="com.intellij">
+
+       <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
+
+        <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
+                                 displayName="Yii2 Support"
+                                 groupId="language"
+                                 id="Yii2Support.SettingsForm"
+                                 nonDefaultProject="true"
+                        />
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
@@ -95,8 +109,8 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissingActiveRecordInActiveQueryInspection"/>
 
-        <!-- Forms -->
-        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.forms.ActiveFormCompletionContributor"/>
+        <!-- Validation -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
 
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
@@ -106,5 +120,14 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
+
+    <!--
+    <project-components>
+        <component>
+            <implementation-class>com.nvlad.yii2support.utils.Yii2SupportSettings</implementation-class>
+        </component>
+
+    </project-components>
+    -->
 
 </idea-plugin>

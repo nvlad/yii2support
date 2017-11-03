@@ -28,6 +28,8 @@ public class ActiveFormCompletionContributor extends com.intellij.codeInsight.co
 
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                if (! (completionParameters.getPosition().getParent() instanceof PhpExpression))
+                    return;
                 PhpExpression position = (PhpExpression) completionParameters.getPosition().getParent();
                 MethodReference mRef = ClassUtils.getMethodRef(position, 3);
                 if (mRef == null)

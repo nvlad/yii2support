@@ -132,11 +132,12 @@ public class ObjectFactoryUtils {
                     MethodReference method = (MethodReference) methodRef;
                     if (method.getClassReference() != null) {
                         PhpExpression methodClass = method.getClassReference();
+                        if (! (methodClass instanceof ClassReference) )
+                            return null;
                         PhpClass callingClass = (PhpClass) ((ClassReference) methodClass).resolve();
                         if (callingClass != null && callingClass.getFQN().equals("\\yii\\grid\\GridView")) {
                             return ClassUtils.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\grid\\DataColumn");
                         }
-
                     }
                 }
 
@@ -148,6 +149,8 @@ public class ObjectFactoryUtils {
 
     @Nullable
     static PhpClass findClassByArrayCreation(ArrayCreationExpression arrayCreation, PsiDirectory dir) {
+        if (arrayCreation == null)
+            return null;
         PhpClass phpClass;
         phpClass = findClassByArray(arrayCreation);
         if (phpClass == null) {
@@ -266,5 +269,36 @@ public class ObjectFactoryUtils {
             case "db": return ClassUtils.getClass(phpIndex, "\\yii\\db\\Connection");
         }
         return null;
+    }
+
+    @Nullable
+    static ArrayCreationExpression getArrayCreationByVarRef(Variable value) {
+        ArrayCreationExpression arrayCreation;
+        PsiElement arrayDecl = value.resolve();
+        if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1 ) {
+            PsiElement psiElement = arrayDecl.getParent().getLastChild();
+            if (psiElement instanceof ArrayCreationExpression)
+                arrayCreation = (ArrayCreationExpression)psiElement;
+            else
+                return null;
+        } else
+            return null;
+        return arrayCreation;
+    }
+
+    @Nullable
+    static ArrayCreationExpression getArrayCreationByFieldRef(FieldReference value) {
+        ArrayCreationExpression arrayCreation = null;
+        PsiElement arrayDecl = null;
+        arrayDecl = value.resolve();
+        if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1 ) {
+            PsiElement psiElement = arrayDecl.getLastChild();
+            if (psiElement instanceof ArrayCreationExpression)
+                arrayCreation = (ArrayCreationExpression)psiElement;
+            else
+                return null;
+        } else
+            return null;
+        return arrayCreation;
     }
 }

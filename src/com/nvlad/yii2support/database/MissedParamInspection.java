@@ -1,10 +1,8 @@
 package com.nvlad.yii2support.database;
 
-import com.google.common.collect.Lists;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiErrorElement;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
@@ -41,6 +39,7 @@ public class MissedParamInspection extends PhpInspection {
 
                         String condition = ClassUtils.getStringByElement(element);
                         String[] conditionParams = DatabaseUtils.extractParamsFromCondition(condition);
+                        String[] conditionParamsWithoutColon = DatabaseUtils.extractParamsFromCondition(condition, false);
 
                         if (conditionParams.length > 0) {
                             if (reference.getParameters().length > paramParameterIndex) {
@@ -52,7 +51,7 @@ public class MissedParamInspection extends PhpInspection {
                                         if (elem.getKey() != null && elem.getKey().getText() != null)
                                             paramString.add(ClassUtils.removeQuotes(elem.getKey().getText()).trim());
                                     }
-                                    if (!Arrays.equals(paramString.toArray(), conditionParams)) {
+                                    if (!Arrays.equals(paramString.toArray(), conditionParams) && !Arrays.equals(paramString.toArray(), conditionParamsWithoutColon)) {
                                         MissedParamQuickFix qFix = new MissedParamQuickFix(reference);
                                         problemsHolder.registerProblem(reference.getParameters()[paramParameterIndex], "Condition parameters do not conform to the condition", qFix);
                                     }
