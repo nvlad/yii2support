@@ -5,15 +5,21 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
  * Created by oleg on 25.04.2017.
  */
 public class UrlUtils {
+    private static List<String> excludeControllers =  Arrays.asList(
+            "\\yii\\rest\\ActiveController",
+            "\\yii\\gii\\controllers\\DefaultController",
+            "\\yii\\rest\\Controller",
+            "\\yii\\debug\\controllers\\DefaultController",
+            "\\yii\\debug\\controllers\\UserController"
+    );
+
     private static Collection<PhpClass> getClassesByParent(String parentFqn, Project project) {
         Collection<PhpClass> subclasses = new ArrayList<>();
         Collection<PhpClass> directSubclasses = PhpIndex.getInstance(project).getDirectSubclasses(parentFqn);
@@ -33,7 +39,8 @@ public class UrlUtils {
         Collection<PhpClass> controllers = getControllers(project);
         HashMap<String, Method> routes = new HashMap<>();
         for (PhpClass controller: controllers) {
-            routes.putAll(controllerToRoutes(controller));
+            if (!excludeControllers.contains(controller.getFQN()))
+                routes.putAll(controllerToRoutes(controller));
         }
         return routes;
     }

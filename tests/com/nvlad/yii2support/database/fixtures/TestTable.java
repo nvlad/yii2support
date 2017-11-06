@@ -15,9 +15,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.JBIterable;
@@ -101,6 +103,11 @@ public class TestTable implements DbTable {
     @Override
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public boolean processChildren(PsiElementProcessor<PsiFileSystemItem> psiElementProcessor) {
+        return false;
     }
 
     @Override
@@ -226,7 +233,19 @@ public class TestTable implements DbTable {
     }
 
     @Override
-    public PsiElement getParent() {
+    public boolean isDirectory() {
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public PsiFileSystemItem getParent() {
+        return null;
+    }
+
+
+    @Override
+    public VirtualFile getVirtualFile() {
         return null;
     }
 
@@ -491,5 +510,10 @@ public class TestTable implements DbTable {
     @Override
     public Icon getIcon() {
         return null;
+    }
+
+    @Override
+    public void checkSetName(String s) throws IncorrectOperationException {
+
     }
 }

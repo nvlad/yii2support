@@ -42,7 +42,7 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
                              Method method = (Method)pair.getValue();
 
                              LookupElementBuilder builder = LookupElementBuilder.create(pair.getValue(), pair.getKey().toString());
-                             builder = builder.withTypeText("appName", true);
+                             builder = builder.withTypeText(method.getContainingClass().getFQN(), true);
                              completionResultSet.addElement(builder);
                              it.remove();
                          }

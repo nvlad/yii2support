@@ -10,9 +10,11 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.JBIterable;
@@ -26,6 +28,31 @@ import javax.swing.*;
  * Created by oleg on 03.04.2017.
  */
 public class TestNamespace implements DasObject, DbElement {
+    @Override
+    public boolean isDirectory() {
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public PsiFileSystemItem getParent() {
+        return null;
+    }
+
+    @Override
+    public VirtualFile getVirtualFile() {
+        return null;
+    }
+
+    @Override
+    public boolean processChildren(PsiElementProcessor<PsiFileSystemItem> psiElementProcessor) {
+        return false;
+    }
+
+    @Override
+    public void checkSetName(String s) throws IncorrectOperationException {
+
+    }
 
     @NotNull
     @Override
@@ -154,10 +181,6 @@ public class TestNamespace implements DasObject, DbElement {
         return new PsiElement[0];
     }
 
-    @Override
-    public PsiElement getParent() {
-        return null;
-    }
 
     @Override
     public PsiElement getFirstChild() {
