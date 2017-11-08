@@ -154,36 +154,40 @@ public class DatabaseUtils {
 
         if (field instanceof Field) {
             builder = builder.withTypeText(((Field) field).getType().toString())
-                    .withIcon(TypePresentationService.getService().getIcon(field));
+                    .withIcon(((Field) field).getIcon());
         }
         if (field instanceof PhpDocProperty) {
             builder = builder.withTypeText(((PhpDocProperty) field).getType().toString())
-                    .withIcon(TypePresentationService.getService().getIcon(field));
+                    .withIcon(((PhpDocProperty) field).getIcon());
         }
         if (field instanceof DasColumn) {
             DasColumn column = (DasColumn) field;
             builder = builder.withTypeText(column.getDataType().typeName, true);
-            if (column.getDasParent() != null && showSchema && column.getDasParent().getDasParent() != null) {
-                builder = builder.withTailText(" (" + column.getDasParent().getDasParent().getName() + "." + RemoveTablePrefix(column.getDasParent().getName(), project) + ")", true);
+            if (column.getDbParent() != null && showSchema && column.getDbParent().getDbParent() != null) {
+                builder = builder.withTailText(" (" + column.getDbParent().getDbParent().getName() + "." + RemoveTablePrefix(column.getDbParent().getName(), project) + ")", true);
             }
             if (column instanceof DasColumn)
                 builder = builder.withIcon(TypePresentationService.getService().getIcon(field));
+            if (column instanceof DbColumnImpl)
+                builder = builder.withIcon(((DbColumnImpl) column).getIcon());
         }
         if (field instanceof DasTable) {
             DasTable table = (DasTable) field;
-            DasObject tableSchema = table.getDasParent();
+            DasObject tableSchema = table.getDbParent();
             if (tableSchema != null) {
                 if (tableSchema instanceof DbNamespaceImpl) {
-                    DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getParent();
+                    DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getDbParent();
                     if (dataSource != null) {
                         builder = builder.withTypeText(dataSource.getName(), true);
                     }
                 }
             }
             if (showSchema && tableSchema != null)
-                builder = builder.withTailText(" (" + table.getDasParent().getName() + ")", true);
+                builder = builder.withTailText(" (" + table.getDbParent().getName() + ")", true);
             if (table instanceof DasTable)
                 builder = builder.withIcon(TypePresentationService.getService().getIcon(table));
+            if (table instanceof DbElement)
+                builder = builder.withIcon(((DbElement) table).getIcon());
 
             builder = builder.withInsertHandler((insertionContext, lookupElement) -> {
                 if (Yii2SupportSettings.getInstance(project).insertWithTablePrefix) {
