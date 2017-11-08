@@ -6,6 +6,7 @@ import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
 import com.intellij.database.model.basic.BasicTable;
 import com.intellij.database.psi.*;
+import com.intellij.ide.TypePresentationService;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -153,20 +154,24 @@ public class DatabaseUtils {
 
         if (field instanceof Field) {
             builder = builder.withTypeText(((Field) field).getType().toString())
-                    .withIcon(((Field) field).getIcon());
+                    .withIcon(TypePresentationService.getService().getIcon(field));
+        }
+        if (field instanceof PhpDocProperty) {
+            builder = builder.withTypeText(((PhpDocProperty) field).getType().toString())
+                    .withIcon(TypePresentationService.getService().getIcon(field));
         }
         if (field instanceof DasColumn) {
             DasColumn column = (DasColumn) field;
             builder = builder.withTypeText(column.getDataType().typeName, true);
-            if (column.getDbParent() != null && showSchema && column.getDbParent().getDbParent() != null) {
-                builder = builder.withTailText(" (" + column.getDbParent().getDbParent().getName() + "." + RemoveTablePrefix(column.getDbParent().getName(), project) + ")", true);
+            if (column.getDasParent() != null && showSchema && column.getDasParent().getDasParent() != null) {
+                builder = builder.withTailText(" (" + column.getDasParent().getDasParent().getName() + "." + RemoveTablePrefix(column.getDasParent().getName(), project) + ")", true);
             }
-            if (column instanceof DbColumnImpl)
-                builder = builder.withIcon(((DbColumnImpl) column).getIcon());
+            if (column instanceof DasColumn)
+                builder = builder.withIcon(TypePresentationService.getService().getIcon(field));
         }
         if (field instanceof DasTable) {
             DasTable table = (DasTable) field;
-            DasObject tableSchema = table.getDbParent();
+            DasObject tableSchema = table.getDasParent();
             if (tableSchema != null) {
                 if (tableSchema instanceof DbNamespaceImpl) {
                     DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getParent();
@@ -176,9 +181,9 @@ public class DatabaseUtils {
                 }
             }
             if (showSchema && tableSchema != null)
-                builder = builder.withTailText(" (" + table.getDbParent().getName() + ")", true);
-            if (table instanceof DbElement)
-                builder = builder.withIcon(((DbElement) table).getIcon());
+                builder = builder.withTailText(" (" + table.getDasParent().getName() + ")", true);
+            if (table instanceof DasTable)
+                builder = builder.withIcon(TypePresentationService.getService().getIcon(table));
 
             builder = builder.withInsertHandler((insertionContext, lookupElement) -> {
                 if (Yii2SupportSettings.getInstance(project).insertWithTablePrefix) {

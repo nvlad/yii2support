@@ -20,7 +20,9 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Fix table prefix for base Yii table name</li>
+            <li>PHPStorm 2017.3 Support</li>
+            <li>Postgres support</li>
+            <li>PHPStorm 2017.3 is a requirement</li>
         </ul>
     ]]>
     </change-notes>
