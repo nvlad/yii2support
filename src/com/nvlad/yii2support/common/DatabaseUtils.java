@@ -176,14 +176,19 @@ public class DatabaseUtils {
             DasObject tableSchema = table.getDbParent();
             if (tableSchema != null) {
                 if (tableSchema instanceof DbNamespaceImpl) {
-                    DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getDbParent();
-                    if (dataSource != null) {
-                        builder = builder.withTypeText(dataSource.getName(), true);
+                    Object dataSource = tableSchema.getDbParent();
+                   // DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getDbParent();
+                    if (dataSource != null && dataSource instanceof DbDataSourceImpl ) {
+                        builder = builder.withTypeText(((DbDataSourceImpl)dataSource).getName(), true);
+                    }
+                    if (dataSource != null && dataSource instanceof DbDataSourceImpl ) {
+                        builder = builder.withTypeText(((DbDataSourceImpl)dataSource).getName(), true);
                     }
                 }
             }
-            if (showSchema && tableSchema != null)
+            if (showSchema && tableSchema != null) {
                 builder = builder.withTailText(" (" + table.getDbParent().getName() + ")", true);
+            }
             if (table instanceof DasTable)
                 builder = builder.withIcon(TypePresentationService.getService().getIcon(table));
             if (table instanceof DbElement)
