@@ -1,9 +1,12 @@
 package com.nvlad.yii2support.url;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.nvlad.yii2support.common.StringUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -52,10 +55,23 @@ public class UrlUtils {
         for (Method method: methods ) {
             if (method.getName().length() > 6 && method.getName().substring(0, 6).equals("action") && Character.isUpperCase(method.getName().charAt(6))) {
                 String part2 = method.getName().replace("action", "");
-                part2 = part2.replaceAll("(?<=[\\p{Lower}\\p{Digit}])[\\p{Upper}]", "-$0").toLowerCase();
+                part1 = StringUtils.CamelToId(part1, "-");
+                part2 = StringUtils.CamelToId(part2, "-") ; // part2.replaceAll("(?<=[\\p{Lower}\\p{Digit}])[\\p{Upper}]", "-$0").toLowerCase();
                 routes.put(part1 + "/" +part2, method);
             }
         }
         return routes;
+    }
+
+    public static Parameter[] getParamsByUrl(String url, Project project) {
+        final HashMap<String, Method> routes = getRoutes(project);
+        if (routes.containsKey(url)) {
+            Method method = routes.get(url);
+            return method.getParameters();
+
+        }
+
+        return null;
+
     }
 }

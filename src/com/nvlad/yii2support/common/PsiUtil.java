@@ -3,7 +3,10 @@ package com.nvlad.yii2support.common;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Array;
 
 /**
  * Created by NVlad on 17.01.2017.
@@ -85,5 +88,19 @@ public class PsiUtil {
                 return i;
         }
         return -1;
+    }
+
+
+    public static ArrayCreationExpression getArrayCreation(PsiElement psiElement) {
+        int limit =10;
+        PsiElement curElement = psiElement;
+        while (limit > 0) {
+            if (curElement instanceof ArrayCreationExpression)
+                return (ArrayCreationExpression)curElement;
+            else
+                curElement = curElement.getParent();
+            limit--;
+        }
+        return null;
     }
 }
