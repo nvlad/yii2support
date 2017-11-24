@@ -6,6 +6,7 @@ import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
 import com.intellij.database.model.basic.BasicTable;
 import com.intellij.database.psi.*;
+import com.intellij.ide.TypePresentationService;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -155,12 +156,18 @@ public class DatabaseUtils {
             builder = builder.withTypeText(((Field) field).getType().toString())
                     .withIcon(((Field) field).getIcon());
         }
+        if (field instanceof PhpDocProperty) {
+            builder = builder.withTypeText(((PhpDocProperty) field).getType().toString())
+                    .withIcon(((PhpDocProperty) field).getIcon());
+        }
         if (field instanceof DasColumn) {
             DasColumn column = (DasColumn) field;
             builder = builder.withTypeText(column.getDataType().typeName, true);
             if (column.getDbParent() != null && showSchema && column.getDbParent().getDbParent() != null) {
                 builder = builder.withTailText(" (" + column.getDbParent().getDbParent().getName() + "." + RemoveTablePrefix(column.getDbParent().getName(), project) + ")", true);
             }
+            if (column instanceof DasColumn)
+                builder = builder.withIcon(TypePresentationService.getService().getIcon(field));
             if (column instanceof DbColumnImpl)
                 builder = builder.withIcon(((DbColumnImpl) column).getIcon());
         }
@@ -169,14 +176,21 @@ public class DatabaseUtils {
             DasObject tableSchema = table.getDbParent();
             if (tableSchema != null) {
                 if (tableSchema instanceof DbNamespaceImpl) {
-                    DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getParent();
-                    if (dataSource != null) {
-                        builder = builder.withTypeText(dataSource.getName(), true);
+                    Object dataSource = tableSchema.getDbParent();
+                   // DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getDbParent();
+                    if (dataSource != null && dataSource instanceof DbDataSourceImpl ) {
+                        builder = builder.withTypeText(((DbDataSourceImpl)dataSource).getName(), true);
+                    }
+                    if (dataSource != null && dataSource instanceof DbDataSourceImpl ) {
+                        builder = builder.withTypeText(((DbDataSourceImpl)dataSource).getName(), true);
                     }
                 }
             }
-            if (showSchema && tableSchema != null)
+            if (showSchema && tableSchema != null) {
                 builder = builder.withTailText(" (" + table.getDbParent().getName() + ")", true);
+            }
+            if (table instanceof DasTable)
+                builder = builder.withIcon(TypePresentationService.getService().getIcon(table));
             if (table instanceof DbElement)
                 builder = builder.withIcon(((DbElement) table).getIcon());
 

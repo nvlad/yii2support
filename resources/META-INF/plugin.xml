@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.6.34.17</version>
+    <version>0.6.34.18</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,7 +20,8 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Fix table prefix for base Yii table name</li>
+            <li>PHPStorm 2017.3 Support</li>
+            <li>PostgreSQL support</li>
         </ul>
     ]]>
     </change-notes>
