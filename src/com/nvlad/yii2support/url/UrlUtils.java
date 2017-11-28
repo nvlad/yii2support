@@ -49,7 +49,7 @@ public class UrlUtils {
     }
 
     private static HashMap<String, Method> controllerToRoutes(PhpClass controller) {
-        String part1 = controller.getName().replace("Controller", "").toLowerCase();
+        String part1 = controller.getName().replace("Controller", "");
         Collection<Method> methods = controller.getMethods();
         HashMap<String, Method> routes = new HashMap<>();
         for (Method method: methods ) {

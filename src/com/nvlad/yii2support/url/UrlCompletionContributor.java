@@ -95,11 +95,15 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
     @Nullable
     private MethodReference getMethodReference(PsiElement position) {
         MethodReference mRef = null;
-        if (position.getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
-            mRef = (MethodReference)position.getParent().getParent().getParent().getParent().getParent();
-        if (position.getParent().getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
-            mRef = (MethodReference)position.getParent().getParent().getParent().getParent().getParent().getParent();
-        return mRef;
+        try {
+            if (position.getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
+                mRef = (MethodReference) position.getParent().getParent().getParent().getParent().getParent();
+            if (position.getParent().getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
+                mRef = (MethodReference) position.getParent().getParent().getParent().getParent().getParent().getParent();
+            return mRef;
+        } catch (NullPointerException ex) {
+            return null;
+        }
     }
 
     @Override
