@@ -235,6 +235,8 @@ public class ObjectFactoryUtils {
                 Method constructor = phpClass.getConstructor();
 
                 PhpClass yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\BaseObject");
+                if (yiiObjectClass == null)
+                    yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\Object");
                 if (!ClassUtils.isClassInheritsOrEqual(phpClass, yiiObjectClass))
                     return null;
 
