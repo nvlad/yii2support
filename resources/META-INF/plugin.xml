@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.6.34.18</version>
+    <version>0.6.34.19</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,8 +20,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>PHPStorm 2017.3 Support</li>
-            <li>PostgreSQL support</li>
+            <li>Object class deprecated</li>
         </ul>
     ]]>
     </change-notes>
