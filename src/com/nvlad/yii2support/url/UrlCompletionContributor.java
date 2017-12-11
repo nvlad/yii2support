@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.MethodUtils;
 import com.nvlad.yii2support.common.PsiUtil;
+import com.nvlad.yii2support.common.UrlUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,18 +24,18 @@ import java.util.Map;
 /**
  * Created by oleg on 25.04.2017.
  */
-public class UrlCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor  {
+public class UrlCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     public UrlCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, ElementPattern(), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 PsiElement position = completionParameters.getPosition();
 
                 // url param
-                if ( PsiUtil.getSuperParent(position, 3) instanceof MethodReference) {
+                if (PsiUtil.getSuperParent(position, 3) instanceof MethodReference) {
                     MethodReference methodRef2 = (MethodReference) PsiUtil.getSuperParent(position, 3);
                     if (methodRef2 != null) {
-                        Method method = (Method)methodRef2.resolve();
+                        Method method = (Method) methodRef2.resolve();
                         if (method != null) {
                             int urlParamIndex = ClassUtils.getParamIndex(method, "url");
                             if (urlParamIndex > -1) {
@@ -45,67 +46,65 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
                             }
                         }
                     }
-
                 }
 
 
-                // Check Url::to
+                // Check check if array creation and it is in url/route param
                 boolean isInArray = position.getParent().getParent().getParent() instanceof ArrayHashElement
                         || position.getParent().getParent().getParent() instanceof ArrayCreationExpression;
                 MethodReference mRef = getMethodReference(position);
                 if (isInArray && mRef != null && mRef.getName() != null) {
                     boolean isUrlParam = false;
-                    Method method = (Method)mRef.resolve();
-                    if (method != null) {
-                        int urlParamIndex = ClassUtils.getParamIndex(method, "url");
-                        if (urlParamIndex > -1) {
-                            int index = MethodUtils.paramIndexByRef(position.getParent().getParent().getParent());
-                            if (index == -1)
-                                index = MethodUtils.paramIndexByRef(position.getParent().getParent().getParent().getParent());
-                            if (index == urlParamIndex) {
-                                isUrlParam = true;
+                    PsiElement calledParam = MethodUtils.findParamRefByElement(position);
+                    if (calledParam != null) {
+                        int paramIndexByRef = MethodUtils.paramIndexByRef(calledParam);
+                        Method method = (Method) mRef.resolve();
+                        if (method != null && paramIndexByRef > -1) {
+                            if (method.getParameters().length > paramIndexByRef) {
+                                Parameter parameter = method.getParameters()[paramIndexByRef];
+                                isUrlParam = parameter.getName().equals("url") || parameter.getName().equals("route");
                             }
                         }
                     }
 
-                     if (isUrlParam) {
-                         ArrayCreationExpression arrayCreationExpression = PsiUtil.getArrayCreation(position);
+                    if (isUrlParam) {
+                        ArrayCreationExpression arrayCreationExpression = PsiUtil.getArrayCreation(position);
 
-                         if (arrayCreationExpression != null) {
-                             int valueIndexInArray = PsiUtil.getValueIndexInArray(position.getParent().getParent(), arrayCreationExpression);
-                             if (valueIndexInArray == -1)
-                                 valueIndexInArray = PsiUtil.getValueIndexInArray(position.getParent().getParent().getParent(), arrayCreationExpression);
-                             if (valueIndexInArray == 0) {  // First array item, url
-                                 buildUrlCompletionList(completionResultSet, position);
-                             } else if (valueIndexInArray > 0) {  // Next array items, params
-                                 HashMap<String, String> usedParams = new HashMap<>();
-                                 for ( ArrayHashElement elem :arrayCreationExpression.getHashElements()) {
-                                     if (elem.getKey() != null)
+                        if (arrayCreationExpression != null) {
+                            int valueIndexInArray = PsiUtil.getValueIndexInArray(position.getParent().getParent(), arrayCreationExpression);
+                            if (valueIndexInArray == -1)
+                                valueIndexInArray = PsiUtil.getValueIndexInArray(position.getParent().getParent().getParent(), arrayCreationExpression);
+                            if (valueIndexInArray == 0) {  // First array item, url
+                                buildUrlCompletionList(completionResultSet, position);
+                            } else if (valueIndexInArray > 0) {  // Next array items, params
+                                HashMap<String, String> usedParams = new HashMap<>();
+                                for (ArrayHashElement elem : arrayCreationExpression.getHashElements()) {
+                                    if (elem.getKey() != null)
                                         usedParams.put(ClassUtils.removeQuotes(elem.getKey().getText()), elem.getKey().getText());
-                                 }
+                                }
 
-                                 PsiElement firstElement = arrayCreationExpression.getChildren()[0];
-                                 if (firstElement.getChildren().length > 0) {
-                                     PsiElement psiElement = firstElement.getChildren()[0];
-                                     if (psiElement instanceof StringLiteralExpression) {
-                                         String url = ((StringLiteralExpression)psiElement).getContents();
-                                         Parameter[] params = UrlUtils.getParamsByUrl(url, psiElement.getProject());
-                                         if (params != null) {
-                                             for (Parameter param : params) {
-                                                 if (!usedParams.containsKey(param.getName())) {
-                                                     LookupElementBuilder builder = LookupElementBuilder.create(param, param.getName());
-                                                     if (param.getType().isComplete())
-                                                         builder = builder.withTypeText(param.getType().toString(), true);
-                                                     completionResultSet.addElement(builder);
-                                                 }
-                                             }
-                                         }
-                                     }
-                                 }
-                             }
-                         }
+                                PsiElement firstElement = arrayCreationExpression.getChildren()[0];
+                                if (firstElement.getChildren().length > 0) {
+                                    PsiElement psiElement = firstElement.getChildren()[0];
+                                    if (psiElement instanceof StringLiteralExpression) {
+                                        String url = ((StringLiteralExpression) psiElement).getContents();
+                                        Parameter[] params = UrlUtils.getParamsByUrl(url, psiElement.getProject());
+                                        if (params != null) {
+                                            for (Parameter param : params) {
+                                                if (!usedParams.containsKey(param.getName())) {
+                                                    LookupElementBuilder builder = LookupElementBuilder.create(param, param.getName());
+                                                    if (param.getType().isComplete())
+                                                        builder = builder.withTypeText(param.getType().toString(), true);
+                                                    completionResultSet.addElement(builder);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-                     }
+                    }
                 }
             }
         });
@@ -151,7 +150,9 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
     private static ElementPattern<PsiElement> ElementPattern() {
         return
                 PlatformPatterns.or(
-                        PlatformPatterns.psiElement().withSuperParent(3, ArrayCreationExpression.class),
-                        PlatformPatterns.psiElement().withSuperParent(4, ArrayCreationExpression.class));
+                        PlatformPatterns.psiElement().withSuperParent(4, MethodReference.class),
+                        PlatformPatterns.psiElement().withSuperParent(5, MethodReference.class),
+                        PlatformPatterns.psiElement().withSuperParent(3, MethodReference.class)
+                        );
     }
 }

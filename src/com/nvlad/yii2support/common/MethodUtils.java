@@ -2,6 +2,8 @@ package com.nvlad.yii2support.common;
 
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.Parameter;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.PhpExpression;
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +31,24 @@ public class MethodUtils {
             }
         }
         return -1;
+    }
+
+    @Nullable
+    public static PsiElement findParamRefByElement(PsiElement element) {
+        int limit = 10;
+        PsiElement prevElement = element;
+        PsiElement currElement = element.getParent();
+        while (limit > 0) {
+            if (currElement instanceof ParameterList)
+                return prevElement;
+            else {
+                prevElement = currElement;
+                currElement = currElement.getParent();
+
+                limit--;
+            }
+        }
+        return null;
     }
 
     public static boolean isYiiCreateObjectMethod(PsiElement psiElement) {

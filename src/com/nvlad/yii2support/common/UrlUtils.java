@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.url;
+package com.nvlad.yii2support.common;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
