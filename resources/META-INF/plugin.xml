@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.6.34.19</version>
+    <version>0.7.35.1</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -13,6 +13,7 @@
        <li>ActiveQuery, Query and migrations (database connection is required)</li>
        <li>Autocomplete in model's rules method</li>
        <li>Calculates return type for Yii::createObject call and one/all method calls of ActiveRecord</li>
+       <li>Url autocomplete</li>
        </ul>
        <br/>
        Detailed information can be found in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a>
@@ -20,7 +21,7 @@
 
     <change-notes><![CDATA[
         <ul>
-            <li>Object class deprecated</li>
+            <li>Url autocomplete: Step 1, url/route parameter support.</li>
         </ul>
     ]]>
     </change-notes>
