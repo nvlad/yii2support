@@ -3,10 +3,7 @@ package com.nvlad.yii2support.common;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.Array;
 
 /**
  * Created by NVlad on 17.01.2017.
@@ -58,23 +55,24 @@ public class PsiUtil {
     }
 
     @Nullable
-    public static PsiElement getSuperParent(PsiElement elem, int level) {
-        for (int i =0; i < level; i++) {
-            if (elem.getParent() == null)
+    public static PsiElement getSuperParent(PsiElement element, int level) {
+        for (int i = 0; i < level; i++) {
+            if (element.getParent() == null) {
                 return null;
-            else
-                elem = elem.getParent();
+            } else {
+                element = element.getParent();
+            }
         }
-        return elem;
+        return element;
     }
 
     @Nullable
-    public static PsiElement getSuperParent(PsiElement elem, Class cls, int maxDepth) {
-        PsiElement parent = elem.getParent();
+    public static PsiElement getSuperParent(PsiElement element, Class clazz, int maxDepth) {
+        PsiElement parent = element.getParent();
         while (maxDepth > 0) {
-            if (cls.isInstance(parent))
+            if (clazz.isInstance(parent)) {
                 return parent;
-            else {
+            } else {
                 parent = parent.getParent();
                 maxDepth--;
             }
@@ -84,21 +82,23 @@ public class PsiUtil {
 
     public static int getValueIndexInArray(PsiElement arrayValue, ArrayCreationExpression array) {
         for (int i = 0; i < array.getChildren().length; i++) {
-            if (array.getChildren()[i] == arrayValue)
+            if (array.getChildren()[i] == arrayValue) {
                 return i;
+            }
         }
         return -1;
     }
 
 
-    public static ArrayCreationExpression getArrayCreation(PsiElement psiElement) {
-        int limit =10;
-        PsiElement curElement = psiElement;
+    public static ArrayCreationExpression getArrayCreation(PsiElement element) {
+        int limit = 10;
+        PsiElement curElement = element;
         while (limit > 0) {
-            if (curElement instanceof ArrayCreationExpression)
-                return (ArrayCreationExpression)curElement;
-            else
+            if (curElement instanceof ArrayCreationExpression) {
+                return (ArrayCreationExpression) curElement;
+            } else {
                 curElement = curElement.getParent();
+            }
             limit--;
         }
         return null;
