@@ -112,7 +112,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         Collection<Method> methods = phpClass.getMethods();
         for (Method method : methods) {
             if (method.getName().startsWith("validate") && method.getName().length() > "validate".length()) {
-                validators.put(method.getName().replace("validate", "").toLowerCase(), method);
+                validators.put(method.getName(), method);
             }
         }
         return validators;
