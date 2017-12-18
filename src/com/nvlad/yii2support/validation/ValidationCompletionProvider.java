@@ -170,7 +170,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
     @NotNull
     private LookupElementBuilder buildLookup(Method method, PhpExpression position) {
-        String lookupString = method.getName().replace("validate", "").toLowerCase();
+        String lookupString = method.getName().toLowerCase();
         LookupElementBuilder builder = LookupElementBuilder.create(method, lookupString).withIcon(method.getIcon())
                 .withInsertHandler((insertionContext, lookupElement) -> {
                 });
