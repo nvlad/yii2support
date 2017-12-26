@@ -34,12 +34,16 @@ public class FieldAttributesCompletionProvider extends CompletionProvider<Comple
                 if (method.getParameters()[paramPosition].getName().equals("attribute") &&
                         method.getParameters()[paramPosition - 1].getName().equals("model")) {
                     PsiElement element = methodRef.getParameters()[paramPosition - 1];
-                    if (element instanceof PhpClass && ClassUtils.isClassInherit((PhpClass)element, "yii\\base\\Model", PhpIndex.getInstance(position.getProject()) )) {
-                        Collection<Field> classFields = ClassUtils.getClassFields((PhpClass) element);
-                        PhpExpression position2 = (PhpExpression) completionParameters.getPosition().getParent();
-                        for (Field field : classFields) {
-                            LookupElementBuilder lookupBuilder = buildLookup(field, position2);
-                            completionResultSet.addElement(lookupBuilder);
+                    if (element instanceof Variable) {
+                        PhpClass classByVariable = ClassUtils.getClassByVariable((Variable) element);
+                        if (classByVariable != null &&
+                                ClassUtils.isClassInherit(classByVariable, "yii\\base\\Model", PhpIndex.getInstance(position.getProject()) )) {
+                            Collection<Field> classFields = ClassUtils.getClassFields(classByVariable);
+                            PhpExpression position2 = (PhpExpression) completionParameters.getPosition().getParent();
+                            for (Field field : classFields) {
+                                LookupElementBuilder lookupBuilder = buildLookup(field, position2);
+                                completionResultSet.addElement(lookupBuilder);
+                            }
                         }
                     }
 

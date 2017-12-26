@@ -16,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by NVlad on 11.01.2017.
@@ -429,5 +431,22 @@ public class ClassUtils {
         return null;
     }
 
-
+    @Nullable
+    public static PhpClass getClassByVariable(Variable element) {
+        if (element == null)
+            return null;
+        PhpType type = element.getType();
+        String typeString = type.toString();
+        String[] split = typeString.split("\\|");
+        typeString = split[0];
+        Pattern pattern = Pattern.compile("\\\\[A-Za-z\\\\]+");
+        Matcher matcher = pattern.matcher(typeString);
+        if (matcher.find())
+            typeString = matcher.group();
+        Collection<PhpClass> anyByFQN = PhpIndex.getInstance(element.getProject()).getAnyByFQN(typeString);
+        if (anyByFQN.isEmpty())
+            return null;
+        else
+            return anyByFQN.iterator().next();
+    }
 }

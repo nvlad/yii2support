@@ -5,6 +5,7 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.nvlad.yii2support.database.ParamsCompletionProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,7 @@ public class FieldAttributesCompletionContributor extends com.intellij.codeInsig
 
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-        if ((typeChar == '\'' || typeChar == '"') && position.getParent() instanceof ArrayCreationExpression) {
+        if ((typeChar == '\'' || typeChar == '"') && position.getParent() instanceof MethodReference) {
             return true;
         }
 
