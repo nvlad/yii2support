@@ -7,6 +7,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.StringUtils;
+import com.nvlad.yii2support.services.GlobalCache;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -39,12 +40,15 @@ public class UrlUtils {
     }
 
     public static HashMap<String, Method> getRoutes(Project project) {
+        if (GlobalCache.getInstance(project).contains("url.routes"))
+            return (HashMap<String, Method>)GlobalCache.getInstance(project).getValue("url.routes");
         Collection<PhpClass> controllers = getControllers(project);
         HashMap<String, Method> routes = new HashMap<>();
         for (PhpClass controller: controllers) {
             if (!excludeControllers.contains(controller.getFQN()))
                 routes.putAll(controllerToRoutes(controller));
         }
+        GlobalCache.getInstance(project).set("url.routes", routes);
         return routes;
     }
 

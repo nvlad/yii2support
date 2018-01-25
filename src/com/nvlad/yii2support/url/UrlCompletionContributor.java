@@ -14,6 +14,7 @@ import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.MethodUtils;
 import com.nvlad.yii2support.common.PsiUtil;
 import com.nvlad.yii2support.common.UrlUtils;
+import com.nvlad.yii2support.services.GlobalCache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,6 +99,7 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
                                                     completionResultSet.addElement(builder);
                                                 }
                                             }
+
                                         }
                                     }
                                 }
@@ -122,6 +124,7 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
             completionResultSet.addElement(builder);
             it.remove();
         }
+        GlobalCache.getInstance(position.getProject()).set("test", completionResultSet);
     }
 
     @Nullable

@@ -45,6 +45,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
+        <projectService serviceInterface="com.nvlad.yii2support.services.GlobalCache" serviceImplementation="com.nvlad.yii2support.services.GlobalCache"/>
        <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
 
         <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
