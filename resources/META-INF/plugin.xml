@@ -118,7 +118,8 @@
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/>
-        <!--  <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/> -->
+      <!--  <renamePsiElementProcessor implementation="com.nvlad.yii2support.url.UrlRenameProcessor"/>  -->
+
 
     </extensions>
 

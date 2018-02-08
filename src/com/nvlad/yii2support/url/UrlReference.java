@@ -3,6 +3,7 @@ package com.nvlad.yii2support.url;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
+import com.intellij.util.IncorrectOperationException;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -23,23 +24,19 @@ public class UrlReference extends PsiReferenceBase<PsiElement> {
         super(element);
     }
 
+
+    @Override
+    public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+        return super.handleElementRename(newElementName);
+    }
+
     @Nullable
     @Override
     public PsiElement resolve() {
-
         if (myElement instanceof StringLiteralExpression) {
             HashMap<String, Method> routes = UrlUtils.getRoutes(myElement.getProject());
             Method method = routes.get(((StringLiteralExpression) myElement).getContents());
             return method;
-
-            /*
-            PhpClass phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
-
-            if (phpClass != null) {
-                PsiElement field = ClassUtils.findWritableField(phpClass, myElement.getText());
-                return field;
-            }
-            */
         }
         return null;
     }
@@ -49,4 +46,5 @@ public class UrlReference extends PsiReferenceBase<PsiElement> {
     public Object[] getVariants() {
         return new Object[0];
     }
+
 }
