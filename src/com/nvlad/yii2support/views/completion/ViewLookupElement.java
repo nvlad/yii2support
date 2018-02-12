@@ -39,6 +39,20 @@ class ViewLookupElement extends LookupElement {
         }
     }
 
+    ViewLookupElement(PsiFile psiFile, String insertText) {
+        myFile = psiFile;
+        VirtualFile file = psiFile.getVirtualFile();
+
+        final String ext = file.getExtension();
+        if (ext != null && ext.equals("php") && insertText.endsWith(".php")) {
+            myTail = "." + file.getExtension();
+            myName = insertText.substring(0, insertText.length() - 4);
+        } else {
+            myTail = null;
+            myName = insertText;
+        }
+    }
+
     @NotNull
     @Override
     public String getLookupString() {
@@ -57,54 +71,54 @@ class ViewLookupElement extends LookupElement {
         presentation.setTypeGrayed(true);
     }
 
-    @Override
-    public void handleInsert(InsertionContext context) {
-        PsiElement element = context.getFile().getViewProvider().findElementAt(context.getSelectionEndOffset());
-        element = PsiTreeUtil.getParentOfType(element, StringLiteralExpression.class);
-        if (element == null) {
-            return;
-        }
-
-        String value = ((StringLiteralExpression) element).getContents();
-        if (value.contains("/")) {
-            value = value.substring(value.lastIndexOf('/') + 1);
-        }
-        if (!myName.equals(value)) {
-            String filename = myFile.getName();
-            if (!filename.equals(value)) {
-                return;
-            }
-        }
-
-        MethodReference reference = PsiTreeUtil.getParentOfType(element, MethodReference.class);
-        if (reference != null) {
-            reference.putUserData(ViewsUtil.RENDER_VIEW, ((StringLiteralExpression) element).getContents());
-            reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, myFile);
-        }
-
-        ArrayList<String> params = ViewsUtil.getViewVariables(myFile);
-        if (params.size() > 0) {
-            ParameterList parameterList = (ParameterList) element.getParent();
-            if (parameterList.getParameters().length == 1) {
-                Project project = context.getProject();
-                Template template = TemplateManager.getInstance(project).createTemplate("", "");
-                template.addTextSegment(", [");
-                boolean addComma = false;
-                for (String param : params) {
-                    String variableName = "$" + param.toUpperCase() + "$";
-                    if (addComma) {
-                        template.addTextSegment(", ");
-                    }
-                    template.addTextSegment("'" + param + "' => ");
-                    template.addVariable(variableName, "", "\"$" + param + "\"", true);
-                    template.addVariableSegment(variableName);
-                    addComma = true;
-                }
-                template.addTextSegment("]");
-                int offset = parameterList.getParameters()[0].getTextRange().getEndOffset();
-                context.getEditor().getCaretModel().moveToOffset(offset);
-                TemplateManager.getInstance(project).startTemplate(context.getEditor(), template);
-            }
-        }
-    }
+//    @Override
+//    public void handleInsert(InsertionContext context) {
+//        PsiElement element = context.getFile().getViewProvider().findElementAt(context.getSelectionEndOffset());
+//        element = PsiTreeUtil.getParentOfType(element, StringLiteralExpression.class);
+//        if (element == null) {
+//            return;
+//        }
+//
+//        String value = ((StringLiteralExpression) element).getContents();
+//        if (value.contains("/")) {
+//            value = value.substring(value.lastIndexOf('/') + 1);
+//        }
+//        if (!myName.equals(value)) {
+//            String filename = myFile.getName();
+//            if (!filename.equals(value)) {
+//                return;
+//            }
+//        }
+//
+//        MethodReference reference = PsiTreeUtil.getParentOfType(element, MethodReference.class);
+//        if (reference != null) {
+//            reference.putUserData(ViewsUtil.RENDER_VIEW, ((StringLiteralExpression) element).getContents());
+//            reference.putUserData(ViewsUtil.RENDER_VIEW_FILE, myFile);
+//        }
+//
+//        ArrayList<String> params = ViewsUtil.getViewVariables(myFile);
+//        if (params.size() > 0) {
+//            ParameterList parameterList = (ParameterList) element.getParent();
+//            if (parameterList.getParameters().length == 1) {
+//                Project project = context.getProject();
+//                Template template = TemplateManager.getInstance(project).createTemplate("", "");
+//                template.addTextSegment(", [");
+//                boolean addComma = false;
+//                for (String param : params) {
+//                    String variableName = "$" + param.toUpperCase() + "$";
+//                    if (addComma) {
+//                        template.addTextSegment(", ");
+//                    }
+//                    template.addTextSegment("'" + param + "' => ");
+//                    template.addVariable(variableName, "", "\"$" + param + "\"", true);
+//                    template.addVariableSegment(variableName);
+//                    addComma = true;
+//                }
+//                template.addTextSegment("]");
+//                int offset = parameterList.getParameters()[0].getTextRange().getEndOffset();
+//                context.getEditor().getCaretModel().moveToOffset(offset);
+//                TemplateManager.getInstance(project).startTemplate(context.getEditor(), template);
+//            }
+//        }
+//    }
 }

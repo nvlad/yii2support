@@ -73,6 +73,8 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.UnusedParameterInspection"/>
 
+        <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex"/>
+
         <!-- Object Factory -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
@@ -117,7 +119,6 @@
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
       <!--  <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/> -->
-
     </extensions>
 
     <actions>

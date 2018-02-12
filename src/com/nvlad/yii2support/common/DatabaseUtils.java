@@ -4,7 +4,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
-import com.intellij.database.model.basic.BasicTable;
 import com.intellij.database.psi.*;
 import com.intellij.ide.TypePresentationService;
 import com.intellij.openapi.editor.Document;

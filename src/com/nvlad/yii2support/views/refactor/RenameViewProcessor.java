@@ -6,10 +6,12 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.refactoring.listeners.RefactoringElementListener;
 import com.intellij.refactoring.rename.RenamePsiElementProcessor;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.nvlad.yii2support.views.index.ViewFileIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +61,9 @@ public class RenameViewProcessor extends RenamePsiElementProcessor {
     @Override
     public Runnable getPostRenameCallback(PsiElement psiElement, String s, RefactoringElementListener refactoringElementListener) {
         return () -> {
+//            final Project project = psiElement.getProject();
+            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
+
             for (PsiElement render : renders) {
                 StringLiteralExpression element = (StringLiteralExpression) ((ParameterList) render).getParameters()[0];
                 final PsiElement parent = element.getParent();
