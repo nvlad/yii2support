@@ -2,7 +2,6 @@ package com.nvlad.yii2support.views.completion;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -13,13 +12,13 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
 import com.nvlad.yii2support.views.index.ViewInfo;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -57,11 +56,16 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         }
 
         final Project project = psiElement.getProject();
+        final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
-        final Collection<String> keys = fileBasedIndex.getAllKeys(ViewFileIndex.identity, project);
+        final Collection<String> keys = new ArrayList<>();
+        fileBasedIndex.processAllKeys(ViewFileIndex.identity, key -> {
+            keys.add(key);
+            return true;
+        }, scope, null);
         keys.removeIf(s -> !s.startsWith(prefix));
 
-        final String prefixMatcherPrefix = completionResultSet.getPrefixMatcher().getPrefix();
+//        final String prefixMatcherPrefix = completionResultSet.getPrefixMatcher().getPrefix();
         if (!completionParameters.isAutoPopup()) {
             completionResultSet = completionResultSet.withPrefixMatcher("");
         }
@@ -72,9 +76,9 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
 
         PsiManager psiManager = PsiManager.getInstance(project);
         for (String key : keys) {
-            Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
+            Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, scope);
             for (ViewInfo view : views) {
-                PsiFile psiFile = psiManager.findFile(view.virtualFile);
+                PsiFile psiFile = psiManager.findFile(view.getVirtualFile());
                 if (psiFile != null) {
                     String insertText = key.substring(prefixLength);
                     completionResultSet.addElement(new ViewLookupElement(psiFile, insertText));
@@ -123,14 +127,14 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
 //            }
 //        }
     }
-
-    @NotNull
-    private String getValue(PsiElement expression) {
-        if (expression instanceof StringLiteralExpression) {
-            String value = ((StringLiteralExpression) expression).getContents();
-            return value.substring(0, value.indexOf("IntellijIdeaRulezzz "));
-        }
-
-        return "";
-    }
+//
+//    @NotNull
+//    private String getValue(PsiElement expression) {
+//        if (expression instanceof StringLiteralExpression) {
+//            String value = ((StringLiteralExpression) expression).getContents();
+//            return value.substring(0, value.indexOf("IntellijIdeaRulezzz "));
+//        }
+//
+//        return "";
+//    }
 }
