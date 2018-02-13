@@ -36,6 +36,9 @@ public class ViewUtil {
     @Nullable
     public static String getViewPrefix(PsiElement element) {
         String result = getValue(element);
+        if (result.startsWith("//")) {
+            return "@app/views" + result.substring(1);
+        }
         if (result.startsWith("/")) {
             return "@app" + result;
         }
