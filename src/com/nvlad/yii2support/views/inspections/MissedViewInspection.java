@@ -72,13 +72,15 @@ final public class MissedViewInspection extends PhpInspection {
                             }
                         }
 
-                        String path = ((StringLiteralExpression) pathParameter).getContents();
-                        final String errorViewNotFoundTemplate = "View file for \"%name%\" not found.";
-                        final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(path);
-                        final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", path);
-                        final PsiElement stringPart = pathParameter.findElementAt(1);
-                        if (stringPart != null) {
-                            problemsHolder.registerProblem(stringPart, descriptionTemplate, quickFix);
+                        if (pathParameter instanceof StringLiteralExpression) {
+                            String path = ((StringLiteralExpression) pathParameter).getContents();
+                            final String errorViewNotFoundTemplate = "View file for \"%name%\" not found.";
+                            final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(path);
+                            final String descriptionTemplate = errorViewNotFoundTemplate.replace("%name%", path);
+                            final PsiElement stringPart = pathParameter.findElementAt(1);
+                            if (stringPart != null) {
+                                problemsHolder.registerProblem(stringPart, descriptionTemplate, quickFix);
+                            }
                         }
                     }
                 }
