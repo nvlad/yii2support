@@ -1,22 +1,10 @@
 package com.nvlad.yii2support.views.completion;
 
-import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
-import com.intellij.codeInsight.template.Template;
-import com.intellij.codeInsight.template.TemplateManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.nvlad.yii2support.views.ViewsUtil;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 
 /**
  * Created by NVlad on 28.12.2016.
@@ -26,30 +14,29 @@ class ViewLookupElement extends LookupElement {
     final private String myName;
     final private String myTail;
 
-    ViewLookupElement(PsiFile psiFile) {
-        myFile = psiFile;
-        VirtualFile file = psiFile.getVirtualFile();
-
-        if (file.getNameWithoutExtension().contains(".")) {
-            myName = file.getName();
-            myTail = null;
-        } else {
-            myName = file.getNameWithoutExtension();
-            myTail = "." + file.getExtension();
-        }
-    }
+//    ViewLookupElement(PsiFile psiFile) {
+//        myFile = psiFile;
+//        VirtualFile file = psiFile.getVirtualFile();
+//
+//        if (file.getNameWithoutExtension().contains(".")) {
+//            myName = file.getName();
+//            myTail = null;
+//        } else {
+//            myName = file.getNameWithoutExtension();
+//            myTail = "." + file.getExtension();
+//        }
+//    }
 
     ViewLookupElement(PsiFile psiFile, String insertText) {
         myFile = psiFile;
         VirtualFile file = psiFile.getVirtualFile();
 
+        myName = insertText;
         final String ext = file.getExtension();
-        if (ext != null && ext.equals("php") && insertText.endsWith(".php")) {
+        if (ext != null && ext.equals("php") && !insertText.endsWith(".php")) {
             myTail = "." + file.getExtension();
-            myName = insertText.substring(0, insertText.length() - 4);
         } else {
             myTail = null;
-            myName = insertText;
         }
     }
 

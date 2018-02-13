@@ -18,8 +18,8 @@ import com.nvlad.yii2support.views.index.ViewFileIndex;
 import com.nvlad.yii2support.views.index.ViewInfo;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Created by NVlad on 27.12.2016.
@@ -58,7 +58,7 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         final Project project = psiElement.getProject();
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
-        final Collection<String> keys = new ArrayList<>();
+        final Collection<String> keys = new HashSet<>();
         fileBasedIndex.processAllKeys(ViewFileIndex.identity, key -> {
             keys.add(key);
             return true;

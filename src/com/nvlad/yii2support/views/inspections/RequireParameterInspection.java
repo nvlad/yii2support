@@ -54,50 +54,50 @@ public class RequireParameterInspection extends PhpInspection {
                     return;
                 }
 
-                final ArrayList<String> viewParameters = ViewsUtil.getViewVariables(file);
-                if (viewParameters.size() > 0) {
-                    final Collection<String> existKeys;
-                    if (parameters.length > 1) {
-                        if (parameters[1] instanceof ArrayCreationExpression) {
-                            existKeys = PhpUtil.getArrayKeys((ArrayCreationExpression) parameters[1]);
-                        } else if (parameters[1] instanceof FunctionReference) {
-                            FunctionReference function = (FunctionReference) parameters[1];
-                            if (function.getName() != null && function.getName().equals("compact")) {
-                                existKeys = new HashSet<>();
-                                for (PsiElement element : function.getParameters()) {
-                                    if (element instanceof StringLiteralExpression) {
-                                        existKeys.add(((StringLiteralExpression) element).getContents());
-                                    }
-                                }
-                            } else {
-                                return;
-                            }
-                        } else {
-                            return;
-                        }
-                    } else {
-                        existKeys = new HashSet<>();
-                    }
-
-                    if (existKeys.size() == 0 && isOnTheFly) {
-                        String errorRequireParameters = "View %view% require parameters.";
-                        RequireParameterLocalQuickFix fix = new RequireParameterLocalQuickFix(viewParameters);
-                        problemsHolder.registerProblem(reference, errorRequireParameters.replace("%view%", parameters[0].getText()), fix);
-                        return;
-                    }
-
-                    viewParameters.removeIf(existKeys::contains);
-                    if (viewParameters.size() > 0) {
-                        String errorRequireParameter = "View %view% require %parameter% parameter";
-                        for (String parameter : viewParameters) {
-                            RequireParameterLocalQuickFix fix = new RequireParameterLocalQuickFix(viewParameters);
-                            String description = errorRequireParameter
-                                    .replace("%view%", parameters[0].getText())
-                                    .replace("%parameter%", parameter);
-                            problemsHolder.registerProblem(reference, description, fix);
-                        }
-                    }
-                }
+//                final ArrayList<String> viewParameters = ViewsUtil.getViewVariables(file);
+//                if (viewParameters.size() > 0) {
+//                    final Collection<String> existKeys;
+//                    if (parameters.length > 1) {
+//                        if (parameters[1] instanceof ArrayCreationExpression) {
+//                            existKeys = PhpUtil.getArrayKeys((ArrayCreationExpression) parameters[1]);
+//                        } else if (parameters[1] instanceof FunctionReference) {
+//                            FunctionReference function = (FunctionReference) parameters[1];
+//                            if (function.getName() != null && function.getName().equals("compact")) {
+//                                existKeys = new HashSet<>();
+//                                for (PsiElement element : function.getParameters()) {
+//                                    if (element instanceof StringLiteralExpression) {
+//                                        existKeys.add(((StringLiteralExpression) element).getContents());
+//                                    }
+//                                }
+//                            } else {
+//                                return;
+//                            }
+//                        } else {
+//                            return;
+//                        }
+//                    } else {
+//                        existKeys = new HashSet<>();
+//                    }
+//
+//                    if (existKeys.size() == 0 && isOnTheFly) {
+//                        String errorRequireParameters = "View %view% require parameters.";
+//                        RequireParameterLocalQuickFix fix = new RequireParameterLocalQuickFix(viewParameters);
+//                        problemsHolder.registerProblem(reference, errorRequireParameters.replace("%view%", parameters[0].getText()), fix);
+//                        return;
+//                    }
+//
+//                    viewParameters.removeIf(existKeys::contains);
+//                    if (viewParameters.size() > 0) {
+//                        String errorRequireParameter = "View %view% require %parameter% parameter";
+//                        for (String parameter : viewParameters) {
+//                            RequireParameterLocalQuickFix fix = new RequireParameterLocalQuickFix(viewParameters);
+//                            String description = errorRequireParameter
+//                                    .replace("%view%", parameters[0].getText())
+//                                    .replace("%parameter%", parameter);
+//                            problemsHolder.registerProblem(reference, description, fix);
+//                        }
+//                    }
+//                }
             }
         };
     }

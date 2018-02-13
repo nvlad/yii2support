@@ -10,19 +10,20 @@ import com.nvlad.yii2support.common.PsiUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by NVlad on 16.01.2017.
  */
 class UnusedParametersLocalQuickFix implements LocalQuickFix {
-    private HashSet<String> myUnusedParams;
+    private Collection<String> myUnusedParams;
 
     UnusedParametersLocalQuickFix() {
     }
 
-    UnusedParametersLocalQuickFix(HashSet<String> unusedParams) {
+    UnusedParametersLocalQuickFix(Collection<String> unusedParams) {
         myUnusedParams = unusedParams;
     }
 
@@ -48,9 +49,10 @@ class UnusedParametersLocalQuickFix implements LocalQuickFix {
         }
 
         if (myUnusedParams != null) {
-            final ArrayList<PsiElement> unused = new ArrayList<>();
+            final Set<PsiElement> unused = new HashSet<>();
             if (viewParameters instanceof ArrayCreationExpression) {
-                for (ArrayHashElement element : ((ArrayCreationExpression) viewParameters).getHashElements()) {
+                final ArrayCreationExpression params = (ArrayCreationExpression) viewParameters;
+                for (ArrayHashElement element : params.getHashElements()) {
                     if (element.getKey() != null) {
                         final String key = ((StringLiteralExpression) element.getKey()).getContents();
                         if (myUnusedParams.contains(key)) {
@@ -60,6 +62,14 @@ class UnusedParametersLocalQuickFix implements LocalQuickFix {
                 }
                 for (PsiElement element : unused) {
                     PsiUtil.deleteArrayElement(element);
+                }
+
+                if (!params.getHashElements().iterator().hasNext()) {
+                    if (params.getPrevSibling() instanceof PsiWhiteSpace) {
+                        params.getPrevSibling().delete();
+                    }
+                    params.getPrevSibling().delete();
+                    params.delete();
                 }
             }
             if (viewParameters instanceof FunctionReference) {

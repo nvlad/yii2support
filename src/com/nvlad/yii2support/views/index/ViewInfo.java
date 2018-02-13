@@ -4,12 +4,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.indexing.FileContent;
 
-import java.util.List;
+import java.util.Collection;
 
 public class ViewInfo {
     public String fileUrl;
     public String namespace;
-    public List<String> parameters;
+    public Collection<String> parameters;
     private VirtualFile myVirtualFile;
 
     public ViewInfo() {

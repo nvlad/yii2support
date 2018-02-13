@@ -9,7 +9,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
-import gnu.trove.THashMap;
+import com.nvlad.yii2support.views.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInput;
@@ -60,7 +60,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 5;
+        return 8;
     }
 
     @NotNull
@@ -118,13 +118,16 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                     }
                     path = viewPath;
                 }
+                if (inputData.getFile().getExtension() != null) {
+                    path = path.substring(0, path.length() - inputData.getFile().getExtension().length() - 1);
+                }
 
                 System.out.println("ViewDataIndexer.map > " + absolutePath + " => " + path);
 
-                Map<String, ViewInfo> map = new THashMap<>();
+                Map<String, ViewInfo> map = new HashMap<>();
                 ViewInfo viewInfo = new ViewInfo(inputData);
                 viewInfo.namespace = "basic";
-                viewInfo.parameters = new ArrayList<>();
+                viewInfo.parameters = ViewUtil.getPhpViewVariables(inputData.getPsiFile());
 
                 map.put(path, viewInfo);
                 return map;
