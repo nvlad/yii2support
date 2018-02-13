@@ -40,7 +40,7 @@ public class ViewUtil {
             return "@app/views" + result.substring(1);
         }
         if (result.startsWith("/")) {
-            return "@app" + result;
+            return "@app/views" + result;
         }
         if (result.startsWith("@app/")) {
             return result;
