@@ -1,11 +1,14 @@
 package com.nvlad.yii2support.views;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,9 +53,13 @@ public class ViewUtil {
         if (method == null || method.getClassReference() == null) {
             return null;
         }
-        String className = method.getClassReference().getType().toStringResolved().replace('\\', '/');
-        if (className.endsWith("Controller")) {
-            String path = StringUtils.CamelToId(className.substring(className.indexOf("/controllers/") + 12, className.length() - 10), "-");
+
+        Project project = element.getProject();
+        PhpIndex phpIndex = PhpIndex.getInstance(project);
+        PhpClass clazz = ClassUtils.getPhpClassByCallChain(method);
+        if (ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Controller", phpIndex)) {
+            final String className = method.getClassReference().getType().toStringResolved().replace('\\', '/');
+            final String path = StringUtils.CamelToId(className.substring(className.indexOf("/controllers/") + 12, className.length() - 10), "-");
             return "@app/views" + normalizePath(path + '/' + result);
         }
 
