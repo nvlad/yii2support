@@ -12,6 +12,7 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.nvlad.yii2support.common.ApplicationUtils;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
@@ -77,11 +78,15 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             completionResultSet = completionResultSet.withPrefixMatcher(prefix.substring(prefixLength));
         }
 
-        PsiManager psiManager = PsiManager.getInstance(project);
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final String application = ApplicationUtils.getApplicationName(psiElement.getContainingFile());
         for (String key : keys) {
             Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, scope);
-            if (views.iterator().hasNext()) {
-                final ViewInfo view = views.iterator().next();
+            for (ViewInfo view : views) {
+                if (!application.equals(view.application)) {
+                    continue;
+                }
+
                 PsiFile psiFile = psiManager.findFile(view.getVirtualFile());
                 if (psiFile != null) {
                     String insertText = key.substring(prefixLength);

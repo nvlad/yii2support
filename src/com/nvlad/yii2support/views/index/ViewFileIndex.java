@@ -3,6 +3,7 @@ package com.nvlad.yii2support.views.index;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
@@ -15,10 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +58,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 8;
+        return 9;
     }
 
     @NotNull
@@ -77,6 +75,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     private static class ViewDataIndexer implements DataIndexer<String, ViewInfo, FileContent> {
         static final Map<Project, Map<Pattern, String>> projectViewPatterns = new HashMap<>();
+        static final VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
 
         @Override
         @NotNull
@@ -103,6 +102,16 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
             String path = absolutePath.substring(projectBaseDirLength);
             if (!path.startsWith("/vendor/")) {
+                String application = "basic";
+
+                if (virtualFileManager.findFileByUrl(project.getBaseDir().getUrl() + "/web") == null) {
+                    int applicationNameEnd = path.indexOf("/", 1);
+                    if (applicationNameEnd != -1) {
+                        application = path.substring(1, applicationNameEnd);
+                        path = path.substring(applicationNameEnd);
+                    }
+                }
+
                 path = "@app" + path;
                 if (!path.startsWith("@app/views/")) {
                     String viewPath = null;
@@ -126,7 +135,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
                 Map<String, ViewInfo> map = new HashMap<>();
                 ViewInfo viewInfo = new ViewInfo(inputData);
-                viewInfo.namespace = "basic";
+                viewInfo.application = application;
                 viewInfo.parameters = ViewUtil.getPhpViewVariables(inputData.getPsiFile());
 
                 map.put(path, viewInfo);
@@ -143,7 +152,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             System.out.println("ViewInfoDataExternalizer.save ==> " + viewInfo.fileUrl);
 
             writeString(dataOutput, viewInfo.fileUrl);
-            writeString(dataOutput, viewInfo.namespace);
+            writeString(dataOutput, viewInfo.application);
             dataOutput.writeInt(viewInfo.parameters.size());
             for (String parameter : viewInfo.parameters) {
                 writeString(dataOutput, parameter);
@@ -154,7 +163,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
         public ViewInfo read(@NotNull DataInput dataInput) throws IOException {
             ViewInfo viewInfo = new ViewInfo();
             viewInfo.fileUrl = readString(dataInput);
-            viewInfo.namespace = readString(dataInput);
+            viewInfo.application = readString(dataInput);
             final int parameterCount = dataInput.readInt();
             viewInfo.parameters = new ArrayList<>(parameterCount);
             for (int i = 0; i < parameterCount; i++) {

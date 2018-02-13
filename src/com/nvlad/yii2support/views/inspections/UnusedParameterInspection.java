@@ -11,6 +11,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.nvlad.yii2support.common.ApplicationUtils;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
@@ -59,6 +60,8 @@ final public class UnusedParameterInspection extends PhpInspection {
                 Project project = reference.getProject();
                 final Collection<ViewInfo> views = FileBasedIndex.getInstance()
                         .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
+                final String application = ApplicationUtils.getApplicationName(reference.getContainingFile());
+                views.removeIf(viewInfo -> !application.equals(viewInfo.application));
                 if (views.size() == 0) {
                     return;
                 }

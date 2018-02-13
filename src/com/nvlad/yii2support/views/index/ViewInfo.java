@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public class ViewInfo {
     public String fileUrl;
-    public String namespace;
+    public String application;
     public Collection<String> parameters;
     private VirtualFile myVirtualFile;
 
