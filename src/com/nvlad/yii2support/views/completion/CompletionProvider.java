@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by NVlad on 27.12.2016.
@@ -58,7 +59,7 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         final Project project = psiElement.getProject();
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
-        final Collection<String> keys = new HashSet<>();
+        final Set<String> keys = new HashSet<>();
         fileBasedIndex.processAllKeys(ViewFileIndex.identity, key -> {
             keys.add(key);
             return true;
@@ -77,7 +78,8 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         PsiManager psiManager = PsiManager.getInstance(project);
         for (String key : keys) {
             Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, scope);
-            for (ViewInfo view : views) {
+            final ViewInfo view = views.iterator().next();
+            if (view != null) {
                 PsiFile psiFile = psiManager.findFile(view.getVirtualFile());
                 if (psiFile != null) {
                     String insertText = key.substring(prefixLength);
