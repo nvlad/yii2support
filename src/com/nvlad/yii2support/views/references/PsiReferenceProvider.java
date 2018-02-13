@@ -1,11 +1,20 @@
 package com.nvlad.yii2support.views.references;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.nvlad.yii2support.views.ViewUtil;
+import com.nvlad.yii2support.views.index.ViewFileIndex;
+import com.nvlad.yii2support.views.index.ViewInfo;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by NVlad on 02.01.2017.
@@ -14,11 +23,24 @@ class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider {
     @NotNull
     @Override
     public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-        List<PsiReference> references = new ArrayList<>();
+        Set<PsiReference> references = new HashSet<>();
 
-        PsiReference reference = new PsiReference(psiElement);
-        references.add(reference);
+        final String key = ViewUtil.getViewPrefix(psiElement);
+        if (key != null) {
+            Project project = psiElement.getProject();
+            final Collection<ViewInfo> views = FileBasedIndex.getInstance()
+                    .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
+            if (views.size() > 0) {
+                for (ViewInfo view : views) {
+                    PsiFile file = PsiManager.getInstance(project).findFile(view.getVirtualFile());
+                    if (file != null) {
+                        PsiReference reference = new PsiReference(psiElement, file);
+                        references.add(reference);
+                    }
+                }
+            }
+        }
 
-        return references.toArray(new PsiReference[references.size()]);
+        return references.toArray(new PsiReference[0]);
     }
 }

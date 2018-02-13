@@ -18,15 +18,17 @@ import org.jetbrains.annotations.Nullable;
  * Created by NVlad on 02.01.2017.
  */
 public class PsiReference extends PsiReferenceBase<PsiElement> {
-    PsiReference(@NotNull PsiElement element) {
+    private final PsiFile myFile;
+
+    PsiReference(@NotNull PsiElement element, PsiFile file) {
         super(element);
+        myFile = file;
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
-
-        return ViewsUtil.getViewFile(myElement);
+        return myFile;
     }
 
     @NotNull
@@ -38,6 +40,7 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     @Override
     public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
         final StringLiteralExpression string = (StringLiteralExpression) this.getElement();
+
         final PsiDirectory context = ViewsUtil.getContextDirectory(string);
         final PsiFile file = (PsiFile) element;
         final PsiElement newValue;
