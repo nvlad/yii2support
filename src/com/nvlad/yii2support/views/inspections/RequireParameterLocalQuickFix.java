@@ -35,11 +35,12 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
     @NotNull
     @Override
     public String getName() {
-        final String parameter = myVariables.iterator().next();
-        if (parameter == null) {
-            return "Add View parameter(s)";
+
+        if (myVariables.iterator().hasNext()) {
+            final String parameter = myVariables.iterator().next();
+            return "Add \"%parameter%\" parameter".replace("%parameter%", parameter);
         }
-        return "Add \"%parameter%\" parameter".replace("%parameter%", parameter);
+        return "Add View parameter(s)";
     }
 
     @Nls

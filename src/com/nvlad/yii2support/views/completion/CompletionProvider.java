@@ -78,8 +78,8 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         PsiManager psiManager = PsiManager.getInstance(project);
         for (String key : keys) {
             Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, scope);
-            final ViewInfo view = views.iterator().next();
-            if (view != null) {
+            if (views.iterator().hasNext()) {
+                final ViewInfo view = views.iterator().next();
                 PsiFile psiFile = psiManager.findFile(view.getVirtualFile());
                 if (psiFile != null) {
                     String insertText = key.substring(prefixLength);
