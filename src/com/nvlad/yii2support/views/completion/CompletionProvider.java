@@ -64,15 +64,17 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             keys.add(key);
             return true;
         }, scope, null);
-        keys.removeIf(s -> !s.startsWith(prefix));
 
-//        final String prefixMatcherPrefix = completionResultSet.getPrefixMatcher().getPrefix();
-        if (!completionParameters.isAutoPopup()) {
-            completionResultSet = completionResultSet.withPrefixMatcher("");
-        }
         int prefixLength = prefix.length();
         if (prefix.contains("/") && !prefix.endsWith("/")) {
             prefixLength = prefix.lastIndexOf('/') + 1;
+        }
+
+        final String prefixFilter = prefix.substring(0, prefixLength);
+        keys.removeIf(path -> !path.startsWith(prefixFilter));
+
+        if (!completionParameters.isAutoPopup()) {
+            completionResultSet = completionResultSet.withPrefixMatcher(prefix.substring(prefixLength));
         }
 
         PsiManager psiManager = PsiManager.getInstance(project);
