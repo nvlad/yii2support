@@ -25,21 +25,21 @@ import java.util.Collection;
  * Created by NVlad on 15.01.2017.
  */
 class RequireParameterLocalQuickFix implements LocalQuickFix {
-    final private String[] myVariables;
+    final private Collection<String> myVariables;
 
     RequireParameterLocalQuickFix(Collection<String> variables) {
-        myVariables = variables.toArray(new String[variables.size()]);
+        myVariables = variables;
     }
 
     @Nls
     @NotNull
     @Override
     public String getName() {
-        if (myVariables.length == 1) {
-            return "Add \"%param%\" parameter".replace("%param%", myVariables[0]);
+        final String parameter = myVariables.iterator().next();
+        if (parameter == null) {
+            return "Add View parameter(s)";
         }
-
-        return "Add View parameter(s)";
+        return "Add \"%parameter%\" parameter".replace("%parameter%", parameter);
     }
 
     @Nls
