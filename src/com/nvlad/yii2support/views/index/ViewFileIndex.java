@@ -113,7 +113,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                 }
 
                 path = "@app" + path;
-                if (!path.startsWith("@app/views/")) {
+                if (!path.startsWith("@app/views/") && (!path.startsWith("@app/modules/") && path.contains("/views/"))) {
                     String viewPath = null;
                     for (Map.Entry<Pattern, String> entry : patterns.entrySet()) {
                         Matcher matcher = entry.getKey().matcher(path);
