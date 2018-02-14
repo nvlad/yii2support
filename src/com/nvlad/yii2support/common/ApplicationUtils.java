@@ -18,6 +18,6 @@ public class ApplicationUtils {
             final String fileUrl = virtualFile.getUrl();
             return fileUrl.substring(projectUrl.length() + 1, fileUrl.indexOf("/", projectUrl.length() + 1));
         }
-        return "basic";
+        return "app";
     }
 }

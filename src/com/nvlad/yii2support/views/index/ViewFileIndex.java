@@ -102,7 +102,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
             String path = absolutePath.substring(projectBaseDirLength);
             if (!path.startsWith("/vendor/")) {
-                String application = "basic";
+                String application = "app";
 
                 if (virtualFileManager.findFileByUrl(project.getBaseDir().getUrl() + "/web") == null) {
                     int applicationNameEnd = path.indexOf("/", 1);

@@ -22,7 +22,7 @@ public class ViewUtil {
 
     public static String resolveViewNamespace(String viewPath) {
         if (viewPath.startsWith("/views/")) {
-            return "basic";
+            return "app";
         }
 
         return viewPath.substring(1, viewPath.indexOf('/', 1));
