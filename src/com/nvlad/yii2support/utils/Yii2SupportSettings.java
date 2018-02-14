@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -22,7 +22,7 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     public Map<String, String> viewPathMap;
 
     public Yii2SupportSettings() {
-        viewPathMap = new HashMap<>();
+        viewPathMap = new LinkedHashMap<>();
         viewPathMap.put("@app/themes/*/modules", "@app/modules");
         viewPathMap.put("@app/themes/*/widgets", "@app/widgets");
         viewPathMap.put("@app/themes/*", "@app/views");
