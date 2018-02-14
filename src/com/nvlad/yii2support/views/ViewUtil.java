@@ -13,6 +13,7 @@ import com.nvlad.yii2support.common.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.InvalidPathException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +39,69 @@ public class ViewUtil {
 
     @Nullable
     public static String getViewPrefix(PsiElement element) {
+        String value = getValue(element);
+        if (value.startsWith("@")) {
+            return value;
+        }
+        final MethodReference method = PsiTreeUtil.getParentOfType(element, MethodReference.class);
+        if (method == null || method.getClassReference() == null) {
+            return null;
+        }
+        PhpClass callerClass = ClassUtils.getPhpClassByCallChain(method);
+        if (callerClass == null) {
+            return null;
+        }
+
+        if (callerClass.getName().endsWith("Controller")) {
+            return resolveViewFromController(callerClass, method, element, value);
+        }
+
+        return null;
+    }
+
+    private static String resolveViewFromController(PhpClass clazz, MethodReference method, PsiElement element, String value) {
+        if (value.startsWith("//")) {
+            return "@app/views" + value.substring(1);
+        }
+
+        final String classFQN = clazz.getFQN().replace('\\', '/');
+        StringBuilder result = new StringBuilder("@app");
+        String path = deletePathPart(classFQN);
+        if (path.startsWith("/modules/")) {
+            result.append("/modules");
+            path = deletePathPart(path);
+        }
+        int controllersPathPartPosition = path.indexOf("/controllers/");
+        if (controllersPathPartPosition == -1) {
+            throw new InvalidPathException(path, "");
+        }
+        if (controllersPathPartPosition > 0) {
+            result.append(path, 0, controllersPathPartPosition);
+            path = path.substring(controllersPathPartPosition);
+        }
+        path = deletePathPart(path);
+        result.append("/views");
+        if (value.startsWith("/")) {
+            return result + value;
+        }
+        final String className = clazz.getName();
+        result.append(path, 0, path.length() - className.length());
+        result.append(StringUtils.CamelToId(className.substring(0, className.length() - 10), "-"));
+        result.append('/');
+        result.append(value);
+
+        return result.toString();
+    }
+
+    private static String deletePathPart(String path) {
+        int returnFromPosition = path.indexOf('/', path.startsWith("/") ? 1 : 0);
+        return returnFromPosition == -1 ? path : path.substring(returnFromPosition);
+    }
+
+    @Nullable
+    public static String _getViewPrefix(PsiElement element) {
         String result = getValue(element);
+
         if (result.startsWith("//")) {
             return "@app/views" + result.substring(1);
         }
@@ -62,6 +125,10 @@ public class ViewUtil {
             final String path = StringUtils.CamelToId(className.substring(className.indexOf("/controllers/") + 12, className.length() - 10), "-");
             return "@app/views" + normalizePath(path + '/' + result);
         }
+//
+//        if (ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\View", phpIndex)) {
+//
+//        }
 
         return null;
     }
