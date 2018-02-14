@@ -58,7 +58,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 13;
+        return 14;
     }
 
     @NotNull
@@ -102,6 +102,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
             String path = absolutePath.substring(projectBaseDirLength);
             if (!path.startsWith("/vendor/")) {
+                final String viewRelativePath;
                 String application = "app";
 
                 if (virtualFileManager.findFileByUrl(project.getBaseDir().getUrl() + "/web") == null) {
@@ -112,6 +113,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                     }
                 }
 
+                viewRelativePath = path;
                 path = "@app" + path;
                 if (!path.startsWith("@app/views/") && !(path.startsWith("@app/modules/") && path.contains("/views/"))) {
                     String viewPath = null;
@@ -139,6 +141,10 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                 viewInfo.parameters = ViewUtil.getPhpViewVariables(inputData.getPsiFile());
 
                 map.put(path, viewInfo);
+                if (path.startsWith("@app/modules/") && !viewRelativePath.startsWith("/modules/")) {
+                    map.put("@app/views/modules" + path.substring(12), viewInfo);
+                    System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/modules" + path.substring(12));
+                }
                 return map;
             }
 
