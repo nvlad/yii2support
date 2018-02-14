@@ -52,11 +52,14 @@ public class ViewUtil {
             return null;
         }
 
+        final String key;
         if (callerClass.getName().endsWith("Controller")) {
-            return resolveViewFromController(callerClass, method, element, value);
+            key = resolveViewFromController(callerClass, method, element, value);
+        } else {
+            return null;
         }
 
-        return null;
+        return normalizePath(key);
     }
 
     private static String resolveViewFromController(PhpClass clazz, MethodReference method, PsiElement element, String value) {
