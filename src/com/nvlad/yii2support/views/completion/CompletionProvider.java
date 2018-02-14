@@ -92,6 +92,7 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
                 if (psiFile != null) {
                     String insertText = key.substring(prefixLength);
                     completionResultSet.addElement(new ViewLookupElement(psiFile, insertText));
+                    break;
                 } else {
                     System.out.println(view.fileUrl + " => not exists");
                 }
