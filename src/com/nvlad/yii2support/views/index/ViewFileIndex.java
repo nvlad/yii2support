@@ -83,7 +83,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             final Project project = inputData.getProject();
             Map<Pattern, String> patterns = projectViewPatterns.get(project);
             if (patterns == null) {
-                patterns = new HashMap<>();
+                patterns = new LinkedHashMap<>();
                 Yii2SupportSettings settings = Yii2SupportSettings.getInstance(project);
                 for (Map.Entry<String, String> entry : settings.viewPathMap.entrySet()) {
                     String patternString = "^(" + entry.getKey().replace("*", "[\\w-]+") + ").+";
