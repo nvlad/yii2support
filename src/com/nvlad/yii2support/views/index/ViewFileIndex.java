@@ -148,7 +148,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     private static class ViewInfoDataExternalizer implements DataExternalizer<ViewInfo> {
         @Override
-        public void save(@NotNull DataOutput dataOutput, ViewInfo viewInfo) throws IOException {
+        public void save(@NotNull DataOutput dataOutput, @NotNull ViewInfo viewInfo) throws IOException {
             System.out.println("ViewInfoDataExternalizer.save ==> " + viewInfo.fileUrl);
 
             writeString(dataOutput, viewInfo.fileUrl);
@@ -160,6 +160,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
         }
 
         @Override
+        @NotNull
         public ViewInfo read(@NotNull DataInput dataInput) throws IOException {
             ViewInfo viewInfo = new ViewInfo();
             viewInfo.fileUrl = readString(dataInput);
@@ -174,12 +175,15 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             return viewInfo;
         }
 
-        private void writeString(DataOutput dataOutput, String data) throws IOException {
+        private void writeString(@NotNull DataOutput dataOutput, @NotNull String data) throws IOException {
             dataOutput.writeInt(data.length());
-            dataOutput.writeChars(data);
+            if (data.length() > 0) {
+                dataOutput.writeChars(data);
+            }
         }
 
-        private String readString(DataInput dataInput) throws IOException {
+        @NotNull
+        private String readString(@NotNull DataInput dataInput) throws IOException {
             final int length = dataInput.readInt();
             if (length == 0) {
                 return "";
