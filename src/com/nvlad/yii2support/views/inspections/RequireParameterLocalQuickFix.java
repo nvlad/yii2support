@@ -19,15 +19,13 @@ import com.jetbrains.php.lang.psi.elements.ParameterList;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
 /**
  * Created by NVlad on 15.01.2017.
  */
 class RequireParameterLocalQuickFix implements LocalQuickFix {
-    final private Collection<String> myVariables;
+    final private String[] myVariables;
 
-    RequireParameterLocalQuickFix(Collection<String> variables) {
+    RequireParameterLocalQuickFix(String ...variables) {
         myVariables = variables;
     }
 
@@ -35,12 +33,11 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
     @NotNull
     @Override
     public String getName() {
-
-        if (myVariables.iterator().hasNext()) {
-            final String parameter = myVariables.iterator().next();
+        if (myVariables.length == 1) {
+            final String parameter = myVariables[0];
             return "Add \"%parameter%\" parameter".replace("%parameter%", parameter);
         }
-        return "Add View parameter(s)";
+        return "Add all missed View parameters";
     }
 
     @Nls

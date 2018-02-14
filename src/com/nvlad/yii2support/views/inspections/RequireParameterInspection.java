@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.views.inspections;
 
+import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Created by NVlad on 23.01.2017.
@@ -99,24 +101,36 @@ public class RequireParameterInspection extends PhpInspection {
                     existKeys = new HashSet<>();
                 }
 
-                if (existKeys.size() == 0 && isOnTheFly) {
-                    String errorRequireParameters = "View %view% require parameters.";
-                    RequireParameterLocalQuickFix fix = new RequireParameterLocalQuickFix(viewParameters);
-                    problemsHolder.registerProblem(reference, errorRequireParameters.replace("%view%", renderParameters[0].getText()), fix);
+                viewParameters.removeIf(existKeys::contains);
+                if (viewParameters.size() == 0) {
                     return;
                 }
 
-                viewParameters.removeIf(existKeys::contains);
-                if (viewParameters.size() > 0) {
-                    String errorRequireParameter = "View %view% require %parameter% parameter";
-                    for (String parameter : viewParameters) {
-                        RequireParameterLocalQuickFix fix = new RequireParameterLocalQuickFix(viewParameters);
-                        String description = errorRequireParameter
-                                .replace("%view%", renderParameters[0].getText())
-                                .replace("%parameter%", parameter);
-                        problemsHolder.registerProblem(reference, description, fix);
+                String description = "View " + renderParameters[0].getText() + " require ";
+                final Collection<LocalQuickFix> fixes = new HashSet<>();
+                final Iterator<String> parameterIterator = viewParameters.iterator();
+                if (isOnTheFly && viewParameters.size() > 1) {
+                    fixes.add(new RequireParameterLocalQuickFix(viewParameters.toArray(new String[0])));
+                    StringBuilder parameterString = new StringBuilder();
+                    String parameter = parameterIterator.next();
+                    while (parameterIterator.hasNext()) {
+                        if (parameterString.length() > 0) {
+                            parameterString.append(", ");
+                        }
+                        parameterString.append("\"").append(parameter).append("\"");
+                        fixes.add(new RequireParameterLocalQuickFix(parameter));
+                        parameter = parameterIterator.next();
                     }
+                    parameterString.append(" and \"").append(parameter).append("\" parameters.");
+                    description += parameterString.toString();
+                    fixes.add(new RequireParameterLocalQuickFix(parameter));
+                } else {
+                    String parameter = parameterIterator.next();
+                    description += "\"" + parameter + "\" parameter.";
+                    fixes.add(new RequireParameterLocalQuickFix(parameter));
                 }
+
+                problemsHolder.registerProblem(reference, description, fixes.toArray(new LocalQuickFix[0]));
             }
         };
     }
