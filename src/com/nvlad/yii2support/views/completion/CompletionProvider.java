@@ -60,11 +60,6 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         final Project project = psiElement.getProject();
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
-        final Set<String> keys = new HashSet<>();
-        fileBasedIndex.processAllKeys(ViewFileIndex.identity, key -> {
-            keys.add(key);
-            return true;
-        }, scope, null);
 
         int prefixLength = prefix.length();
         if (prefix.contains("/") && !prefix.endsWith("/")) {
@@ -72,7 +67,13 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         }
 
         final String prefixFilter = prefix.substring(0, prefixLength);
-        keys.removeIf(path -> !path.startsWith(prefixFilter));
+        final Set<String> keys = new HashSet<>();
+        fileBasedIndex.processAllKeys(ViewFileIndex.identity, key -> {
+            if (key.startsWith(prefixFilter)) {
+                keys.add(key);
+            }
+            return true;
+        }, scope, null);
 
         if (!completionParameters.isAutoPopup()) {
             completionResultSet = completionResultSet.withPrefixMatcher(prefix.substring(prefixLength));
@@ -96,7 +97,6 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
                 }
             }
         }
-
 
 //        Collection<String> keys = StubIndex.getInstance().getAllKeys(YiiViewIndex.KEY, completionParameters.getPosition().getProject());
 
