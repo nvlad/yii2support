@@ -107,9 +107,18 @@ public class RequireParameterInspection extends PhpInspection {
                 }
 
                 String description = "View " + renderParameters[0].getText() + " require ";
-                final Collection<LocalQuickFix> fixes = new HashSet<>();
                 final Iterator<String> parameterIterator = viewParameters.iterator();
-                if (isOnTheFly && viewParameters.size() > 1) {
+                if (!isOnTheFly) {
+                    while (parameterIterator.hasNext()) {
+                        final String parameter = parameterIterator.next();
+                        final String problemDescription = description + "\"" + parameter + "\" parameter.";
+                        problemsHolder.registerProblem(reference, problemDescription, new RequireParameterLocalQuickFix(parameter));
+                    }
+                    return;
+                }
+
+                final Collection<LocalQuickFix> fixes = new HashSet<>();
+                if (viewParameters.size() > 1) {
                     fixes.add(new RequireParameterLocalQuickFix(viewParameters.toArray(new String[0])));
                     StringBuilder parameterString = new StringBuilder();
                     String parameter = parameterIterator.next();
@@ -129,7 +138,6 @@ public class RequireParameterInspection extends PhpInspection {
                     description += "\"" + parameter + "\" parameter.";
                     fixes.add(new RequireParameterLocalQuickFix(parameter));
                 }
-
                 problemsHolder.registerProblem(reference, description, fixes.toArray(new LocalQuickFix[0]));
             }
         };
