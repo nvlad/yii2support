@@ -40,9 +40,13 @@ public class ViewUtil {
     @Nullable
     public static String getViewPrefix(PsiElement element) {
         String value = getValue(element);
-        if (value.startsWith("@")) {
+        if (value.startsWith("@app")) {
             return value;
         }
+        if (value.startsWith("//")) {
+            return "@app/views" + value.substring(1);
+        }
+
         final MethodReference method = PsiTreeUtil.getParentOfType(element, MethodReference.class);
         if (method == null || method.getClassReference() == null) {
             return null;
@@ -63,11 +67,8 @@ public class ViewUtil {
         return normalizePath(key);
     }
 
+    @NotNull
     private static String resolveViewFromController(PhpClass clazz, MethodReference method, PsiElement element, String value) {
-        if (value.startsWith("//")) {
-            return "@app/views" + value.substring(1);
-        }
-
         final String classFQN = clazz.getFQN().replace('\\', '/');
         StringBuilder result = new StringBuilder("@app");
         String path = deletePathPart(classFQN);
