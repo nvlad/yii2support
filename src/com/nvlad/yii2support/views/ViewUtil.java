@@ -1,6 +1,7 @@
 package com.nvlad.yii2support.views;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.SearchScope;
@@ -10,6 +11,7 @@ import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.StringUtils;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +22,7 @@ import java.util.regex.Pattern;
 
 public class ViewUtil {
     private static final Set<String> ignoredVariables = getIgnoredVariables();
+    static final Map<Project, Map<Pattern, String>> projectViewPatterns = new HashMap<>();
 
     public static String resolveViewNamespace(String viewPath) {
         if (viewPath.startsWith("/views/")) {
@@ -35,6 +38,22 @@ public class ViewUtil {
         }
 
         return null;
+    }
+
+    @NotNull
+    public static Map<Pattern, String> getPatterns(Project project) {
+        Map<Pattern, String> patterns = projectViewPatterns.get(project);
+        if (patterns == null) {
+            patterns = new LinkedHashMap<>();
+            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(project);
+            for (Map.Entry<String, String> entry : settings.viewPathMap.entrySet()) {
+                String patternString = "^(" + entry.getKey().replace("*", "([\\w-]+)") + ").+";
+                Pattern pattern = Pattern.compile(patternString);
+                patterns.put(pattern, entry.getValue());
+            }
+            projectViewPatterns.put(project, patterns);
+        }
+        return patterns;
     }
 
     @Nullable

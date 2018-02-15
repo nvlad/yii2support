@@ -74,23 +74,11 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     }
 
     private static class ViewDataIndexer implements DataIndexer<String, ViewInfo, FileContent> {
-        static final Map<Project, Map<Pattern, String>> projectViewPatterns = new HashMap<>();
 
         @Override
         @NotNull
         public Map<String, ViewInfo> map(@NotNull final FileContent inputData) {
             final Project project = inputData.getProject();
-            Map<Pattern, String> patterns = projectViewPatterns.get(project);
-            if (patterns == null) {
-                patterns = new LinkedHashMap<>();
-                Yii2SupportSettings settings = Yii2SupportSettings.getInstance(project);
-                for (Map.Entry<String, String> entry : settings.viewPathMap.entrySet()) {
-                    String patternString = "^(" + entry.getKey().replace("*", "[\\w-]+") + ").+";
-                    Pattern pattern = Pattern.compile(patternString);
-                    patterns.put(pattern, entry.getValue());
-                }
-                projectViewPatterns.put(project, patterns);
-            }
 
             final String projectPath = project.getBaseDir().getPath();
             int projectBaseDirLength = projectPath.length();
@@ -111,7 +99,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                 path = "@app" + path;
                 if (!path.startsWith("@app/views/") && !(path.startsWith("@app/modules/") && path.contains("/views/"))) {
                     String viewPath = null;
-                    for (Map.Entry<Pattern, String> entry : patterns.entrySet()) {
+                    for (Map.Entry<Pattern, String> entry : ViewUtil.getPatterns(project).entrySet()) {
                         Matcher matcher = entry.getKey().matcher(path);
                         if (matcher.find()) {
                             viewPath = entry.getValue() + path.substring(matcher.end(1));
