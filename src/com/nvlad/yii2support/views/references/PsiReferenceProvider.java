@@ -7,7 +7,9 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.nvlad.yii2support.common.YiiApplicationUtils;
+import com.nvlad.yii2support.common.PhpUtil;
+import com.nvlad.yii2support.views.ViewResolve;
+import com.nvlad.yii2support.views.ViewResolveFrom;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
 import com.nvlad.yii2support.views.index.ViewInfo;
@@ -26,16 +28,24 @@ class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider {
     public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
         Set<PsiReference> references = new HashSet<>();
 
-        final String key = ViewUtil.getViewPrefix(psiElement);
-        if (key != null) {
+        final ViewResolve resolve = ViewUtil.resolveView(psiElement);
+        if (resolve != null) {
             Project project = psiElement.getProject();
             final Collection<ViewInfo> views = FileBasedIndex.getInstance()
-                    .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
+                    .getValues(ViewFileIndex.identity, resolve.key, GlobalSearchScope.projectScope(project));
 
-            final String application = YiiApplicationUtils.getApplicationName(psiElement.getContainingFile());
             if (views.size() > 0) {
+                boolean localViewSearch = false;
+                if (resolve.from == ViewResolveFrom.View) {
+                    final String value = PhpUtil.getValue(psiElement);
+                    localViewSearch = !value.startsWith("@") && !value.startsWith("//");
+                }
                 for (ViewInfo view : views) {
-                    if (!application.equals(view.application)) {
+                    if (!resolve.application.equals(view.application)) {
+                        continue;
+                    }
+
+                    if (localViewSearch && !resolve.theme.equals(view.theme)) {
                         continue;
                     }
 

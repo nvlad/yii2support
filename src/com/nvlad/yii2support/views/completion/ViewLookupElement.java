@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.views.completion;
 
+import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.openapi.vfs.VirtualFile;

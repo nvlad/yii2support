@@ -14,8 +14,11 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.nvlad.yii2support.common.PhpUtil;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.common.ClassUtils;
+import com.nvlad.yii2support.views.ViewResolve;
+import com.nvlad.yii2support.views.ViewResolveFrom;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
@@ -47,16 +50,31 @@ final public class MissedViewInspection extends PhpInspection {
                 if (ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
                     if (reference.getParameters().length > 0) {
                         final PsiElement pathParameter = reference.getParameters()[0];
-                        final String key = ViewUtil.getViewPrefix(pathParameter);
-                        if (key == null) {
+                        final ViewResolve resolve = ViewUtil.resolveView(pathParameter);
+                        if (resolve == null) {
                             return;
                         }
 
                         Project project = reference.getProject();
                         final Collection<ViewInfo> views = FileBasedIndex.getInstance()
-                                .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
+                                .getValues(ViewFileIndex.identity, resolve.key, GlobalSearchScope.projectScope(project));
+
                         final String application = YiiApplicationUtils.getApplicationName(reference.getContainingFile());
-                        views.removeIf(viewInfo -> !application.equals(viewInfo.application));
+                        final boolean localViewSearch;
+                        if (resolve.from == ViewResolveFrom.View) {
+                            final String value = PhpUtil.getValue(pathParameter);
+                            localViewSearch = !value.startsWith("@") && !value.startsWith("//");
+                        } else {
+                            localViewSearch = false;
+                        }
+
+                        views.removeIf(view -> {
+                            if (!application.equals(view.application)) {
+                                return true;
+                            }
+
+                            return localViewSearch && !resolve.theme.equals(view.theme);
+                        });
                         if (views.size() != 0) {
                             return;
                         }

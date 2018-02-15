@@ -12,7 +12,9 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.nvlad.yii2support.common.YiiApplicationUtils;
+import com.nvlad.yii2support.common.PhpUtil;
+import com.nvlad.yii2support.views.ViewResolve;
+import com.nvlad.yii2support.views.ViewResolveFrom;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
@@ -43,17 +45,17 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             return;
         }
 
-        PsiElement parameter = psiElement;
-        while (parameter != null && !(parameter.getParent() instanceof ParameterList)) {
-            parameter = parameter.getParent();
+        PsiElement viewParameter = psiElement;
+        while (viewParameter != null && !(viewParameter.getParent() instanceof ParameterList)) {
+            viewParameter = viewParameter.getParent();
         }
 
-        if (parameter == null || !parameter.equals(method.getParameters()[0])) {
+        if (viewParameter == null || !viewParameter.equals(method.getParameters()[0])) {
             return;
         }
 
-        final String prefix = ViewUtil.getViewPrefix(parameter);
-        if (prefix == null) {
+        final ViewResolve resolve = ViewUtil.resolveView(viewParameter);
+        if (resolve == null) {
             return;
         }
 
@@ -61,12 +63,12 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
-        int prefixLength = prefix.length();
-        if (prefix.contains("/") && !prefix.endsWith("/")) {
-            prefixLength = prefix.lastIndexOf('/') + 1;
+        int prefixLength = resolve.key.length();
+        if (resolve.key.contains("/") && !resolve.key.endsWith("/")) {
+            prefixLength = resolve.key.lastIndexOf('/') + 1;
         }
 
-        final String prefixFilter = prefix.substring(0, prefixLength);
+        final String prefixFilter = resolve.key.substring(0, prefixLength);
         final Set<String> keys = new HashSet<>();
         fileBasedIndex.processAllKeys(ViewFileIndex.identity, key -> {
             if (key.startsWith(prefixFilter)) {
@@ -76,15 +78,23 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         }, scope, null);
 
         if (!completionParameters.isAutoPopup()) {
-            completionResultSet = completionResultSet.withPrefixMatcher(prefix.substring(prefixLength));
+            completionResultSet = completionResultSet.withPrefixMatcher(resolve.key.substring(prefixLength));
         }
 
         final PsiManager psiManager = PsiManager.getInstance(project);
-        final String application = YiiApplicationUtils.getApplicationName(psiElement.getContainingFile());
+        boolean localViewSearch = false;
+        if (resolve.from == ViewResolveFrom.View) {
+            final String value = PhpUtil.getValue(viewParameter);
+            localViewSearch = !value.startsWith("@") && !value.startsWith("//");
+        }
         for (String key : keys) {
             Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, scope);
             for (ViewInfo view : views) {
-                if (!application.equals(view.application)) {
+                if (!resolve.application.equals(view.application)) {
+                    continue;
+                }
+
+                if (localViewSearch && !resolve.theme.equals(view.theme)) {
                     continue;
                 }
 

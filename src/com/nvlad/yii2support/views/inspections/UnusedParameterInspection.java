@@ -12,6 +12,7 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
+import com.nvlad.yii2support.views.ViewResolve;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
@@ -53,13 +54,13 @@ final public class UnusedParameterInspection extends PhpInspection {
                     return;
                 }
 
-                final String key = ViewUtil.getViewPrefix(renderParameters[0]);
-                if (key == null) {
+                final ViewResolve resolve = ViewUtil.resolveView(renderParameters[0]);
+                if (resolve == null) {
                     return;
                 }
                 Project project = reference.getProject();
                 final Collection<ViewInfo> views = FileBasedIndex.getInstance()
-                        .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
+                        .getValues(ViewFileIndex.identity, resolve.key, GlobalSearchScope.projectScope(project));
                 final String application = YiiApplicationUtils.getApplicationName(reference.getContainingFile());
                 views.removeIf(viewInfo -> !application.equals(viewInfo.application));
                 if (views.size() == 0) {

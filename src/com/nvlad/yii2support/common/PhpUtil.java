@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.common;
 
+import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -25,5 +26,18 @@ public class PhpUtil {
         }
 
         return result;
+    }
+
+    @NotNull
+    public static String getValue(PsiElement expression) {
+        if (expression instanceof StringLiteralExpression) {
+            String value = ((StringLiteralExpression) expression).getContents();
+            if (value.contains("IntellijIdeaRulezzz ")) {
+                return value.substring(0, value.indexOf("IntellijIdeaRulezzz "));
+            }
+            return value;
+        }
+
+        return "";
     }
 }

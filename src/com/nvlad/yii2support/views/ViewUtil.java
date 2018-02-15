@@ -10,7 +10,9 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
+import com.nvlad.yii2support.common.PhpUtil;
 import com.nvlad.yii2support.common.StringUtils;
+import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,26 +24,24 @@ import java.util.regex.Pattern;
 
 public class ViewUtil {
     private static final Set<String> ignoredVariables = getIgnoredVariables();
-    static final Map<Project, Map<Pattern, String>> projectViewPatterns = new HashMap<>();
+    private static final Map<Project, Map<Pattern, String>> projectViewPatterns = new HashMap<>();
 
-    public static String resolveViewNamespace(String viewPath) {
-        if (viewPath.startsWith("/views/")) {
-            return "app";
-        }
-
-        return viewPath.substring(1, viewPath.indexOf('/', 1));
-    }
-
-    public static String resolveViewName(String viewPath) {
-        if (viewPath.startsWith("/views/")) {
-            return "@app" + viewPath;
-        }
-
-        return null;
-    }
+//    @Nullable
+//    public static String getKeyForFile(@NotNull VirtualFile file, @NotNull Project project) {
+//        Map<Pattern, String> patterns = getPatterns(project);
+//
+//        final String projectPath = project.getBaseDir().getPath();
+//        int projectBaseDirLength = projectPath.length();
+//        final String absolutePath = file.getPath();
+//        if (!absolutePath.startsWith(projectPath)) {
+//            return null;
+//        }
+//
+//        return null;
+//    }
 
     @NotNull
-    public static Map<Pattern, String> getPatterns(Project project) {
+    private static Map<Pattern, String> getPatterns(Project project) {
         Map<Pattern, String> patterns = projectViewPatterns.get(project);
         if (patterns == null) {
             patterns = new LinkedHashMap<>();
@@ -57,13 +57,63 @@ public class ViewUtil {
     }
 
     @Nullable
-    public static String getViewPrefix(PsiElement element) {
-        String value = getValue(element);
+    public static ViewResolve resolveView(VirtualFile virtualFile, Project project) {
+        final String projectPath = project.getBaseDir().getPath();
+        int projectBaseDirLength = projectPath.length();
+        final String absolutePath = virtualFile.getPath();
+        if (!absolutePath.startsWith(projectPath)) {
+            return null;
+        }
+
+        String path = absolutePath.substring(projectBaseDirLength);
+        if (!path.startsWith("/vendor/")) {
+            ViewResolve result = new ViewResolve();
+            result.application = YiiApplicationUtils.getApplicationName(virtualFile, project);
+            result.theme = "";
+            if (path.startsWith("/" + result.application + "/")) {
+                path = path.substring(result.application.length() + 1);
+            }
+
+            result.relativePath = path;
+            path = "@app" + path;
+            if (!path.startsWith("@app/views/") && !(path.startsWith("@app/modules/") && path.contains("/views/"))) {
+                String viewPath = null;
+                for (Map.Entry<Pattern, String> entry : ViewUtil.getPatterns(project).entrySet()) {
+                    Matcher matcher = entry.getKey().matcher(path);
+                    if (matcher.find()) {
+                        viewPath = entry.getValue() + path.substring(matcher.end(1));
+                        result.theme = matcher.group(2);
+                        break;
+                    }
+                }
+                if (viewPath == null) {
+                    return null;
+                }
+                path = viewPath;
+            }
+            if (virtualFile.getExtension() != null) {
+                path = path.substring(0, path.length() - virtualFile.getExtension().length() - 1);
+            }
+            result.key = path;
+
+            return result;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static ViewResolve resolveView(PsiElement element) {
+        String value = PhpUtil.getValue(element);
         if (value.startsWith("@app")) {
-            return value;
+            ViewResolve resolve = new ViewResolve(value);
+            resolve.application = YiiApplicationUtils.getApplicationName(element.getContainingFile());
+            return resolve;
         }
         if (value.startsWith("//")) {
-            return "@app/views" + value.substring(1);
+            ViewResolve resolve = new ViewResolve("@app/views" + value.substring(1));
+            resolve.application = YiiApplicationUtils.getApplicationName(element.getContainingFile());
+            return resolve;
         }
 
         final MethodReference method = PsiTreeUtil.getParentOfType(element, MethodReference.class);
@@ -76,25 +126,27 @@ public class ViewUtil {
         }
 
         final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
-        final String key;
+        final ViewResolve viewResolve;
         if (callerClass.getName().endsWith("Controller") && ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\Controller", phpIndex)) {
-            key = resolveViewFromController(callerClass, method, element, value);
+            viewResolve = resolveViewFromController(callerClass, value);
         } else if (ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\View", phpIndex)) {
-            key = resolveViewFromView(callerClass, method, element, value);
+            viewResolve = resolveViewFromView(callerClass, method, element, value);
         } else {
             return null;
         }
 
-        return normalizePath(key);
+        viewResolve.application = YiiApplicationUtils.getApplicationName(element.getContainingFile());
+        return viewResolve;
     }
 
     @NotNull
-    private static String resolveViewFromController(PhpClass clazz, MethodReference method, PsiElement element, String value) {
+    private static ViewResolve resolveViewFromController(PhpClass clazz, String value) {
+        ViewResolve result = new ViewResolve(ViewResolveFrom.Controller);
         final String classFQN = clazz.getFQN().replace('\\', '/');
-        StringBuilder result = new StringBuilder("@app");
+        StringBuilder key = new StringBuilder("@app");
         String path = deletePathPart(classFQN);
         if (path.startsWith("/modules/")) {
-            result.append("/modules");
+            key.append("/modules");
             path = deletePathPart(path);
         }
         int controllersPathPartPosition = path.indexOf("/controllers/");
@@ -102,27 +154,51 @@ public class ViewUtil {
             throw new InvalidPathException(path, "");
         }
         if (controllersPathPartPosition > 0) {
-            result.append(path, 0, controllersPathPartPosition);
+            final String module = path.substring(0, controllersPathPartPosition);
+            key.append(module);
             path = path.substring(controllersPathPartPosition);
+            result.module = module;
         }
         path = deletePathPart(path);
-        result.append("/views");
+        key.append("/views");
         if (value.startsWith("/")) {
-            return result + value;
+            result.key = normalizePath(key + value);
+            return result;
         }
         final String className = clazz.getName();
-        result.append(path, 0, path.length() - className.length());
-        result.append(StringUtils.CamelToId(className.substring(0, className.length() - 10), "-"));
-        result.append('/');
-        result.append(value);
+        key.append(path, 0, path.length() - className.length());
+        key.append(StringUtils.CamelToId(className.substring(0, className.length() - 10), "-"));
+        key.append('/');
+        key.append(value);
+        result.key = normalizePath(key.toString());
 
-        return result.toString();
+        return result;
     }
 
     @NotNull
-    private static String resolveViewFromView(PhpClass clazz, MethodReference method, PsiElement element, String value) {
+    private static ViewResolve resolveViewFromView(PhpClass clazz, MethodReference method, PsiElement element, String value) {
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        if (virtualFile == null) {
+            virtualFile = element.getContainingFile().getOriginalFile().getVirtualFile();
+        }
+        ViewResolve result = resolveView(virtualFile, element.getProject());
+        if (result == null) {
+            throw new InvalidPathException(virtualFile.getPath(), "");
+        }
 
-        return "";
+        result.from = ViewResolveFrom.View;
+        if (value.startsWith("/")) {
+            int viewsPathPartPosition = result.key.lastIndexOf("/views/");
+            if (viewsPathPartPosition == -1) {
+                throw new InvalidPathException(result.key, "");
+            }
+            result.key = result.key.substring(0, viewsPathPartPosition + 6) + value;
+            return result;
+        }
+
+        int lastSlashPosition = result.key.lastIndexOf('/');
+        result.key = normalizePath(result.key.substring(0, lastSlashPosition + 1) + value);
+        return result;
     }
 
     private static String deletePathPart(String path) {
@@ -130,40 +206,40 @@ public class ViewUtil {
         return returnFromPosition == -1 ? path : path.substring(returnFromPosition);
     }
 
-    @Nullable
-    public static String _getViewPrefix(PsiElement element) {
-        String result = getValue(element);
-
-        if (result.startsWith("//")) {
-            return "@app/views" + result.substring(1);
-        }
-        if (result.startsWith("/")) {
-            return "@app/views" + result;
-        }
-        if (result.startsWith("@app/")) {
-            return result;
-        }
-
-        final MethodReference method = PsiTreeUtil.getParentOfType(element, MethodReference.class);
-        if (method == null || method.getClassReference() == null) {
-            return null;
-        }
-
-        Project project = element.getProject();
-        PhpIndex phpIndex = PhpIndex.getInstance(project);
-        PhpClass clazz = ClassUtils.getPhpClassByCallChain(method);
-        if (ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Controller", phpIndex)) {
-            final String className = method.getClassReference().getType().toStringResolved().replace('\\', '/');
-            final String path = StringUtils.CamelToId(className.substring(className.indexOf("/controllers/") + 12, className.length() - 10), "-");
-            return "@app/views" + normalizePath(path + '/' + result);
-        }
+//    @Nullable
+//    public static String _getViewPrefix(PsiElement element) {
+//        String result = getValue(element);
 //
-//        if (ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\View", phpIndex)) {
-//
+//        if (result.startsWith("//")) {
+//            return "@app/views" + result.substring(1);
 //        }
-
-        return null;
-    }
+//        if (result.startsWith("/")) {
+//            return "@app/views" + result;
+//        }
+//        if (result.startsWith("@app/")) {
+//            return result;
+//        }
+//
+//        final MethodReference method = PsiTreeUtil.getParentOfType(element, MethodReference.class);
+//        if (method == null || method.getClassReference() == null) {
+//            return null;
+//        }
+//
+//        Project project = element.getProject();
+//        PhpIndex phpIndex = PhpIndex.getInstance(project);
+//        PhpClass clazz = ClassUtils.getPhpClassByCallChain(method);
+//        if (ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Controller", phpIndex)) {
+//            final String className = method.getClassReference().getType().toStringResolved().replace('\\', '/');
+//            final String path = StringUtils.CamelToId(className.substring(className.indexOf("/controllers/") + 12, className.length() - 10), "-");
+//            return "@app/views" + normalizePath(path + '/' + result);
+//        }
+////
+////        if (ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\View", phpIndex)) {
+////
+////        }
+//
+//        return null;
+//    }
 
     private static String normalizePath(String path) {
         Pattern pattern = Pattern.compile("/([a-z0-9-]+/\\.\\./)");
@@ -251,20 +327,7 @@ public class ViewUtil {
 //                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Widget", phpIndex)
 //                || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\mail\\BaseMailer", phpIndex);
 //    }
-
-    @NotNull
-    private static String getValue(PsiElement expression) {
-        if (expression instanceof StringLiteralExpression) {
-            String value = ((StringLiteralExpression) expression).getContents();
-            if (value.contains("IntellijIdeaRulezzz ")) {
-                return value.substring(0, value.indexOf("IntellijIdeaRulezzz "));
-            }
-            return value;
-        }
-
-        return "";
-    }
-
+//
 //    private static String transformName(String name) {
 //        Pattern pattern = Pattern.compile("([A-Z])");
 //        Matcher matcher = pattern.matcher(name);
