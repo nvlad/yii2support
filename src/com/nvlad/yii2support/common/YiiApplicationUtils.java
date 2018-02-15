@@ -5,7 +5,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
-public class ApplicationUtils {
+public class YiiApplicationUtils {
     @NotNull
     public static String getApplicationName(@NotNull PsiFile file) {
         String projectUrl = file.getProject().getBaseDir().getUrl();

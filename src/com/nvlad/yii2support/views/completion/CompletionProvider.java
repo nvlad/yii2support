@@ -12,7 +12,7 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.nvlad.yii2support.common.ApplicationUtils;
+import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.views.ViewUtil;
 import com.nvlad.yii2support.views.ViewsUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
@@ -80,7 +80,7 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         }
 
         final PsiManager psiManager = PsiManager.getInstance(project);
-        final String application = ApplicationUtils.getApplicationName(psiElement.getContainingFile());
+        final String application = YiiApplicationUtils.getApplicationName(psiElement.getContainingFile());
         for (String key : keys) {
             Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, scope);
             for (ViewInfo view : views) {
