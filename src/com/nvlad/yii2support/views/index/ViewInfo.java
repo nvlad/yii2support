@@ -9,6 +9,7 @@ import java.util.Collection;
 public class ViewInfo {
     public String fileUrl;
     public String application;
+    public String theme;
     public Collection<String> parameters;
     private VirtualFile myVirtualFile;
 

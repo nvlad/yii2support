@@ -102,6 +102,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             String path = absolutePath.substring(projectBaseDirLength);
             if (!path.startsWith("/vendor/")) {
                 String application = YiiApplicationUtils.getApplicationName(inputData.getFile(), project);
+                String theme = "";
                 if (path.startsWith("/" + application + "/")) {
                     path = path.substring(application.length() + 1);
                 }
@@ -114,6 +115,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                         Matcher matcher = entry.getKey().matcher(path);
                         if (matcher.find()) {
                             viewPath = entry.getValue() + path.substring(matcher.end(1));
+                            theme = matcher.group(2);
                             break;
                         }
                     }
@@ -131,6 +133,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                 Map<String, ViewInfo> map = new HashMap<>();
                 ViewInfo viewInfo = new ViewInfo(inputData);
                 viewInfo.application = application;
+                viewInfo.theme = theme;
                 viewInfo.parameters = ViewUtil.getPhpViewVariables(inputData.getPsiFile());
 
                 map.put(path, viewInfo);
@@ -152,6 +155,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
             writeString(dataOutput, viewInfo.fileUrl);
             writeString(dataOutput, viewInfo.application);
+            writeString(dataOutput, viewInfo.theme);
             dataOutput.writeInt(viewInfo.parameters.size());
             for (String parameter : viewInfo.parameters) {
                 writeString(dataOutput, parameter);
@@ -164,6 +168,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             ViewInfo viewInfo = new ViewInfo();
             viewInfo.fileUrl = readString(dataInput);
             viewInfo.application = readString(dataInput);
+            viewInfo.theme = readString(dataInput);
             final int parameterCount = dataInput.readInt();
             viewInfo.parameters = new ArrayList<>(parameterCount);
             for (int i = 0; i < parameterCount; i++) {
