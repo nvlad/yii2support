@@ -60,6 +60,8 @@ public class ViewUtil {
         final String key;
         if (callerClass.getName().endsWith("Controller") && ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\Controller", phpIndex)) {
             key = resolveViewFromController(callerClass, method, element, value);
+        } else if (ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\View", phpIndex)) {
+            key = resolveViewFromView(callerClass, method, element, value);
         } else {
             return null;
         }
@@ -96,6 +98,12 @@ public class ViewUtil {
         result.append(value);
 
         return result.toString();
+    }
+
+    @NotNull
+    private static String resolveViewFromView(PhpClass clazz, MethodReference method, PsiElement element, String value) {
+
+        return "";
     }
 
     private static String deletePathPart(String path) {
