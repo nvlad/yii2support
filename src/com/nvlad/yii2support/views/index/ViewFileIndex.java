@@ -3,12 +3,12 @@ package com.nvlad.yii2support.views.index;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
+import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import com.nvlad.yii2support.views.ViewUtil;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 14;
+        return 15;
     }
 
     @NotNull
@@ -75,7 +75,6 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     private static class ViewDataIndexer implements DataIndexer<String, ViewInfo, FileContent> {
         static final Map<Project, Map<Pattern, String>> projectViewPatterns = new HashMap<>();
-        static final VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
 
         @Override
         @NotNull
@@ -102,18 +101,12 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
             String path = absolutePath.substring(projectBaseDirLength);
             if (!path.startsWith("/vendor/")) {
-                final String viewRelativePath;
-                String application = "app";
-
-                if (virtualFileManager.findFileByUrl(project.getBaseDir().getUrl() + "/web") == null) {
-                    int applicationNameEnd = path.indexOf("/", 1);
-                    if (applicationNameEnd != -1) {
-                        application = path.substring(1, applicationNameEnd);
-                        path = path.substring(applicationNameEnd);
-                    }
+                String application = YiiApplicationUtils.getApplicationName(inputData.getFile(), project);
+                if (path.startsWith("/" + application + "/")) {
+                    path = path.substring(application.length() + 1);
                 }
 
-                viewRelativePath = path;
+                final String viewRelativePath = path;
                 path = "@app" + path;
                 if (!path.startsWith("@app/views/") && !(path.startsWith("@app/modules/") && path.contains("/views/"))) {
                     String viewPath = null;
