@@ -52,8 +52,9 @@ public class ViewUtil {
             return null;
         }
 
+        final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
         final String key;
-        if (callerClass.getName().endsWith("Controller")) {
+        if (callerClass.getName().endsWith("Controller") && ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\Controller", phpIndex)) {
             key = resolveViewFromController(callerClass, method, element, value);
         } else {
             return null;
