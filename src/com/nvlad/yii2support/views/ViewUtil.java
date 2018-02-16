@@ -132,6 +132,8 @@ public class ViewUtil {
                 viewResolve = resolveViewFromController(callerClass, value);
             } else if (ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\View", phpIndex)) {
                 viewResolve = resolveViewFromView(callerClass, method, element, value);
+            } else if (ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\Widget", phpIndex)) {
+                viewResolve = resolveViewFromWidget(callerClass, method, element, value);
             } else {
                 return null;
             }
@@ -203,6 +205,12 @@ public class ViewUtil {
         int lastSlashPosition = result.key.lastIndexOf('/');
         result.key = normalizePath(result.key.substring(0, lastSlashPosition + 1) + value);
         return result;
+    }
+
+    @NotNull
+    private static ViewResolve resolveViewFromWidget(PhpClass clazz, MethodReference method, PsiElement element, String value) {
+        ViewResolve result = new ViewResolve(ViewResolveFrom.Widget);
+        throw new InvalidPathException(value, "View not found");
     }
 
     private static String deletePathPart(String path) {
