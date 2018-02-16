@@ -127,11 +127,15 @@ public class ViewUtil {
 
         final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
         final ViewResolve viewResolve;
-        if (callerClass.getName().endsWith("Controller") && ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\Controller", phpIndex)) {
-            viewResolve = resolveViewFromController(callerClass, value);
-        } else if (ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\View", phpIndex)) {
-            viewResolve = resolveViewFromView(callerClass, method, element, value);
-        } else {
+        try {
+            if (callerClass.getName().endsWith("Controller") && ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\Controller", phpIndex)) {
+                viewResolve = resolveViewFromController(callerClass, value);
+            } else if (ClassUtils.isClassInheritsOrEqual(callerClass, "\\yii\\base\\View", phpIndex)) {
+                viewResolve = resolveViewFromView(callerClass, method, element, value);
+            } else {
+                return null;
+            }
+        } catch (InvalidPathException e) {
             return null;
         }
 
@@ -151,7 +155,7 @@ public class ViewUtil {
         }
         int controllersPathPartPosition = path.indexOf("/controllers/");
         if (controllersPathPartPosition == -1) {
-            throw new InvalidPathException(path, "");
+            throw new InvalidPathException(path, "Not found \"controllers\" directory.");
         }
         if (controllersPathPartPosition > 0) {
             final String module = path.substring(0, controllersPathPartPosition);
@@ -183,14 +187,14 @@ public class ViewUtil {
         }
         ViewResolve result = resolveView(virtualFile, element.getProject());
         if (result == null) {
-            throw new InvalidPathException(virtualFile.getPath(), "");
+            throw new InvalidPathException(virtualFile.getPath(), "Not resolved");
         }
 
         result.from = ViewResolveFrom.View;
         if (value.startsWith("/")) {
             int viewsPathPartPosition = result.key.lastIndexOf("/views/");
             if (viewsPathPartPosition == -1) {
-                throw new InvalidPathException(result.key, "");
+                throw new InvalidPathException(result.key, "Not found \"views\" directory");
             }
             result.key = result.key.substring(0, viewsPathPartPosition + 6) + value;
             return result;

@@ -79,8 +79,8 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
         @NotNull
         public Map<String, ViewInfo> map(@NotNull final FileContent inputData) {
             final Project project = inputData.getProject();
-            ViewResolve resolve = ViewUtil.resolveView(inputData.getFile(), project);
 
+            ViewResolve resolve = ViewUtil.resolveView(inputData.getFile(), project);
             if (resolve == null) {
                 return Collections.emptyMap();
             }
