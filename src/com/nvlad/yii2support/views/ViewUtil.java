@@ -210,12 +210,39 @@ public class ViewUtil {
     @NotNull
     private static ViewResolve resolveViewFromWidget(PhpClass clazz, MethodReference method, PsiElement element, String value) {
         ViewResolve result = new ViewResolve(ViewResolveFrom.Widget);
-        throw new InvalidPathException(value, "View not found");
+        final String classFQN = clazz.getFQN().replace('\\', '/');
+        StringBuilder key = new StringBuilder("@app");
+        result.application = getFirstPathPart(classFQN);
+        String path = deletePathPart(classFQN);
+        final int widgetsPathPartPosition = path.indexOf("/widgets/");
+        if (widgetsPathPartPosition == -1) {
+            throw new InvalidPathException(path, "Not found \"widgets\" directory.");
+        }
+        if (widgetsPathPartPosition > 0) {
+            final String modulePath = path.substring(0, widgetsPathPartPosition);
+            key.append(modulePath);
+            result.module = modulePath.substring(modulePath.lastIndexOf('/') + 1);
+        }
+
+        if (value.startsWith("/")) {
+            key.append("/views");
+        } else {
+            key.append("/widgets/views/");
+        }
+        key.append(value);
+        result.key = normalizePath(key.toString());
+        return result;
     }
 
     private static String deletePathPart(String path) {
         int returnFromPosition = path.indexOf('/', path.startsWith("/") ? 1 : 0);
         return returnFromPosition == -1 ? path : path.substring(returnFromPosition);
+    }
+
+    private static String getFirstPathPart(String path) {
+        int start = path.startsWith("/") ? 1 : 0;
+        int end = path.indexOf('/', start) - 1;
+        return end == -1 ? path : path.substring(start, end);
     }
 
 //    @Nullable
