@@ -230,7 +230,10 @@ public class ViewUtil {
         if (value.startsWith("/")) {
             key.append("/views");
         } else {
-            key.append("/widgets/views/");
+            key.append("/widgets");
+            path = deletePathPart(path);
+            key.append(path, 0, path.length() - clazz.getName().length());
+            key.append("views/");
         }
         key.append(value);
         result.key = normalizePath(key.toString());
