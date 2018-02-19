@@ -4,6 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,7 +21,8 @@ class ViewLookupElement extends LookupElement {
 
         myName = insertText;
         final String ext = file.getExtension();
-        if (ext != null && ext.equals("php") && !insertText.endsWith(".php")) {
+        final String defaultViewExtension = Yii2SupportSettings.getInstance(myFile.getProject()).defaultViewExtension;
+        if (ext != null && ext.equals(defaultViewExtension) && !insertText.endsWith("." + defaultViewExtension)) {
             myTail = "." + file.getExtension();
         } else {
             myTail = null;
