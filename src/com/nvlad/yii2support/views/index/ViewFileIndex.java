@@ -58,7 +58,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 21;
+        return 23;
     }
 
     @NotNull
@@ -98,6 +98,10 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             if (resolve.key.startsWith("@app/modules/") && !resolve.relativePath.startsWith("/modules/")) {
                 map.put("@app/views/modules" + resolve.key.substring(12), viewInfo);
                 System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/modules" + resolve.key.substring(12));
+            }
+            if (resolve.key.startsWith("@app/widgets/") && !resolve.relativePath.startsWith("/widgets/")) {
+                map.put("@app/views/widgets" + resolve.key.substring(12), viewInfo);
+                System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/widgets" + resolve.key.substring(12));
             }
             return map;
 

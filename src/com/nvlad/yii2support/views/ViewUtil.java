@@ -76,7 +76,9 @@ public class ViewUtil {
 
             result.relativePath = path;
             path = "@app" + path;
-            if (!path.startsWith("@app/views/") && !(path.startsWith("@app/modules/") && path.contains("/views/"))) {
+            if (!path.startsWith("@app/views/")
+                    && !(path.startsWith("@app/modules/") && path.contains("/views/"))
+                    && !(path.startsWith("@app/widgets/") && path.contains("/views/"))) {
                 String viewPath = null;
                 for (Map.Entry<Pattern, String> entry : ViewUtil.getPatterns(project).entrySet()) {
                     Matcher matcher = entry.getKey().matcher(path);
