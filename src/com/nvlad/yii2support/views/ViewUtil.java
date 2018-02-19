@@ -159,6 +159,7 @@ public class ViewUtil {
         if (controllersPathPartPosition == -1) {
             throw new InvalidPathException(path, "Not found \"controllers\" directory.");
         }
+        result.application = getFirstPathPart(classFQN);
         if (controllersPathPartPosition > 0) {
             final String module = path.substring(0, controllersPathPartPosition);
             key.append(module);
@@ -212,12 +213,12 @@ public class ViewUtil {
         ViewResolve result = new ViewResolve(ViewResolveFrom.Widget);
         final String classFQN = clazz.getFQN().replace('\\', '/');
         StringBuilder key = new StringBuilder("@app");
-        result.application = getFirstPathPart(classFQN);
         String path = deletePathPart(classFQN);
         final int widgetsPathPartPosition = path.indexOf("/widgets/");
         if (widgetsPathPartPosition == -1) {
             throw new InvalidPathException(path, "Not found \"widgets\" directory.");
         }
+        result.application = getFirstPathPart(classFQN);
         if (widgetsPathPartPosition > 0) {
             final String modulePath = path.substring(0, widgetsPathPartPosition);
             key.append(modulePath);
