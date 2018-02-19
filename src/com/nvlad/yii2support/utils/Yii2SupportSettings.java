@@ -20,6 +20,7 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     public String tablePrefix = "";
     public boolean insertWithTablePrefix = false;
     public Map<String, String> viewPathMap;
+    public String defaultViewExtension = "php";
 
     public Yii2SupportSettings() {
         viewPathMap = new LinkedHashMap<>();

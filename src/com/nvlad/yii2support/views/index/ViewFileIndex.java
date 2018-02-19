@@ -8,8 +8,9 @@ import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
-import com.nvlad.yii2support.views.ViewResolve;
-import com.nvlad.yii2support.views.ViewUtil;
+import com.nvlad.yii2support.views.entities.ViewInfo;
+import com.nvlad.yii2support.views.entities.ViewResolve;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInput;
@@ -104,60 +105,6 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                 System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/widgets" + resolve.key.substring(12));
             }
             return map;
-
-//            final String projectPath = project.getBaseDir().getPath();
-//            int projectBaseDirLength = projectPath.length();
-//            final String absolutePath = inputData.getFile().getPath();
-//            if (!absolutePath.startsWith(projectPath)) {
-//                return Collections.emptyMap();
-//            }
-//
-//            String path = absolutePath.substring(projectBaseDirLength);
-//            if (!path.startsWith("/vendor/")) {
-//                String application = YiiApplicationUtils.getApplicationName(inputData.getFile(), project);
-//                String theme = "";
-//                if (path.startsWith("/" + application + "/")) {
-//                    path = path.substring(application.length() + 1);
-//                }
-//
-//                final String viewRelativePath = path;
-//                path = "@app" + path;
-//                if (!path.startsWith("@app/views/") && !(path.startsWith("@app/modules/") && path.contains("/views/"))) {
-//                    String viewPath = null;
-//                    for (Map.Entry<Pattern, String> entry : ViewUtil.getPatterns(project).entrySet()) {
-//                        Matcher matcher = entry.getKey().matcher(path);
-//                        if (matcher.find()) {
-//                            viewPath = entry.getValue() + path.substring(matcher.end(1));
-//                            theme = matcher.group(2);
-//                            break;
-//                        }
-//                    }
-//                    if (viewPath == null) {
-//                        return Collections.emptyMap();
-//                    }
-//                    path = viewPath;
-//                }
-//                if (inputData.getFile().getExtension() != null) {
-//                    path = path.substring(0, path.length() - inputData.getFile().getExtension().length() - 1);
-//                }
-//
-//                System.out.println("ViewDataIndexer.map > " + absolutePath + " => " + path);
-//
-//                Map<String, ViewInfo> map = new HashMap<>();
-//                ViewInfo viewInfo = new ViewInfo(inputData);
-//                viewInfo.application = application;
-//                viewInfo.theme = theme;
-//                viewInfo.parameters = ViewUtil.getPhpViewVariables(inputData.getPsiFile());
-//
-//                map.put(path, viewInfo);
-//                if (path.startsWith("@app/modules/") && !viewRelativePath.startsWith("/modules/")) {
-//                    map.put("@app/views/modules" + path.substring(12), viewInfo);
-//                    System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/modules" + path.substring(12));
-//                }
-//                return map;
-//            }
-//
-//            return Collections.emptyMap();
         }
     }
 

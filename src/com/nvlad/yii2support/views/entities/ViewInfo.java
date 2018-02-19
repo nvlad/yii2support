@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.views.index;
+package com.nvlad.yii2support.views.entities;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;

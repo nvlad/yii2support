@@ -5,7 +5,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.nvlad.yii2support.common.Patterns;
-import com.nvlad.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,6 +19,6 @@ public class PsiReferenceContributor extends com.intellij.psi.PsiReferenceContri
 
     private static ElementPattern<PsiElement> ElementPattern() {
         return PlatformPatterns.psiElement(PsiElement.class)
-                .withSuperParent(2, Patterns.methodWithName(ViewsUtil.renderMethods));
+                .withSuperParent(2, Patterns.methodWithName(ViewUtil.renderMethods));
     }
 }

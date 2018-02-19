@@ -13,12 +13,11 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.nvlad.yii2support.common.PhpUtil;
-import com.nvlad.yii2support.views.ViewResolve;
-import com.nvlad.yii2support.views.ViewResolveFrom;
-import com.nvlad.yii2support.views.ViewUtil;
-import com.nvlad.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.entities.ViewInfo;
+import com.nvlad.yii2support.views.entities.ViewResolve;
+import com.nvlad.yii2support.views.entities.ViewResolveFrom;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
-import com.nvlad.yii2support.views.index.ViewInfo;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -41,7 +40,7 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             return;
         }
 
-        if (!ViewsUtil.isValidRenderMethod(method)) {
+        if (!ViewUtil.isValidRenderMethod(method)) {
             return;
         }
 
@@ -108,53 +107,5 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
                 }
             }
         }
-
-//        Collection<String> keys = StubIndex.getInstance().getAllKeys(YiiViewIndex.KEY, completionParameters.getPosition().getProject());
-
-//
-
-
-//        String path = getValue(method.getParameters()[0]);
-//        PsiDirectory directory;
-//        if (path.startsWith("/")) {
-//            path = path.substring(1);
-//            directory = ViewsUtil.getRootDirectory(psiElement);
-//        } else {
-//            directory = ViewsUtil.getContextDirectory(psiElement);
-//        }
-//        if (path.contains("/")) {
-//            path = path.substring(0, path.lastIndexOf('/') + 1);
-//        }
-//
-//        while (path.contains("/") && directory != null) {
-//            String subdirectory = path.substring(0, path.indexOf('/'));
-//            path = path.substring(path.indexOf('/') + 1);
-//            directory = subdirectory.equals("..") ? directory.getParent() : directory.findSubdirectory(subdirectory);
-//        }
-//        if (directory != null) {
-//            if (completionResultSet.getPrefixMatcher().getPrefix().contains("/")) {
-//                String prefix = completionResultSet.getPrefixMatcher().getPrefix();
-//                prefix = prefix.substring(prefix.lastIndexOf("/") + 1);
-//                completionResultSet = completionResultSet.withPrefixMatcher(prefix);
-//            }
-//
-//            for (PsiDirectory psiDirectory : directory.getSubdirectories()) {
-//                completionResultSet.addElement(new DirectoryLookupElement(psiDirectory));
-//            }
-//
-//            for (PsiFile psiFile : directory.getFiles()) {
-//                completionResultSet.addElement(new ViewLookupElement(psiFile));
-//            }
-//        }
     }
-//
-//    @NotNull
-//    private String getValue(PsiElement expression) {
-//        if (expression instanceof StringLiteralExpression) {
-//            String value = ((StringLiteralExpression) expression).getContents();
-//            return value.substring(0, value.indexOf("IntellijIdeaRulezzz "));
-//        }
-//
-//        return "";
-//    }
 }

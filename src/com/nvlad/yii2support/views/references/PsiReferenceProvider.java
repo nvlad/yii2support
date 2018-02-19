@@ -8,11 +8,11 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.nvlad.yii2support.common.PhpUtil;
-import com.nvlad.yii2support.views.ViewResolve;
-import com.nvlad.yii2support.views.ViewResolveFrom;
-import com.nvlad.yii2support.views.ViewUtil;
+import com.nvlad.yii2support.views.entities.ViewResolve;
+import com.nvlad.yii2support.views.entities.ViewResolveFrom;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
-import com.nvlad.yii2support.views.index.ViewInfo;
+import com.nvlad.yii2support.views.entities.ViewInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.views;
+package com.nvlad.yii2support.views.entities;
 
 public enum ViewResolveFrom {
     Controller,

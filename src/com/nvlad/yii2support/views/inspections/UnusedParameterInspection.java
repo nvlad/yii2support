@@ -12,11 +12,10 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
-import com.nvlad.yii2support.views.ViewResolve;
-import com.nvlad.yii2support.views.ViewUtil;
-import com.nvlad.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.entities.ViewInfo;
+import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
-import com.nvlad.yii2support.views.index.ViewInfo;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -40,12 +39,12 @@ final public class UnusedParameterInspection extends PhpInspection {
         return new PhpElementVisitor() {
             @Override
             public void visitPhpMethodReference(MethodReference reference) {
-                if (!ViewsUtil.isValidRenderMethod(reference)) {
+                if (!ViewUtil.isValidRenderMethod(reference)) {
                     return;
                 }
 
                 final String name = reference.getName();
-                if (name == null || !ArrayUtil.contains(name, ViewsUtil.renderMethods)) {
+                if (name == null || !ArrayUtil.contains(name, ViewUtil.renderMethods)) {
                     return;
                 }
 

@@ -10,7 +10,7 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.nvlad.yii2support.common.Patterns;
-import com.nvlad.yii2support.views.ViewsUtil;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,7 +24,7 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
         MethodReference reference = PsiTreeUtil.getParentOfType(position, MethodReference.class);
-        if (reference != null && ArrayUtil.contains(reference.getName(), ViewsUtil.renderMethods)) {
+        if (reference != null && ArrayUtil.contains(reference.getName(), ViewUtil.renderMethods)) {
             if (typeChar == '\'' || typeChar == '"') {
                 if (position instanceof LeafPsiElement && position.getText().equals("$view")) {
                     return true;
@@ -40,6 +40,6 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
 
     private static ElementPattern<PsiElement> ElementPattern() {
         return PlatformPatterns.psiElement()
-                .withSuperParent(3, Patterns.methodWithName(ViewsUtil.renderMethods));
+                .withSuperParent(3, Patterns.methodWithName(ViewUtil.renderMethods));
     }
 }
