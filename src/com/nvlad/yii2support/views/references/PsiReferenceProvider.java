@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.views.references;
 
+import com.google.common.io.Files;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -8,6 +9,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.nvlad.yii2support.common.PhpUtil;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.entities.ViewResolveFrom;
 import com.nvlad.yii2support.views.util.ViewUtil;
@@ -31,8 +33,14 @@ class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider {
         final ViewResolve resolve = ViewUtil.resolveView(psiElement);
         if (resolve != null) {
             Project project = psiElement.getProject();
+
+            String key = resolve.key;
+            if (Files.getFileExtension(key).isEmpty()) {
+                key = key + '.' + Yii2SupportSettings.getInstance(psiElement.getProject()).defaultViewExtension;
+            }
+
             final Collection<ViewInfo> views = FileBasedIndex.getInstance()
-                    .getValues(ViewFileIndex.identity, resolve.key, GlobalSearchScope.projectScope(project));
+                    .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
 
             if (views.size() > 0) {
                 boolean localViewSearch = false;

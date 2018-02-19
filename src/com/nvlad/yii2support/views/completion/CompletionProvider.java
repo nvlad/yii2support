@@ -13,6 +13,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.nvlad.yii2support.common.PhpUtil;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import com.nvlad.yii2support.views.entities.ViewInfo;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.entities.ViewResolveFrom;
@@ -86,6 +87,8 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             final String value = PhpUtil.getValue(viewParameter);
             localViewSearch = !value.startsWith("@") && !value.startsWith("//");
         }
+
+        final String defaultViewExtension = '.' + Yii2SupportSettings.getInstance(psiElement.getProject()).defaultViewExtension;
         for (String key : keys) {
             Collection<ViewInfo> views = fileBasedIndex.getValues(ViewFileIndex.identity, key, scope);
             for (ViewInfo view : views) {
@@ -100,6 +103,9 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
                 PsiFile psiFile = psiManager.findFile(view.getVirtualFile());
                 if (psiFile != null) {
                     String insertText = key.substring(prefixLength);
+                    if (insertText.endsWith(defaultViewExtension)) {
+                        insertText = insertText.substring(0, insertText.length() - defaultViewExtension.length());
+                    }
                     completionResultSet.addElement(new ViewLookupElement(psiFile, insertText));
                     break;
                 } else {

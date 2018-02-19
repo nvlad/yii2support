@@ -67,11 +67,6 @@ public class ViewUtil {
                 }
                 path = viewPath;
             }
-
-            final String defaultViewExtension = Yii2SupportSettings.getInstance(project).defaultViewExtension;
-            if (virtualFile.getExtension() != null && virtualFile.getExtension().equals(defaultViewExtension)) {
-                path = path.substring(0, path.length() - defaultViewExtension.length() - 1);
-            }
             result.key = path;
 
             return result;
