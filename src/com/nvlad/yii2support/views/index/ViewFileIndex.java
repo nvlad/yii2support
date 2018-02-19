@@ -1,6 +1,5 @@
 package com.nvlad.yii2support.views.index;
 
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.indexing.*;
@@ -8,6 +7,8 @@ import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
+import com.jetbrains.smarty.SmartyFileType;
+import com.jetbrains.twig.TwigFileType;
 import com.nvlad.yii2support.views.entities.ViewInfo;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.util.ViewUtil;
@@ -30,7 +31,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     public ViewFileIndex() {
         myViewDataIndexer = new ViewDataIndexer();
         myViewInfoDataExternalizer = new ViewInfoDataExternalizer();
-        myInputFilter = new ViewFileInputFilter(PhpFileType.INSTANCE);
+        myInputFilter = new ViewFileInputFilter();
     }
 
     @NotNull
@@ -59,7 +60,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 23;
+        return 25;
     }
 
     @NotNull
@@ -161,15 +162,29 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     }
 
     private class ViewFileInputFilter implements FileBasedIndex.InputFilter {
-        private final FileType myFileType;
+        private boolean twigSupported;
 
-        ViewFileInputFilter(FileType fileType) {
-            this.myFileType = fileType;
+        ViewFileInputFilter() {
+            try {
+                Class.forName("com.jetbrains.twig.TwigFileType");
+                twigSupported = true;
+            } catch (ClassNotFoundException e) {
+                twigSupported = false;
+            }
         }
 
         @Override
         public boolean acceptInput(@NotNull VirtualFile virtualFile) {
-            return virtualFile.getFileType() == myFileType;
+            if (virtualFile.getFileType() == PhpFileType.INSTANCE) {
+                return true;
+            }
+
+            if (virtualFile.getFileType() == SmartyFileType.INSTANCE) {
+                return true;
+            }
+
+            return twigSupported && virtualFile.getFileType() == TwigFileType.INSTANCE;
+
         }
     }
 }

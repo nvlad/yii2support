@@ -35,6 +35,7 @@
     <depends>com.intellij.modules.lang</depends>
     -->
     <depends>com.jetbrains.php</depends>
+    <depends optional="true">com.jetbrains.twig</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
 
