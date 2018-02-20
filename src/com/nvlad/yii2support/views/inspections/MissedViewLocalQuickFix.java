@@ -117,14 +117,14 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
 
     private String getFileTemplateName(FileType fileType) {
         if (fileType == PhpFileType.INSTANCE) {
-            return "PHP File";
+            return "Yii2 PHP View File";
         } else if (fileType == SmartyFileType.INSTANCE) {
-            return "Smarty File";
+            return "Yii2 Smarty View File";
         } else {
             try {
                 Class.forName("com.jetbrains.twig.TwigFileType");
                 if (fileType == TwigFileType.INSTANCE) {
-                    return "Twig File";
+                    return "Yii2 Twig View File";
                 }
             } catch (ClassNotFoundException e) {
                 return null;
