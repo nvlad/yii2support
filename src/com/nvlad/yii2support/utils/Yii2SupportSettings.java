@@ -5,7 +5,10 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.MapAnnotation;
+import com.nvlad.yii2support.views.index.ViewFileIndex;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
@@ -19,8 +22,9 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
 
     public String tablePrefix = "";
     public boolean insertWithTablePrefix = false;
-    public Map<String, String> viewPathMap;
     public String defaultViewExtension = "php";
+    @MapAnnotation(sortBeforeSave = false)
+    public Map<String, String> viewPathMap;
 
     public Yii2SupportSettings() {
         viewPathMap = new LinkedHashMap<>();
@@ -37,6 +41,9 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
 
     @Override
     public void loadState(Yii2SupportSettings applicationService) {
+        if (this.viewPathMap.hashCode() != applicationService.viewPathMap.hashCode()) {
+            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
+        }
         XmlSerializerUtil.copyBean(applicationService, this);
     }
 
