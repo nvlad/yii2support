@@ -61,7 +61,7 @@ final public class MissedViewInspection extends PhpInspection {
                             key = key + '.' + Yii2SupportSettings.getInstance(reference.getProject()).defaultViewExtension;
                         }
 
-                        Project project = reference.getProject();
+                        final Project project = reference.getProject();
                         final Collection<ViewInfo> views = FileBasedIndex.getInstance()
                                 .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
 

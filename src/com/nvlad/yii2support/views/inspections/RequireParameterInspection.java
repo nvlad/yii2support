@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.views.inspections;
 
+import com.google.common.io.Files;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
@@ -16,6 +17,7 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.nvlad.yii2support.common.PhpUtil;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import com.nvlad.yii2support.views.entities.ViewInfo;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
@@ -60,9 +62,15 @@ public class RequireParameterInspection extends PhpInspection {
                 if (resolve == null) {
                     return;
                 }
-                Project project = reference.getProject();
+
+                String key = resolve.key;
+                if (Files.getFileExtension(key).isEmpty()) {
+                    key = key + '.' + Yii2SupportSettings.getInstance(reference.getProject()).defaultViewExtension;
+                }
+
+                final Project project = reference.getProject();
                 final Collection<ViewInfo> views = FileBasedIndex.getInstance()
-                        .getValues(ViewFileIndex.identity, resolve.key, GlobalSearchScope.projectScope(project));
+                        .getValues(ViewFileIndex.identity, key, GlobalSearchScope.projectScope(project));
                 final String application = YiiApplicationUtils.getApplicationName(reference.getContainingFile());
                 views.removeIf(viewInfo -> !application.equals(viewInfo.application));
                 if (views.size() == 0) {
