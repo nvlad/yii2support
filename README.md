@@ -1,5 +1,5 @@
 IntelliJ IDEA / PhpStorm Yii2 Support
-====================================
+=====================================
 
 [![Latest Stable Version](http://phpstorm.espend.de/badge/9388/version)](https://plugins.jetbrains.com/plugin/9388)
 [![Total Downloads](http://phpstorm.espend.de/badge/9388/downloads)](https://plugins.jetbrains.com/plugin/9388)
@@ -16,7 +16,7 @@ Provides [Yii 2 Framework](http://www.yiiframework.com/) support for [PhpStorm](
 and [IntelliJ IDEA](https://www.jetbrains.com/idea/).  
 
 Donate
---------
+------
 
 Please make donations to support plugin development.  
 [![paypal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MVG9CP6NZV856)  
@@ -114,3 +114,4 @@ Acknowledging and or citing the plugin is as important as direct contributions.
 If you are giving a presentation or talk we suggest using
 [our logo](https://github.com/nvlad/yii2support/raw/master/img/logo.png?raw=true).
 
+[Project Changelog](CHANGELOG.md)
