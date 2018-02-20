@@ -59,8 +59,7 @@ class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider {
 
                     PsiFile file = PsiManager.getInstance(project).findFile(view.getVirtualFile());
                     if (file != null) {
-                        PsiReference reference = new PsiReference(psiElement, file);
-                        references.add(reference);
+                        references.add(new PsiReference(psiElement, file));
                     }
                 }
             }

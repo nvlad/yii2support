@@ -1,7 +1,9 @@
 package com.nvlad.yii2support.views.util;
 
+import com.google.common.io.Files;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.SearchScope;
@@ -78,7 +80,7 @@ public class ViewUtil {
     @Nullable
     public static ViewResolve resolveView(PsiElement element) {
         String value = PhpUtil.getValue(element);
-        if (value.startsWith("@app")) {
+        if (value.startsWith("@")) {
             ViewResolve resolve = new ViewResolve(value);
             resolve.application = YiiApplicationUtils.getApplicationName(element.getContainingFile());
             return resolve;
@@ -186,6 +188,28 @@ public class ViewUtil {
                 || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\View", phpIndex)
                 || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\base\\Widget", phpIndex)
                 || ClassUtils.isClassInheritsOrEqual(clazz, "\\yii\\mail\\BaseMailer", phpIndex);
+    }
+
+    @NotNull
+    public static Collection<String> viewResolveToPaths(@NotNull ViewResolve resolve, @NotNull Project project) {
+        Set<String> result = new HashSet<>();
+
+        String path = resolve.key;
+        if (Files.getFileExtension(path).isEmpty()) {
+            path = path + '.' + Yii2SupportSettings.getInstance(project).defaultViewExtension;
+        }
+        if (path.startsWith("@app/")) {
+            path = path.substring(4);
+        }
+
+        String projectUrl = project.getBaseDir().getUrl();
+        VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
+        if (virtualFileManager.findFileByUrl(projectUrl + "/web") == null) {
+            path = '/' + resolve.application + path;
+        }
+        result.add(path);
+
+        return result;
     }
 
     @NotNull

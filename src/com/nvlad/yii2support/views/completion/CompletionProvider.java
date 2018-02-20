@@ -64,8 +64,23 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
         final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
 
         int prefixLength = resolve.key.length();
-        if (resolve.key.contains("/") && !resolve.key.endsWith("/")) {
-            prefixLength = resolve.key.lastIndexOf('/') + 1;
+        int lastSlashPosition = resolve.key.lastIndexOf('/');
+        if (lastSlashPosition != -1 && !resolve.key.endsWith("/")) {
+            prefixLength = lastSlashPosition + 1;
+        }
+
+        if (!completionParameters.isAutoPopup()) {
+            if (completionResultSet.getPrefixMatcher().getPrefix().startsWith("@") && lastSlashPosition == -1) {
+                final String prefix = completionResultSet.getPrefixMatcher().getPrefix();
+                completionResultSet = completionResultSet.withPrefixMatcher(prefix.substring(1));
+                prefixLength = 1;
+            } else {
+                completionResultSet = completionResultSet.withPrefixMatcher(resolve.key.substring(prefixLength));
+            }
+
+        }
+        if (completionResultSet.getPrefixMatcher().getPrefix().equals("@")) {
+            completionResultSet = completionResultSet.withPrefixMatcher("");
         }
 
         final String prefixFilter = resolve.key.substring(0, prefixLength);
@@ -76,10 +91,6 @@ class CompletionProvider extends com.intellij.codeInsight.completion.CompletionP
             }
             return true;
         }, scope, null);
-
-        if (!completionParameters.isAutoPopup()) {
-            completionResultSet = completionResultSet.withPrefixMatcher(resolve.key.substring(prefixLength));
-        }
 
         final PsiManager psiManager = PsiManager.getInstance(project);
         boolean localViewSearch = false;
