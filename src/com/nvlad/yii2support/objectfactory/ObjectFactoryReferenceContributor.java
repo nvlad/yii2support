@@ -5,9 +5,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.nvlad.yii2support.common.Patterns;
-import com.nvlad.yii2support.views.ViewsUtil;
 
 import org.jetbrains.annotations.NotNull;
 
