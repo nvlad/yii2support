@@ -1,2 +1,6 @@
 <?php
 #parse("PHP File Header.php")
+
+#foreach( $VAR in $YII2_VIEW_PARAMETERS.split("\|") )
+/** @var $${VAR} */
+#end

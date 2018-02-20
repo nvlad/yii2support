@@ -1,0 +1,3 @@
+#foreach( $VAR in $YII2_VIEW_PARAMETERS.split("\|") )
+{# @var ${VAR} #}
+#end

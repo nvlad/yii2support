@@ -22,8 +22,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by NVlad on 15.01.2017.
@@ -31,10 +30,18 @@ import java.util.Properties;
 class MissedViewLocalQuickFix implements LocalQuickFix {
     final private String myName;
     final private String myPath;
+    final private Map<String, String> myParameters;
 
     MissedViewLocalQuickFix(String name, String path) {
         myName = name;
         myPath = path;
+        myParameters = null;
+    }
+
+    MissedViewLocalQuickFix(String name, String path, Map<String, String> parameters) {
+        myName = name;
+        myPath = path;
+        myParameters = parameters;
     }
 
     @Nls
@@ -105,6 +112,15 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
 
         if (template != null && viewPsiFile.getViewProvider().getDocument() != null) {
             final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
+            if (myParameters != null) {
+                Set<String> parameters = new LinkedHashSet<>(myParameters.size());
+                for (Map.Entry<String, String> parameter : myParameters.entrySet()) {
+                    parameters.add(parameter.getKey() + ' ' + parameter.getValue());
+                }
+
+                properties.setProperty("YII2_VIEW_PARAMETERS", StringUtil.join(parameters, "|"));
+            }
+
             template.setLiveTemplateEnabled(true);
             template.setReformatCode(true);
             try {

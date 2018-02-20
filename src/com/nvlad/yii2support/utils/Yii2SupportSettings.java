@@ -23,6 +23,7 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     public String tablePrefix = "";
     public boolean insertWithTablePrefix = false;
     public String defaultViewExtension = "php";
+    public String defaultViewClass = "\\yii\\web\\View";
     @MapAnnotation(sortBeforeSave = false)
     public Map<String, String> viewPathMap;
 
