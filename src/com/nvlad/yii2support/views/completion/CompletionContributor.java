@@ -9,6 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.nvlad.yii2support.common.Patterns;
 import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,10 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
                 if (position.getNextSibling() instanceof ParameterList) {
                     return true;
                 }
+            }
+            if (typeChar == '@' && position.getParent() instanceof StringLiteralExpression) {
+                ParameterList parameterList = PsiTreeUtil.getParentOfType(position, ParameterList.class);
+                return parameterList != null && parameterList.getParameters()[0] == position.getParent();
             }
         }
 

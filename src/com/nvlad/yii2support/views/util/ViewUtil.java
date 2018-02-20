@@ -78,7 +78,7 @@ public class ViewUtil {
     @Nullable
     public static ViewResolve resolveView(PsiElement element) {
         String value = PhpUtil.getValue(element);
-        if (value.startsWith("@app")) {
+        if (value.startsWith("@")) {
             ViewResolve resolve = new ViewResolve(value);
             resolve.application = YiiApplicationUtils.getApplicationName(element.getContainingFile());
             return resolve;

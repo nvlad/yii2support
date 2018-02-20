@@ -184,7 +184,6 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             }
 
             return twigSupported && virtualFile.getFileType() == TwigFileType.INSTANCE;
-
         }
     }
 }
