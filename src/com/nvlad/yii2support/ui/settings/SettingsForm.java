@@ -2,24 +2,20 @@ package com.nvlad.yii2support.ui.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class SettingsForm  implements Configurable {
+public class SettingsForm implements Configurable {
     private JPanel mainPanel;
     private JTextField tablePrefixTextbox;
     private JCheckBox insertTableNamesWithCheckBox;
@@ -48,6 +44,12 @@ public class SettingsForm  implements Configurable {
     @Override
     public String getDisplayName() {
         return "Yii2 Support";
+    }
+
+    @Nullable
+    @Override
+    public String getHelpTopic() {
+        return null;
     }
 
     @Nullable

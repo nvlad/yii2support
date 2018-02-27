@@ -42,7 +42,7 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                         return new PhpType().add("#" + this.getKey() + signature + TRIM_KEY + ((FieldReference) firstParam).getSignature());
                     }
                     // Case: Yii::createObject($array_var)
-                    if (firstParam instanceof Variable  && ((VariableImpl) firstParam).getDeclaredType().getTypes().contains("\\array") ) {
+                    if (firstParam instanceof Variable  && ((VariableImpl) firstParam).getType().getTypes().contains("\\array") ) {
                         firstParam = getArrayCreationByVariableRef(firstParam);
                     }
                     if (firstParam instanceof ArrayCreationExpression) {
