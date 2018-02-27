@@ -29,6 +29,13 @@ public class MissedParamQuickFix  implements LocalQuickFix {
     @Nls
     @NotNull
     @Override
+    public String getName() {
+        return getFamilyName();
+    }
+
+    @Nls
+    @NotNull
+    @Override
     public String getFamilyName() {
         return "Conform parameters to condition";
     }

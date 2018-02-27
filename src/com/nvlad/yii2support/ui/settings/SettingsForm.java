@@ -1,7 +1,6 @@
 package com.nvlad.yii2support.ui.settings;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -64,13 +63,12 @@ public class SettingsForm implements Configurable {
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         settings.tablePrefix = tablePrefixTextbox.getText();
         settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
     }
 
     private void createUIComponents() {
-        mainPanel = mainPanel;
         // TODO: place custom component creation code here
     }
 
@@ -79,6 +77,10 @@ public class SettingsForm implements Configurable {
         tablePrefixTextbox.setText(settings.tablePrefix);
         insertTableNamesWithCheckBox.setSelected(settings.insertWithTablePrefix);
         adjustInputs();
+    }
+
+    @Override
+    public void disposeUIResources() {
     }
 
     {

@@ -41,8 +41,8 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider3  {
 
     }
 
-    @Override
-    public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
+//    @Override
+    public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
         Collection<PhpNamedElement> elements = new HashSet<>();
         PhpClass classBySignature = SignatureUtils.getClassBySignature(s, project);
         boolean classInheritsFromAD = ClassUtils.isClassInherit(classBySignature, "\\yii\\db\\BaseActiveRecord", PhpIndex.getInstance(project));
@@ -60,5 +60,10 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider3  {
             }
         }
         return elements;
+    }
+
+//    @Override
+    public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
+        return getBySignature(s, project);
     }
 }

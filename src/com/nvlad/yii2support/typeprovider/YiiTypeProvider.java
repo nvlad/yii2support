@@ -10,11 +10,9 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.MethodUtils;
-import com.nvlad.yii2support.common.SignatureUtils;
 import com.nvlad.yii2support.objectfactory.ObjectFactoryUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -98,8 +96,8 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
         return null;
     }
 
-    @Override
-    public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
+//    @Override
+    public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
         Collection<PhpNamedElement> elements = new HashSet<>();
         int trimIndex = s.indexOf(TRIM_KEY);
         if (trimIndex > -1 && s.length() + 1 > trimIndex) {
@@ -120,5 +118,10 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
         }
 
         return elements;
+    }
+
+//    @Override
+    public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
+        return getBySignature(s, project);
     }
 }
