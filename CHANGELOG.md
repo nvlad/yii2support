@@ -1,6 +1,19 @@
 Yii2 Support Change Log
 =======================
 
+0.8 March 1, 2018
+-----------------
+- New Views support (v2)
+    - Nested folders for Controllers & Views
+    - Resolve paths "@app/...", "//..." и "/..."
+    - Themes
+    - Views in modules
+    - Create directory for views if is not exists
+    - Add templates for Views (Yii2 PHP View File.php, Yii2 Twig View File.twig, Yii2 Smarty View File.tpl)
+    - Adding PhpDoc @var for described render parameters on View create
+- Fix compatibility for PhpStorm 2016.2 & PhpStorm 2016.3
+- No longer support PhpStorm 2016.1 
+
 0.7.35.2 December 27, 2017
 --------------------------
 - Form's field method autocomplete
