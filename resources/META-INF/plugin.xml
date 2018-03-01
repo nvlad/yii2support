@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.7.35.2</version>
+    <version>0.8</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -20,8 +20,20 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <p>!!! New Views support</p>
         <ul>
-            <li>Form's field method autocomplete</li>
+            <li>Nested folders for Controllers & Views</li>
+            <li>Resolve paths "@app/...", "//..." и "/..."</li>
+            <li>Themes</li>
+            <li>Views in modules</li>
+            <li>Create directory for views if is not exists</li>
+            <li>Add templates for Views (Yii2 PHP View File.php, Yii2 Twig View File.twig, Yii2 Smarty View File.tpl)</li>
+            <li>Adding PhpDoc @var for described render parameters on View create</li>
+        </ul>
+        <p>Other</p>
+        <ul>
+            <li>Fix compatibility for PhpStorm 2016.2 & PhpStorm 2016.3</li>
+            <li>No longer supported PhpStorm 2016.1</li>
         </ul>
     ]]>
     </change-notes>
