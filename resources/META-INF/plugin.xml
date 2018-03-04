@@ -136,6 +136,11 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action id="yii2support.GotoViewCalls" class="com.nvlad.yii2support.views.actions.OpenViewCalls"
+                text="Goto Views calls">
+            <add-to-group group-id="GoToMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="shift meta R"/>
+        </action>
     </actions>
 
     <!--
