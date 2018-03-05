@@ -8,6 +8,10 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.searches.ReferencesSearch;
+
+import java.util.Collection;
 
 public class OpenViewCalls extends AnAction {
 
@@ -19,8 +23,18 @@ public class OpenViewCalls extends AnAction {
             return;
         }
 
+        Collection<PsiReference> references = ReferencesSearch.search(psiFile).findAll();
+        if (references.size() == 0) {
+            return;
+        }
+
+        if (references.size() == 1) {
+            ReferenceListPopupStep.openReference(references.iterator().next());
+            return;
+        }
+
         JBPopupFactory popupFactory = JBPopupFactory.getInstance();
-        BaseListPopupStep popupStep = new BaseListPopupStep("Render from", "sadsasd", "asdasdasd");
+        BaseListPopupStep popupStep = new ReferenceListPopupStep("Render this View from", references);
         ListPopup popup = popupFactory.createListPopup(popupStep);
         Project project = e.getProject();
         if (project == null) {
