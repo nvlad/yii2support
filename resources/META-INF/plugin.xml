@@ -58,7 +58,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
-       <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
+        <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
 
         <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
                                  displayName="Yii2 Support"
@@ -85,6 +85,10 @@
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.UnusedParameterInspection"/>
+        <localInspection language="PHP" shortName="ViewMissedPhpDocInspection"
+                         groupName="Views" groupPath="PHP,Framework,Yii2"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.nvlad.yii2support.views.inspections.ViewMissedPhpDocInspection"/>
 
         <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex"/>
 

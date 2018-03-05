@@ -9,7 +9,8 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.inspections.PhpInspection;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.nvlad.yii2support.common.PhpUtil;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
@@ -18,12 +19,11 @@ import com.nvlad.yii2support.views.entities.ViewInfo;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.entities.ViewResolveFrom;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
+import com.nvlad.yii2support.views.util.RenderUtil;
 import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Created by NVlad on 15.01.2017.
@@ -89,7 +89,7 @@ final public class MissedViewInspection extends PhpInspection {
                                 return;
                             }
 
-                            final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(value, paths.iterator().next(), getViewParameters(reference));
+                            final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(value, paths.iterator().next(), RenderUtil.getViewParameters(reference));
                             final PsiElement stringPart = pathParameter.findElementAt(1);
                             if (stringPart != null) {
                                 problemsHolder.registerProblem(stringPart, viewNotFoundMessage, quickFix);
@@ -97,50 +97,6 @@ final public class MissedViewInspection extends PhpInspection {
                         }
                     }
                 }
-            }
-
-            @NotNull
-            private Map<String, String> getViewParameters(MethodReference reference) {
-                final Map<String, String> result = new LinkedHashMap<>();
-                result.put("this", Yii2SupportSettings.getInstance(reference.getProject()).defaultViewClass);
-
-                ParameterList parameterList = reference.getParameterList();
-                if (parameterList == null) {
-                    return result;
-                }
-
-                if (parameterList.getParameters().length == 1) {
-                    return result;
-                }
-
-                final PsiElement parameter = parameterList.getParameters()[1];
-                if (parameter instanceof ArrayCreationExpression) {
-                    final ArrayCreationExpression array = (ArrayCreationExpression) parameter;
-                    for (ArrayHashElement item : array.getHashElements()) {
-                        PhpPsiElement keyElement = item.getKey();
-
-                        String key;
-                        if (keyElement instanceof StringLiteralExpression) {
-                            key = ((StringLiteralExpression) keyElement).getContents();
-                        } else {
-                            return result;
-                        }
-
-                        String valueType;
-                        final PhpPsiElement valueElement = item.getValue();
-                        if (valueElement instanceof PhpExpression) {
-                            valueType = ((PhpExpression) valueElement).getType().toString();
-                        } else {
-                            return result;
-                        }
-
-                        result.put(key, valueType);
-                    }
-
-                    return result;
-                }
-
-                return result;
             }
         };
     }
