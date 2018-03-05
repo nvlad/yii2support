@@ -86,7 +86,8 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.UnusedParameterInspection"/>
 
-        <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex"/>
+        <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex" id="view-index"/>
+        <fileBasedIndex implementation="com.nvlad.yii2support.views.index.RenderViewIndex" order="after view-index"/>
 
         <!-- Object Factory -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
