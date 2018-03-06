@@ -306,6 +306,7 @@ public class ViewUtil {
             final String modulePath = path.substring(0, widgetsPathPartPosition);
             key.append(modulePath);
             result.module = modulePath.substring(modulePath.lastIndexOf('/') + 1);
+            path = path.substring(modulePath.length());
         }
 
         if (value.startsWith("/")) {
