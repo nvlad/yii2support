@@ -1,8 +1,12 @@
 Yii2 Support Change Log
 =======================
 
+0.8.38.1 March 6, 2018
+----------------------
+- Fix resolve View path for widgets in module
+
 0.8.38 March 4, 2018
------------------
+--------------------
 - New Views support (v2)
     - Nested folders for Controllers & Views
     - Resolve paths "@app/...", "//..." и "/..."

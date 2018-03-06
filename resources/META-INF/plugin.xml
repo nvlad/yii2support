@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.8.38</version>
+    <version>0.8.38.1</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -34,6 +34,10 @@
         <ul>
             <li>Fix compatibility for PhpStorm 2016.2 & PhpStorm 2016.3</li>
             <li>No longer supported PhpStorm 2016.1</li>
+        </ul>
+        <p>Fixes</p>
+        <ul>
+            <li>Resolve View path for widgets in module</li>
         </ul>
     ]]>
     </change-notes>
