@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocVariable;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
@@ -33,7 +34,26 @@ public class ViewMissedPhpDocInspection extends PhpInspection {
                 }
 
                 Map<String, String> params = getVariables(PhpFile);
-                System.out.println("skdjflksjdfhglkjsdhfglksdfg");
+                Map<String, String> declaredVariables = new HashMap<>();
+                Collection<PhpDocVariable> variableCollection = PsiTreeUtil.findChildrenOfType(PhpFile, PhpDocVariable.class);
+                for (PhpDocVariable variable : variableCollection) {
+                    declaredVariables.put(variable.getName(), variable.getType().toString());
+                }
+
+                Map<String, String> missedVariables = new HashMap<>();
+                for (String variableName : params.keySet()) {
+                    if (!declaredVariables.containsKey(variableName)) {
+                        missedVariables.put(variableName, params.get(variableName));
+                    }
+                }
+
+                if (missedVariables.isEmpty()) {
+                    return;
+                }
+
+                String problemDescription = "Missed View variable declaration.";
+                ViewMissedPhpDocLocalQuickFix quickFix = new ViewMissedPhpDocLocalQuickFix(PhpFile, missedVariables);
+                problemsHolder.registerProblem(PhpFile, problemDescription, quickFix);
             }
 
             private Map<String, String> getVariables(PhpFile phpFile) {

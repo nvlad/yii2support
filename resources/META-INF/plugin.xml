@@ -86,6 +86,7 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.UnusedParameterInspection"/>
         <localInspection language="PHP" shortName="ViewMissedPhpDocInspection"
+                         displayName="Missed PhpDoc variable declaration"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.ViewMissedPhpDocInspection"/>
