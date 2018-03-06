@@ -2,6 +2,7 @@ package com.nvlad.yii2support.views.util;
 
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.refactoring.PhpRefactoringUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +40,7 @@ public class RenderUtil {
                 String valueType;
                 final PhpPsiElement valueElement = item.getValue();
                 if (valueElement instanceof PhpExpression) {
-                    valueType = ((PhpExpression) valueElement).getType().toString();
+                    valueType = PhpRefactoringUtil.getCompletedType((PhpTypedElement) valueElement, valueElement.getProject()).toString();
                 } else {
                     return result;
                 }
