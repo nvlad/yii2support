@@ -118,7 +118,7 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
                     parameters.add(parameter.getKey() + ' ' + parameter.getValue());
                 }
 
-                properties.setProperty("YII2_VIEW_PARAMETERS", StringUtil.join(parameters, "|"));
+                properties.setProperty("YII2_VIEW_PARAMETERS", StringUtil.join(parameters, ";"));
             }
 
             template.setLiveTemplateEnabled(true);
