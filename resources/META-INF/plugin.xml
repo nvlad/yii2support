@@ -92,6 +92,13 @@
 
         <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex"/>
 
+        <projectConfigurable instance="com.nvlad.yii2support.views.settings.ViewSettings"
+                             displayName="View Settings"
+                             id="Yii2Support.ViewSettings"
+                             groupId="language"
+                             parentId="Yii2Support.SettingsForm"
+                             nonDefaultProject="true"/>
+
         <!-- Object Factory -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
