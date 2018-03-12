@@ -89,7 +89,7 @@ final public class MissedViewInspection extends PhpInspection {
                                 return;
                             }
 
-                            final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(value, paths.iterator().next(), RenderUtil.getViewParameters(reference));
+                            final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(value, paths.iterator().next(), RenderUtil.getViewArguments(reference));
                             final PsiElement stringPart = pathParameter.findElementAt(1);
                             if (stringPart != null) {
                                 problemsHolder.registerProblem(stringPart, viewNotFoundMessage, quickFix);

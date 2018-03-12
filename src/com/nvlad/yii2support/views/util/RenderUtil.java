@@ -2,6 +2,7 @@ package com.nvlad.yii2support.views.util;
 
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,9 +11,9 @@ import java.util.Map;
 
 public class RenderUtil {
     @NotNull
-    public static Map<String, String> getViewParameters(MethodReference reference) {
-        final Map<String, String> result = new LinkedHashMap<>();
-        result.put("this", Yii2SupportSettings.getInstance(reference.getProject()).defaultViewClass);
+    public static Map<String, PhpType> getViewArguments(MethodReference reference) {
+        final Map<String, PhpType> result = new LinkedHashMap<>();
+        result.put("this", new PhpType.PhpTypeBuilder().add(Yii2SupportSettings.getInstance(reference.getProject()).defaultViewClass).build());
 
         ParameterList parameterList = reference.getParameterList();
         if (parameterList == null) {
@@ -33,15 +34,15 @@ public class RenderUtil {
                 if (keyElement instanceof StringLiteralExpression) {
                     key = ((StringLiteralExpression) keyElement).getContents();
                 } else {
-                    return result;
+                    continue;
                 }
 
-                String valueType;
+                PhpType valueType;
                 final PhpPsiElement valueElement = item.getValue();
                 if (valueElement instanceof PhpExpression) {
-                    valueType = ((PhpTypedElement) valueElement).getType().global(valueElement.getProject()).toString();
+                    valueType = ((PhpTypedElement) valueElement).getType().global(valueElement.getProject());
                 } else {
-                    return result;
+                    continue;
                 }
 
                 result.put(key, valueType);

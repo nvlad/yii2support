@@ -16,6 +16,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.PhpFileType;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.smarty.SmartyFileType;
 import com.jetbrains.twig.TwigFileType;
 import org.jetbrains.annotations.Nls;
@@ -30,15 +31,9 @@ import java.util.*;
 class MissedViewLocalQuickFix implements LocalQuickFix {
     final private String myName;
     final private String myPath;
-    final private Map<String, String> myParameters;
+    final private Map<String, PhpType> myParameters;
 
-    MissedViewLocalQuickFix(String name, String path) {
-        myName = name;
-        myPath = path;
-        myParameters = null;
-    }
-
-    MissedViewLocalQuickFix(String name, String path, Map<String, String> parameters) {
+    MissedViewLocalQuickFix(String name, String path, Map<String, PhpType> parameters) {
         myName = name;
         myPath = path;
         myParameters = parameters;
@@ -114,7 +109,7 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
             final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
             if (myParameters != null) {
                 Set<String> parameters = new LinkedHashSet<>(myParameters.size());
-                for (Map.Entry<String, String> parameter : myParameters.entrySet()) {
+                for (Map.Entry<String, PhpType> parameter : myParameters.entrySet()) {
                     parameters.add(parameter.getKey() + ' ' + parameter.getValue());
                 }
 

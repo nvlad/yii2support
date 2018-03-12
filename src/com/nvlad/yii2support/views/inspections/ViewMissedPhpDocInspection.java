@@ -10,6 +10,7 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocVariable;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.util.RenderUtil;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ViewMissedPhpDocInspection extends PhpInspection {
@@ -59,22 +61,30 @@ public class ViewMissedPhpDocInspection extends PhpInspection {
             private Map<String, String> getVariables(PhpFile phpFile) {
                 Collection<PsiReference> references = ReferencesSearch.search(phpFile).findAll();
                 Map<String, String> result = new HashMap<>();
+                Map<String, PhpType> viewArgumentCollection = new LinkedHashMap<>();
                 for (PsiReference reference : references) {
                     MethodReference methodReference = PsiTreeUtil.getParentOfType(reference.getElement(), MethodReference.class);
                     if (methodReference == null) {
                         continue;
                     }
 
-                    Map<String, String> params = RenderUtil.getViewParameters(methodReference);
-                    for (Map.Entry<String, String> entry : params.entrySet()) {
-                        if (result.containsKey(entry.getKey())) {
-                            String currentType = result.get(entry.getKey()) + "|" + entry.getValue();
-                            result.replace(entry.getKey(), currentType);
+                    Map<String, PhpType> params = RenderUtil.getViewArguments(methodReference);
+                    for (Map.Entry<String, PhpType> entry : params.entrySet()) {
+                        if (viewArgumentCollection.containsKey(entry.getKey())) {
+                            PhpType.PhpTypeBuilder typeBuilder = new PhpType.PhpTypeBuilder();
+                            typeBuilder.add(viewArgumentCollection.get(entry.getKey()));
+                            typeBuilder.add(entry.getValue());
+                            viewArgumentCollection.replace(entry.getKey(), typeBuilder.build());
                         } else {
-                            result.put(entry.getKey(), entry.getValue());
+                            viewArgumentCollection.put(entry.getKey(), entry.getValue());
                         }
                     }
                 }
+
+                for (String key : viewArgumentCollection.keySet()) {
+                    result.put(key, viewArgumentCollection.get(key).toString());
+                }
+
                 return result;
             }
         };
