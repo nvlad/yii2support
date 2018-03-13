@@ -93,7 +93,7 @@
         <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex"/>
 
         <projectConfigurable instance="com.nvlad.yii2support.views.settings.ViewSettings"
-                             displayName="View Settings"
+                             displayName="Views"
                              id="Yii2Support.ViewSettings"
                              groupId="language"
                              parentId="Yii2Support.SettingsForm"

@@ -23,7 +23,7 @@ public class ViewSettings implements Configurable {
     @Nls
     @Override
     public String getDisplayName() {
-        return "View Settings";
+        return "Views";
     }
 
     @Nullable
