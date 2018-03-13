@@ -3,22 +3,21 @@ package com.nvlad.yii2support.views.settings;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.table.JBTable;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class ViewSettings implements Configurable {
-    private JTable viewPathMap;
     private JPanel mainPanel;
-    private Yii2SupportSettings mySettings;
+    private JPanel viewPathMap;
 
     public ViewSettings(Project project) {
-        mySettings = Yii2SupportSettings.getInstance(project);
+        Yii2SupportSettings mySettings = Yii2SupportSettings.getInstance(project);
 
-        viewPathMap.setModel(new ViewPathMapTableModel(mySettings.viewPathMap));
+        ((ViewPathMapPanel) viewPathMap).setData(new ArrayList<>(mySettings.viewPathMap.entrySet()));
     }
 
     @Nls
@@ -56,13 +55,10 @@ public class ViewSettings implements Configurable {
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
-
-        viewPathMap = new JBTable();
-        viewPathMap.setSize(150, 150);
+        viewPathMap = new ViewPathMapPanel();
     }
 
     @Override
     public void disposeUIResources() {
-
     }
 }
