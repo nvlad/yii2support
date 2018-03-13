@@ -11,13 +11,16 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 public class ViewSettings implements Configurable {
+    private Project myProject;
     private JPanel mainPanel;
     private JPanel viewPathMap;
 
     public ViewSettings(Project project) {
+        myProject = project;
+
         Yii2SupportSettings mySettings = Yii2SupportSettings.getInstance(project);
 
-        ((ViewPathMapPanel) viewPathMap).setData(new ArrayList<>(mySettings.viewPathMap.entrySet()));
+        ((ThemePathMapPanel) viewPathMap).setData(new ArrayList<>(mySettings.viewPathMap.entrySet()));
     }
 
     @Nls
@@ -55,7 +58,7 @@ public class ViewSettings implements Configurable {
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
-        viewPathMap = new ViewPathMapPanel();
+        viewPathMap = new ThemePathMapPanel(myProject);
     }
 
     @Override

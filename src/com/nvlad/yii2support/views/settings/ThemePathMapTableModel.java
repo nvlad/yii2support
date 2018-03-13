@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-public class ViewPathMapTableModel extends AddEditRemovePanel.TableModel<Map.Entry<String, String>> {
+public class ThemePathMapTableModel extends AddEditRemovePanel.TableModel<Map.Entry<String, String>> {
     @Override
     public int getColumnCount() {
         return 2;
@@ -14,7 +14,7 @@ public class ViewPathMapTableModel extends AddEditRemovePanel.TableModel<Map.Ent
     @Nullable
     @Override
     public String getColumnName(int i) {
-        return i == 0 ? "Search Path" : "Path Alias";
+        return i == 0 ? "Path" : "Alias";
     }
 
     @Override
