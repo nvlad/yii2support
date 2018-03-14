@@ -2,7 +2,11 @@ package com.nvlad.yii2support.views.settings;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.*;
+import com.intellij.ui.AddEditRemovePanel;
+import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.ToolbarDecorator;
+import com.intellij.ui.table.JBTable;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ThemePathMapPanel extends AddEditRemovePanel<Map.Entry<String, String>> {
@@ -67,10 +72,30 @@ public class ThemePathMapPanel extends AddEditRemovePanel<Map.Entry<String, Stri
                     }
                 })
                 .setMoveUpAction(button -> {
-                    System.out.println("Up");
+                    List<Map.Entry<String, String>> data = this.getData();
+                    JBTable table = this.getTable();
+                    int[] selectedRows = table.getSelectedRows();
+                    table.clearSelection();
+                    for (int index : selectedRows) {
+                        Map.Entry<String, String> entry = data.get(index - 1);
+                        data.set(index - 1, data.get(index));
+                        data.set(index, entry);
+                        table.addRowSelectionInterval(index - 1, index - 1);
+                    }
+                    this.updateUI();
                 })
                 .setMoveDownAction(button -> {
-                    System.out.println("Down");
+                    List<Map.Entry<String, String>> data = this.getData();
+                    JBTable table = this.getTable();
+                    int[] selectedRows = ArrayUtil.reverseArray(table.getSelectedRows());
+                    table.clearSelection();
+                    for (int index : selectedRows) {
+                        Map.Entry<String, String> entry = data.get(index + 1);
+                        data.set(index + 1, data.get(index));
+                        data.set(index, entry);
+                        table.addRowSelectionInterval(index + 1, index + 1);
+                    }
+                    this.updateUI();
                 })
                 .createPanel();
         this.add(panel, "Center");
