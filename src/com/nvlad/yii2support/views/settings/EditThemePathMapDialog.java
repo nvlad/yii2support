@@ -33,4 +33,10 @@ public class EditThemePathMapDialog extends DialogWrapper {
     protected JComponent createCenterPanel() {
         return myPanel;
     }
+
+    @Nullable
+    @Override
+    public JComponent getPreferredFocusedComponent() {
+        return myPanel.getPreferredFocusedComponent();
+    }
 }

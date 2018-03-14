@@ -2,6 +2,7 @@ package com.nvlad.yii2support.views.settings;
 
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -26,5 +27,10 @@ public class EditThemePathMapEntry extends JPanel {
     @NotNull
     public String getAlias() {
         return StringUtil.notNullize(this.alias.getText());
+    }
+
+    @Nullable
+    public JComponent getPreferredFocusedComponent() {
+        return this.path;
     }
 }
