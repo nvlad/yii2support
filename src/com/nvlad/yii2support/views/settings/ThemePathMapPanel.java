@@ -16,7 +16,7 @@ import java.util.Map;
 public class ThemePathMapPanel extends AddEditRemovePanel<Map.Entry<String, String>> {
     private Project myProject;
 
-    public ThemePathMapPanel(Project project) {
+    ThemePathMapPanel(Project project) {
         super(new ThemePathMapTableModel(), new LinkedList<>(), "Themes Path Map");
 
         myProject = project;
@@ -25,7 +25,14 @@ public class ThemePathMapPanel extends AddEditRemovePanel<Map.Entry<String, Stri
     @Nullable
     @Override
     protected Map.Entry<String, String> addItem() {
-        return getEntryWithStrings("", "");
+        EditThemePathMapDialog dialog = new EditThemePathMapDialog(myProject, "@app/themes/*", "@app/views");
+        dialog.show();
+
+        if (dialog.getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
+            return null;
+        }
+
+        return getEntryWithStrings(dialog.getPath(), dialog.getAlias());
     }
 
     @Override
