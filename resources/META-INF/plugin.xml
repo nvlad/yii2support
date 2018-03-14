@@ -64,7 +64,7 @@
 
        <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
 
-        <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
+        <projectConfigurable instance="com.nvlad.yii2support.database.settings.SettingsForm"
                                  displayName="Yii2 Support"
                                  id="Yii2Support.SettingsForm"
                                  groupId="language"

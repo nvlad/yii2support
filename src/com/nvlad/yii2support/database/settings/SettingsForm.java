@@ -1,10 +1,12 @@
-package com.nvlad.yii2support.ui.settings;
+package com.nvlad.yii2support.database.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.IdeBorderFactory;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -18,11 +20,11 @@ public class SettingsForm implements Configurable {
     private JPanel mainPanel;
     private JTextField tablePrefixTextbox;
     private JCheckBox insertTableNamesWithCheckBox;
+    private JPanel panel;
     private Yii2SupportSettings settings;
 
     public SettingsForm(Project project) {
         settings = Yii2SupportSettings.getInstance(project);
-
 
         tablePrefixTextbox.addKeyListener(new KeyAdapter() {
             @Override
@@ -31,6 +33,8 @@ public class SettingsForm implements Configurable {
                 adjustInputs();
             }
         });
+
+        UIUtil.addBorder(panel, IdeBorderFactory.createTitledBorder("Table Prefix Support", false));
     }
 
     private void adjustInputs() {
