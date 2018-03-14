@@ -64,12 +64,10 @@
 
        <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
 
-        <projectConfigurable instance="com.nvlad.yii2support.database.settings.SettingsForm"
-                                 displayName="Yii2 Support"
-                                 id="Yii2Support.SettingsForm"
-                                 groupId="language"
-                                 parentId="reference.webide.settings.project.settings.php"
-                                 nonDefaultProject="true"/>
+        <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
+                             displayName="Yii2 Support"
+                             id="Yii2Support.SettingsForm"
+                             parentId="reference.webide.settings.project.settings.php"/>
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
@@ -95,7 +93,6 @@
         <projectConfigurable instance="com.nvlad.yii2support.views.settings.ViewSettings"
                              displayName="Views"
                              id="Yii2Support.ViewSettings"
-                             groupId="language"
                              parentId="Yii2Support.SettingsForm"
                              nonDefaultProject="true"/>
 
@@ -136,6 +133,12 @@
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissingActiveRecordInActiveQueryInspection"/>
+
+        <projectConfigurable instance="com.nvlad.yii2support.database.settings.SettingsForm"
+                             displayName="Database"
+                             id="Yii2Support.DatabaseSettings"
+                             parentId="Yii2Support.SettingsForm" order="first"
+                             nonDefaultProject="true"/>
 
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
