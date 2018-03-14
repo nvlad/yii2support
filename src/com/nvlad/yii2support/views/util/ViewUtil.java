@@ -212,6 +212,10 @@ public class ViewUtil {
         return result;
     }
 
+    public static void resetPathMapPatterns(Project project) {
+        projectViewPatterns.remove(project);
+    }
+
     @NotNull
     private static Map<Pattern, String> getPatterns(Project project) {
         Map<Pattern, String> patterns = projectViewPatterns.get(project);
