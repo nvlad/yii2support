@@ -19,15 +19,19 @@ public class ViewSettings implements Configurable {
     private Project myProject;
     private JPanel mainPanel;
     private JPanel viewPathMap;
+    private JTextField defaultViewClass;
+    private JComboBox defaultViewFileExt;
     private final List<Map.Entry<String, String>> currentThemePathMap;
 
     public ViewSettings(Project project) {
         myProject = project;
-
         mySettings = Yii2SupportSettings.getInstance(project);
-        currentThemePathMap = new ArrayList<>(mySettings.viewPathMap.entrySet());
 
+        currentThemePathMap = new ArrayList<>(mySettings.viewPathMap.entrySet());
         ((ThemePathMapPanel) viewPathMap).setData(new ArrayList<>(mySettings.viewPathMap.entrySet()));
+
+        defaultViewClass.setText(mySettings.defaultViewClass);
+        defaultViewFileExt.getModel().setSelectedItem(mySettings.defaultViewExtension);
     }
 
     @Nls
@@ -50,19 +54,27 @@ public class ViewSettings implements Configurable {
 
     @Override
     public boolean isModified() {
-        return ((ThemePathMapPanel) viewPathMap).getData().hashCode() != currentThemePathMap.hashCode();
+        return !mySettings.defaultViewClass.equals(defaultViewClass.getText())
+                || !mySettings.defaultViewExtension.equals(defaultViewFileExt.getModel().getSelectedItem())
+                || ((ThemePathMapPanel) viewPathMap).getData().hashCode() != currentThemePathMap.hashCode();
     }
 
     @Override
     public void apply() {
-        currentThemePathMap.clear();
-        currentThemePathMap.addAll(((ThemePathMapPanel) viewPathMap).getData());
-        mySettings.viewPathMap.clear();
-        for (Map.Entry<String, String> entry : currentThemePathMap) {
-            mySettings.viewPathMap.put(entry.getKey(), entry.getValue());
+        if (((ThemePathMapPanel) viewPathMap).getData().hashCode() != currentThemePathMap.hashCode()
+                || !mySettings.defaultViewExtension.equals(defaultViewFileExt.getModel().getSelectedItem())) {
+            currentThemePathMap.clear();
+            currentThemePathMap.addAll(((ThemePathMapPanel) viewPathMap).getData());
+            mySettings.viewPathMap.clear();
+            for (Map.Entry<String, String> entry : currentThemePathMap) {
+                mySettings.viewPathMap.put(entry.getKey(), entry.getValue());
+            }
+            mySettings.defaultViewExtension = defaultViewFileExt.getModel().getSelectedItem().toString();
+
+            ViewUtil.resetPathMapPatterns(myProject);
+            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
         }
-        ViewUtil.resetPathMapPatterns(myProject);
-        FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
+        mySettings.defaultViewClass = defaultViewClass.getText();
     }
 
     @Override
@@ -71,6 +83,9 @@ public class ViewSettings implements Configurable {
         data.clear();
         data.addAll(currentThemePathMap);
         viewPathMap.updateUI();
+
+        defaultViewClass.setText(mySettings.defaultViewClass);
+        defaultViewFileExt.getModel().setSelectedItem(mySettings.defaultViewExtension);
     }
 
     private void createUIComponents() {
