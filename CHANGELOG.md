@@ -1,6 +1,12 @@
 Yii2 Support Change Log
 =======================
 
+0.8.42 March 16, 2018
+---------------------
+- Change plugin settings structure
+- Add setup Yii Root Path in project
+- Add settings page for Views (Theme paths, View file extension, Default View class)
+
 0.8.38.1 March 6, 2018
 ----------------------
 - Fix resolve View path for widgets in module
