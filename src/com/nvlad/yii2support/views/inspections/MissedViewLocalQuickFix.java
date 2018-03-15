@@ -19,6 +19,7 @@ import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.smarty.SmartyFileType;
 import com.jetbrains.twig.TwigFileType;
+import com.nvlad.yii2support.common.YiiApplicationUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +56,7 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-        final String projectUrl = project.getBaseDir().getUrl();
+        final String projectUrl = YiiApplicationUtils.getYiiRootUrl(project);
         final VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
         VirtualFile virtualFile = virtualFileManager.findFileByUrl(projectUrl + myPath);
         if (virtualFile != null) {
@@ -63,7 +64,12 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
             return;
         }
 
-        PsiDirectory directory = PsiManager.getInstance(project).findDirectory(project.getBaseDir());
+        VirtualFile yiiRoot = YiiApplicationUtils.getYiiRootVirtualFile(project);
+        if (yiiRoot == null) {
+            return;
+        }
+
+        PsiDirectory directory = PsiManager.getInstance(project).findDirectory(yiiRoot);
         if (directory == null) {
             return;
         }

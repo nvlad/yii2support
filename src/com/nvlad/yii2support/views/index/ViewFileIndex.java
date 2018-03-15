@@ -60,7 +60,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 27;
+        return 29;
     }
 
     @NotNull
@@ -76,7 +76,6 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     }
 
     private static class ViewDataIndexer implements DataIndexer<String, ViewInfo, FileContent> {
-
         @Override
         @NotNull
         public Map<String, ViewInfo> map(@NotNull final FileContent inputData) {

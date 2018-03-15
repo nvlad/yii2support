@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.8.38.1</version>
+    <version>0.8.38.2</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -65,11 +65,9 @@
         <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
 
         <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
-                                 displayName="Yii2 Support"
-                                 groupId="language"
-                                 id="Yii2Support.SettingsForm"
-                                 nonDefaultProject="true"
-                        />
+                             displayName="Yii2 Support"
+                             id="Yii2Support.SettingsForm"
+                             parentId="reference.webide.settings.project.settings.php"/>
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
@@ -96,6 +94,12 @@
                          implementationClass="com.nvlad.yii2support.views.inspections.ViewMissedPhpDocInspection"/>
 
         <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex" id="view-index"/>
+
+        <projectConfigurable instance="com.nvlad.yii2support.views.settings.ViewSettings"
+                             displayName="Views"
+                             id="Yii2Support.ViewSettings"
+                             parentId="Yii2Support.SettingsForm"
+                             nonDefaultProject="true"/>
 
         <!-- Object Factory -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
@@ -134,6 +138,12 @@
                          groupName="Database" groupPath="PHP,Framework,Yii2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.nvlad.yii2support.database.MissingActiveRecordInActiveQueryInspection"/>
+
+        <projectConfigurable instance="com.nvlad.yii2support.database.settings.SettingsForm"
+                             displayName="Database"
+                             id="Yii2Support.DatabaseSettings"
+                             parentId="Yii2Support.SettingsForm" order="first"
+                             nonDefaultProject="true"/>
 
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>

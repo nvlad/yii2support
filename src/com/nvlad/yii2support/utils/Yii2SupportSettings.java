@@ -17,11 +17,16 @@ import java.util.Map;
 /**
  * Created by oleg on 2017-09-06.
  */
-@State(name = "Yii2 support", storages = @Storage("yii2settings.xml"))
+@State(name = "Yii2 Support", storages = @Storage("yii2settings.xml"))
 public class Yii2SupportSettings implements PersistentStateComponent<Yii2SupportSettings> {
+    // Yii Settings
+    public String yiiRootPath = null;
 
+    // Database Settings
     public String tablePrefix = "";
     public boolean insertWithTablePrefix = false;
+
+    // View Settings
     public String defaultViewExtension = "php";
     public String defaultViewClass = "\\yii\\web\\View";
     @MapAnnotation(sortBeforeSave = false)
@@ -51,5 +56,4 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     public static Yii2SupportSettings getInstance(Project project) {
         return ServiceManager.getService(project, Yii2SupportSettings.class);
     }
-
 }
