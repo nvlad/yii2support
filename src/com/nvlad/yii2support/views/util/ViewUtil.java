@@ -34,7 +34,11 @@ public class ViewUtil {
 
     @Nullable
     public static ViewResolve resolveView(VirtualFile virtualFile, Project project) {
-        final String projectPath = project.getBaseDir().getPath();
+        final String projectPath = YiiApplicationUtils.getYiiRootPath(project);
+        if (projectPath == null) {
+            return null;
+        }
+
         int projectBaseDirLength = projectPath.length();
         final String absolutePath = virtualFile.getPath();
         if (!absolutePath.startsWith(projectPath)) {
