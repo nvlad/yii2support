@@ -6,6 +6,8 @@ Yii2 Support Change Log
 - Change plugin settings structure
 - Add setup Yii Root Path in project
 - Add settings page for Views (Theme paths, View file extension, Default View class)
+- Action for go to render method call this View (by default Ctrl + Alt + R / Cmd + Alt + R, or Navigate -> Goto View render call)
+- Inspection for missed variable declaration in View + QuickFix
 
 0.8.38.1 March 6, 2018
 ----------------------
