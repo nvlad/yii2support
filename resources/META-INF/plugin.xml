@@ -90,7 +90,7 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.UnusedParameterInspection"/>
 
-        <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex"/>
+        <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex" id="view-index"/>
 
         <!-- Object Factory -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
@@ -140,6 +140,11 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action id="yii2support.GotoViewCalls" class="com.nvlad.yii2support.views.actions.OpenViewCalls"
+                text="Goto View render call">
+            <add-to-group group-id="GoToMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
+        </action>
     </actions>
 
     <!--
