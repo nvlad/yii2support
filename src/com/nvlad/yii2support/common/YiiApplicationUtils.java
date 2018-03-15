@@ -1,9 +1,11 @@
 package com.nvlad.yii2support.common;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiFile;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,32 +18,20 @@ public class YiiApplicationUtils {
 
     @Nullable
     public static String getYiiRootPath(Project project) {
-        if (yiiRootPaths.containsKey(project)) {
-            return yiiRootPaths.get(project).getPath();
-        }
+        VirtualFile yiiRoot = getYiiRootVirtualFile(project);
 
-        VirtualFile yiiRoot = findYiiRoot(project.getBaseDir());
-        if (yiiRoot != null) {
-            yiiRootPaths.put(project, yiiRoot);
-            return yiiRoot.getPath();
-        }
-
-        return null;
+        return yiiRoot == null ? null : yiiRoot.getPath();
     }
 
     @Nullable
     public static String getYiiRootUrl(Project project) {
-        if (yiiRootPaths.containsKey(project)) {
-            return yiiRootPaths.get(project).getUrl();
-        }
+        VirtualFile yiiRoot = getYiiRootVirtualFile(project);
 
-        VirtualFile yiiRoot = findYiiRoot(project.getBaseDir());
-        if (yiiRoot != null) {
-            yiiRootPaths.put(project, yiiRoot);
-            return yiiRoot.getUrl();
-        }
+        return yiiRoot == null ? null : yiiRoot.getUrl();
+    }
 
-        return null;
+    public static void resetYiiRootPath(Project project) {
+        yiiRootPaths.remove(project);
     }
 
     @NotNull
@@ -77,17 +67,20 @@ public class YiiApplicationUtils {
     }
 
     @Nullable
-    private static VirtualFile findYiiRoot(VirtualFile dir) {
-        if (dir.findFileByRelativePath("/vendor/yiisoft/yii2/Yii.php") != null) {
-            return dir;
+    private static VirtualFile getYiiRootVirtualFile(Project project) {
+        if (yiiRootPaths.containsKey(project)) {
+            return yiiRootPaths.get(project);
         }
 
-        for (VirtualFile file : dir.getChildren()) {
-            if (file.findFileByRelativePath("/vendor/yiisoft/yii2/Yii.php") != null) {
-                return file;
-            }
+        final String path = Yii2SupportSettings.getInstance(project).yiiRootPath;
+        final VirtualFile yiiRootPath;
+        if (path == null) {
+            yiiRootPath = project.getBaseDir();
+        } else {
+            yiiRootPath = LocalFileSystem.getInstance().findFileByPath(path);
         }
 
-        return null;
+        yiiRootPaths.put(project, yiiRootPath);
+        return yiiRootPath;
     }
 }

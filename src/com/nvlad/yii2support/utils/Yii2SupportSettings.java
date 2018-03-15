@@ -19,6 +19,9 @@ import java.util.Map;
  */
 @State(name = "Yii2 Support", storages = @Storage("yii2settings.xml"))
 public class Yii2SupportSettings implements PersistentStateComponent<Yii2SupportSettings> {
+    // Yii Settings
+    public String yiiRootPath = null;
+
     // Database Settings
     public String tablePrefix = "";
     public boolean insertWithTablePrefix = false;
