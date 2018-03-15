@@ -67,7 +67,7 @@ public class YiiApplicationUtils {
     }
 
     @Nullable
-    private static VirtualFile getYiiRootVirtualFile(Project project) {
+    public static VirtualFile getYiiRootVirtualFile(Project project) {
         if (yiiRootPaths.containsKey(project)) {
             return yiiRootPaths.get(project);
         }
