@@ -1,6 +1,7 @@
 package com.nvlad.yii2support.common;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class YiiApplicationUtils {
@@ -72,12 +74,30 @@ public class YiiApplicationUtils {
             return yiiRootPaths.get(project);
         }
 
-        final String path = Yii2SupportSettings.getInstance(project).yiiRootPath;
-        final VirtualFile yiiRootPath;
+        String path = Yii2SupportSettings.getInstance(project).yiiRootPath;
+        VirtualFile yiiRootPath;
         if (path == null) {
             yiiRootPath = project.getBaseDir();
         } else {
-            yiiRootPath = LocalFileSystem.getInstance().findFileByPath(path);
+            LocalFileSystem fileSystem = LocalFileSystem.getInstance();
+            yiiRootPath = fileSystem.refreshAndFindFileByPath(path);
+            if (yiiRootPath == null) {
+                yiiRootPath = project.getBaseDir();
+                path = path.replace('\\', '/');
+                if (path.startsWith("./")) {
+                    path = path.substring(2);
+                }
+                if (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                List<String> pathEntries = StringUtil.split(path, "/");
+                for (String pathEntry : pathEntries) {
+                    yiiRootPath = yiiRootPath.findChild(pathEntry);
+                    if (yiiRootPath == null) {
+                        break;
+                    }
+                }
+            }
         }
 
         yiiRootPaths.put(project, yiiRootPath);
