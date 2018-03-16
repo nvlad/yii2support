@@ -1,6 +1,12 @@
 Yii2 Support Change Log
 =======================
 
+0.8.42.3 March 16, 2018
+-----------------------
+- Path to missed View file in error message
+- Support relative path to Yii root
+- Fix View path resolving
+
 0.8.42 March 16, 2018
 ---------------------
 - Change plugin settings structure

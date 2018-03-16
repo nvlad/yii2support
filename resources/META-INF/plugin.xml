@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.8.42</version>
+    <version>0.8.42.3</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -16,16 +16,26 @@
        <li>Url autocomplete</li>
        </ul>
        <br/>
-       Detailed information can be found in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a>
+       Detailed information can be found in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a><br/>
+       <br/>
+       Detailed changelog can be found in <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG.md</a>
     ]]></description>
 
     <change-notes><![CDATA[
+      <p><b>Features</b></p>
       <ul>
         <li>Change plugin settings structure</li>
         <li>Add setup Yii Root Path in project</li>
         <li>Add settings page for Views (Theme paths, View file extension, Default View class)</li>
         <li>Action for go to render method call this View (by default Ctrl + Alt + R / Cmd + Alt + R, or Navigate -> Goto View render call)</li>
         <li>Inspection for missed variable declaration in View + QuickFix</li>
+        <li>Support relative path to Yii root</li>
+        <li>Path to missed View file in error message</li>
+      </ul>
+      <p>&nbsp;</p>
+      <p><b>Fixes</b></p>
+      <ul>
+        <li>Fix View path resolving</li>
       </ul>
     ]]>
     </change-notes>
