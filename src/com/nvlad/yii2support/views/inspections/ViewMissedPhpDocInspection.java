@@ -4,6 +4,8 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocVariable;
@@ -59,7 +61,8 @@ public class ViewMissedPhpDocInspection extends PhpInspection {
             }
 
             private Map<String, String> getVariables(PhpFile phpFile) {
-                Collection<PsiReference> references = ReferencesSearch.search(phpFile).findAll();
+                SearchScope projectScope = GlobalSearchScope.projectScope(phpFile.getProject());
+                Collection<PsiReference> references = ReferencesSearch.search(phpFile, projectScope).findAll();
                 Map<String, String> result = new HashMap<>();
                 Map<String, PhpType> viewArgumentCollection = new LinkedHashMap<>();
                 for (PsiReference reference : references) {
