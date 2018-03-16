@@ -3,6 +3,7 @@ package com.nvlad.yii2support.views.inspections;
 import com.google.common.io.Files;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -82,14 +83,20 @@ final public class MissedViewInspection extends PhpInspection {
                             return;
                         }
 
-                        Collection<String> paths = ViewUtil.viewResolveToPaths(resolve, project);
                         if (pathParameter instanceof StringLiteralExpression) {
-                            final String viewNotFoundMessage = "View file for \"" + value + "\" not found.";
+                            Collection<String> paths = ViewUtil.viewResolveToPaths(resolve, project);
                             if (!paths.iterator().hasNext()) {
                                 return;
                             }
 
-                            final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(value, paths.iterator().next(), RenderUtil.getViewArguments(reference));
+                            VirtualFile yiiRoot = YiiApplicationUtils.getYiiRootVirtualFile(project);
+                            if (yiiRoot == null) {
+                                return;
+                            }
+
+                            String path = yiiRoot.getUrl().substring(project.getBaseDir().getUrl().length()) + paths.iterator().next();
+                            final String viewNotFoundMessage = "View file for \"" + value + "\" not found in \"" + path + "\".";
+                            final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(value, path, RenderUtil.getViewArguments(reference));
                             final PsiElement stringPart = pathParameter.findElementAt(1);
                             if (stringPart != null) {
                                 problemsHolder.registerProblem(stringPart, viewNotFoundMessage, quickFix);
