@@ -207,7 +207,7 @@ public class ViewUtil {
         }
 
         VirtualFile yiiRoot = YiiApplicationUtils.getYiiRootVirtualFile(project);
-        if (yiiRoot != null && yiiRoot.findChild("web") == null) {
+        if (yiiRoot != null && yiiRoot.findChild("controllers") == null) {
             path = '/' + resolve.application + path;
         }
         result.add(path);
