@@ -206,9 +206,8 @@ public class ViewUtil {
             path = path.substring(4);
         }
 
-        String projectUrl = project.getBaseDir().getUrl();
-        VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
-        if (virtualFileManager.findFileByUrl(projectUrl + "/web") == null) {
+        VirtualFile yiiRoot = YiiApplicationUtils.getYiiRootVirtualFile(project);
+        if (yiiRoot != null && yiiRoot.findChild("web") == null) {
             path = '/' + resolve.application + path;
         }
         result.add(path);
