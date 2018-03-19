@@ -19,6 +19,7 @@ import com.nvlad.yii2support.common.PhpUtil;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import com.nvlad.yii2support.views.entities.ViewInfo;
+import com.nvlad.yii2support.views.entities.ViewParameter;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
 import com.nvlad.yii2support.views.util.ViewUtil;
@@ -77,14 +78,13 @@ public class RequireParameterInspection extends PhpInspection {
                     return;
                 }
 
-                final Collection<String> viewParameters = new HashSet<>();
+                final Collection<ViewParameter> viewParameters = new HashSet<>();
                 for (ViewInfo view : views) {
                     viewParameters.addAll(view.parameters);
                 }
                 if (viewParameters.size() == 0) {
                     return;
                 }
-
 
                 final Collection<String> existKeys;
                 if (renderParameters.length > 1) {
@@ -109,17 +109,17 @@ public class RequireParameterInspection extends PhpInspection {
                     existKeys = new HashSet<>();
                 }
 
-                viewParameters.removeIf(existKeys::contains);
+                viewParameters.removeIf(viewParameter -> existKeys.contains(viewParameter.name));
                 if (viewParameters.size() == 0) {
                     return;
                 }
 
                 String description = "View " + renderParameters[0].getText() + " require ";
-                final Iterator<String> parameterIterator = viewParameters.iterator();
+                final Iterator<ViewParameter> parameterIterator = viewParameters.iterator();
                 if (!isOnTheFly) {
                     while (parameterIterator.hasNext()) {
-                        final String parameter = parameterIterator.next();
-                        final String problemDescription = description + "\"" + parameter + "\" parameter.";
+                        final ViewParameter parameter = parameterIterator.next();
+                        final String problemDescription = description + "\"" + parameter.name + "\" parameter.";
                         problemsHolder.registerProblem(reference, problemDescription, new RequireParameterLocalQuickFix(parameter));
                     }
                     return;
@@ -127,23 +127,23 @@ public class RequireParameterInspection extends PhpInspection {
 
                 final Collection<LocalQuickFix> fixes = new HashSet<>();
                 if (viewParameters.size() > 1) {
-                    fixes.add(new RequireParameterLocalQuickFix(viewParameters.toArray(new String[0])));
+                    fixes.add(new RequireParameterLocalQuickFix(viewParameters.toArray(new ViewParameter[0])));
                     StringBuilder parameterString = new StringBuilder();
-                    String parameter = parameterIterator.next();
+                    ViewParameter parameter = parameterIterator.next();
                     while (parameterIterator.hasNext()) {
                         if (parameterString.length() > 0) {
                             parameterString.append(", ");
                         }
-                        parameterString.append("\"").append(parameter).append("\"");
+                        parameterString.append("\"").append(parameter.name).append("\"");
                         fixes.add(new RequireParameterLocalQuickFix(parameter));
                         parameter = parameterIterator.next();
                     }
-                    parameterString.append(" and \"").append(parameter).append("\" parameters.");
+                    parameterString.append(" and \"").append(parameter.name).append("\" parameters.");
                     description += parameterString.toString();
                     fixes.add(new RequireParameterLocalQuickFix(parameter));
                 } else {
-                    String parameter = parameterIterator.next();
-                    description += "\"" + parameter + "\" parameter.";
+                    ViewParameter parameter = parameterIterator.next();
+                    description += "\"" + parameter.name + "\" parameter.";
                     fixes.add(new RequireParameterLocalQuickFix(parameter));
                 }
                 problemsHolder.registerProblem(reference, description, fixes.toArray(new LocalQuickFix[0]));

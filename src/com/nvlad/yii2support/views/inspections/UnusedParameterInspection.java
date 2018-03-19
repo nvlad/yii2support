@@ -15,6 +15,7 @@ import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import com.nvlad.yii2support.views.entities.ViewInfo;
+import com.nvlad.yii2support.views.entities.ViewParameter;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
 import com.nvlad.yii2support.views.util.ViewUtil;
@@ -74,7 +75,7 @@ final public class UnusedParameterInspection extends PhpInspection {
                     return;
                 }
 
-                final Collection<String> viewParameters = new HashSet<>();
+                final Collection<ViewParameter> viewParameters = new HashSet<>();
                 for (ViewInfo view : views) {
                     viewParameters.addAll(view.parameters);
                 }
@@ -94,7 +95,15 @@ final public class UnusedParameterInspection extends PhpInspection {
                 final String errorUnusedParameter = "View " + renderParameters[0].getText() + " not use \"%parameter%\" parameter";
                 final Set<String> unusedParameters = new HashSet<>();
                 BiConsumer<String, PsiElement> processParameter = (String arrayKey, PsiElement element) -> {
-                    if (!viewParameters.contains(arrayKey)) {
+                    boolean contains = false;
+                    for (ViewParameter parameter : viewParameters) {
+                        if (parameter.name.equals(arrayKey)) {
+                            contains = true;
+                            break;
+                        }
+                    }
+
+                    if (!contains) {
                         UnusedParameterLocalQuickFix fix = new UnusedParameterLocalQuickFix(arrayKey);
                         String description = errorUnusedParameter.replace("%parameter%", arrayKey);
                         problemsHolder.registerProblem(element, description, ProblemHighlightType.LIKE_UNUSED_SYMBOL, fix);

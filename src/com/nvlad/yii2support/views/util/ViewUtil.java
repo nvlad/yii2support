@@ -3,19 +3,20 @@ package com.nvlad.yii2support.views.util;
 import com.google.common.io.Files;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.PhpUtil;
 import com.nvlad.yii2support.common.StringUtils;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
+import com.nvlad.yii2support.views.entities.ViewParameter;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.entities.ViewResolveFrom;
 import org.jetbrains.annotations.NotNull;
@@ -125,10 +126,10 @@ public class ViewUtil {
     }
 
     @NotNull
-    public static Collection<String> getPhpViewVariables(PsiFile psiFile) {
-        final ArrayList<String> result = new ArrayList<>();
-        final HashSet<String> allVariables = new HashSet<>();
-        final HashSet<String> declaredVariables = new HashSet<>();
+    public static Collection<ViewParameter> getPhpViewVariables(PsiFile psiFile) {
+        final Set<ViewParameter> result = new HashSet<>();
+        final Set<ViewParameter> allVariables = new HashSet<>();
+        final Set<String> declaredVariables = new HashSet<>();
         final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
 
         for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
@@ -136,7 +137,7 @@ public class ViewUtil {
                 if (reference.getName() != null && reference.getName().equals("compact")) {
                     for (PsiElement element : reference.getParameters()) {
                         if (element instanceof StringLiteralExpression) {
-                            allVariables.add(((StringLiteralExpression) element).getContents());
+                            allVariables.add(new ViewParameter((StringLiteralExpression) element));
                         }
                     }
                 }
@@ -144,7 +145,7 @@ public class ViewUtil {
         }
 
         final SearchScope fileScope = psiFile.getUseScope();
-        final HashSet<String> usedBeforeDeclaration = new HashSet<>();
+        final Set<String> usedBeforeDeclaration = new HashSet<>();
         for (Variable variable : viewVariables) {
             String variableName = variable.getName();
             if (variable.isDeclaration()
@@ -160,11 +161,11 @@ public class ViewUtil {
                         if (variable.getName().equals("") && variable.getParent() instanceof StringLiteralExpression) {
                             Variable inlineVariable = PsiTreeUtil.findChildOfType(variable, Variable.class);
                             if (inlineVariable != null) {
-                                allVariables.add(inlineVariable.getName());
+                                allVariables.add(new ViewParameter(inlineVariable));
                                 usedBeforeDeclaration.add(variableName);
                             }
                         } else {
-                            allVariables.add(variableName);
+                            allVariables.add(new ViewParameter(variable));
                             usedBeforeDeclaration.add(variableName);
                         }
                     }
@@ -172,8 +173,9 @@ public class ViewUtil {
             }
         }
 
-        for (String variable : allVariables) {
-            if (!declaredVariables.contains(variable)) {
+
+        for (ViewParameter variable : allVariables) {
+            if (!declaredVariables.contains(variable.name)) {
                 result.add(variable);
             }
         }

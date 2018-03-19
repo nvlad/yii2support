@@ -10,7 +10,7 @@ public class ViewInfo {
     public String fileUrl;
     public String application;
     public String theme;
-    public Collection<String> parameters;
+    public Collection<ViewParameter> parameters;
     private VirtualFile myVirtualFile;
 
     public ViewInfo() {

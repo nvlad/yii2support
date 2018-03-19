@@ -16,6 +16,7 @@ import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.FunctionReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.nvlad.yii2support.views.entities.ViewParameter;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
  * Created by NVlad on 15.01.2017.
  */
 class RequireParameterLocalQuickFix implements LocalQuickFix {
-    final private String[] myVariables;
+    final private ViewParameter[] myVariables;
 
-    RequireParameterLocalQuickFix(String ...variables) {
+    RequireParameterLocalQuickFix(ViewParameter...variables) {
         myVariables = variables;
     }
 
@@ -34,8 +35,8 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
     @Override
     public String getName() {
         if (myVariables.length == 1) {
-            final String parameter = myVariables[0];
-            return "Add \"%parameter%\" parameter".replace("%parameter%", parameter);
+            final ViewParameter parameter = myVariables[0];
+            return "Add \"%parameter%\" parameter".replace("%parameter%", parameter.name);
         }
         return "Add all missed View parameters";
     }
@@ -85,10 +86,10 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
             template.setToReformat(true);
 
             Boolean firstElement = functionReference.getParameters().length == 0;
-            for (String variable : myVariables) {
+            for (ViewParameter variable : myVariables) {
                 template.addTextSegment(firstElement ? "'" : ", '");
-                String var = "$" + variable.toUpperCase() + "$";
-                template.addVariable(var, "", "\"" + variable + "\"", true);
+                String var = "$" + variable.name.toUpperCase() + "$";
+                template.addVariable(var, "", "\"" + variable.name + "\"", true);
                 template.addVariableSegment(var);
                 template.addTextSegment("'");
                 firstElement = false;
@@ -125,14 +126,14 @@ class RequireParameterLocalQuickFix implements LocalQuickFix {
             addComma = false;
         }
 
-        for (String variable : myVariables) {
+        for (ViewParameter variable : myVariables) {
             if (addComma) {
                 template.addTextSegment(",");
             }
             template.addTextSegment((newLined ? "\n" : " "));
-            String templateVariable = "$" + variable.toUpperCase() + "$";
-            template.addVariable(templateVariable, "", "\"$" + variable + "\"", true);
-            template.addTextSegment("'" + variable + "' => ");
+            String templateVariable = "$" + variable.name.toUpperCase() + "$";
+            template.addVariable(templateVariable, "", "\"$" + variable.name + "\"", true);
+            template.addTextSegment("'" + variable.name + "' => ");
             template.addVariableSegment(templateVariable);
             addComma = true;
         }

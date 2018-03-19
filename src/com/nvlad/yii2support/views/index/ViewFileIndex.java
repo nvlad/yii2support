@@ -10,6 +10,7 @@ import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.smarty.SmartyFileType;
 import com.jetbrains.twig.TwigFileType;
 import com.nvlad.yii2support.views.entities.ViewInfo;
+import com.nvlad.yii2support.views.entities.ViewParameter;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 29;
+        return 30;
     }
 
     @NotNull
@@ -117,8 +118,10 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             writeString(dataOutput, viewInfo.application);
             writeString(dataOutput, viewInfo.theme);
             dataOutput.writeInt(viewInfo.parameters.size());
-            for (String parameter : viewInfo.parameters) {
-                writeString(dataOutput, parameter);
+            for (ViewParameter parameter : viewInfo.parameters) {
+                writeString(dataOutput, parameter.name);
+                writeString(dataOutput, parameter.type);
+                dataOutput.writeBoolean(parameter.required);
             }
         }
 
@@ -132,7 +135,8 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             final int parameterCount = dataInput.readInt();
             viewInfo.parameters = new ArrayList<>(parameterCount);
             for (int i = 0; i < parameterCount; i++) {
-                viewInfo.parameters.add(readString(dataInput));
+                ViewParameter parameter = new ViewParameter(readString(dataInput), readString(dataInput), dataInput.readBoolean());
+                viewInfo.parameters.add(parameter);
             }
 
             System.out.println("ViewInfoDataExternalizer.read <== " + viewInfo.fileUrl);
