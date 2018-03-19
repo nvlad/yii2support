@@ -14,3 +14,4 @@
 | IDE Name         | PhpStorm
 | IDE Version      | 
 | Plugin version   | 
+| Yii App Template | basic / advanced 
