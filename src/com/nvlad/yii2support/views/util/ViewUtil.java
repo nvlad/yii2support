@@ -9,7 +9,6 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.PhpUtil;
@@ -128,7 +127,7 @@ public class ViewUtil {
     @NotNull
     public static Collection<ViewParameter> getPhpViewVariables(PsiFile psiFile) {
         final Set<ViewParameter> result = new HashSet<>();
-        final Set<ViewParameter> allVariables = new HashSet<>();
+        final Map<String, ViewParameter> allParameters = new HashMap<>();
         final Set<String> declaredVariables = new HashSet<>();
         final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
 
@@ -137,7 +136,8 @@ public class ViewUtil {
                 if (reference.getName() != null && reference.getName().equals("compact")) {
                     for (PsiElement element : reference.getParameters()) {
                         if (element instanceof StringLiteralExpression) {
-                            allVariables.add(new ViewParameter((StringLiteralExpression) element));
+                            ViewParameter parameter = new ViewParameter((StringLiteralExpression) element);
+                            allParameters.put(parameter.name, parameter);
                         }
                     }
                 }
@@ -161,11 +161,13 @@ public class ViewUtil {
                         if (variable.getName().equals("") && variable.getParent() instanceof StringLiteralExpression) {
                             Variable inlineVariable = PsiTreeUtil.findChildOfType(variable, Variable.class);
                             if (inlineVariable != null) {
-                                allVariables.add(new ViewParameter(inlineVariable));
+                                ViewParameter parameter = new ViewParameter(inlineVariable);
+                                allParameters.put(parameter.name, parameter);
                                 usedBeforeDeclaration.add(variableName);
                             }
                         } else {
-                            allVariables.add(new ViewParameter(variable));
+                            ViewParameter parameter = new ViewParameter(variable);
+                            allParameters.put(parameter.name, parameter);
                             usedBeforeDeclaration.add(variableName);
                         }
                     }
@@ -174,9 +176,9 @@ public class ViewUtil {
         }
 
 
-        for (ViewParameter variable : allVariables) {
-            if (!declaredVariables.contains(variable.name)) {
-                result.add(variable);
+        for (ViewParameter parameter : allParameters.values()) {
+            if (!declaredVariables.contains(parameter.name)) {
+                result.add(parameter);
             }
         }
 
