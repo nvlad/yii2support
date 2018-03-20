@@ -1,6 +1,11 @@
 Yii2 Support Change Log
 =======================
 
+0.8.42.5 March 20, 2018
+-----------------------
+- Fix View path resolving
+- Fix "String index out of range" Exceptions
+
 0.8.42.3 March 16, 2018
 -----------------------
 - Path to missed View file in error message
