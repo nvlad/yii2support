@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiFile;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class YiiApplicationUtils {
-    private static VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
     private static Map<Project, VirtualFile> yiiRootPaths = new HashMap<>();
 
     @Nullable
@@ -38,32 +36,29 @@ public class YiiApplicationUtils {
 
     @NotNull
     public static String getApplicationName(@NotNull PsiFile file) {
-        String projectUrl = getYiiRootUrl(file.getProject());
-        if (projectUrl == null) {
-            return "";
-        }
-
-        if (virtualFileManager.findFileByUrl(projectUrl + "/web") == null) {
-            final String fileUrl = FileUtil.getVirtualFile(file).getUrl();
-            return fileUrl.substring(projectUrl.length() + 1, fileUrl.indexOf("/", projectUrl.length() + 1));
-        }
-        return "app";
+        return getApplicationName(FileUtil.getVirtualFile(file), file.getProject());
     }
 
     @NotNull
     public static String getApplicationName(@NotNull VirtualFile file, @NotNull Project project) {
-        String projectUrl = getYiiRootUrl(project);
-        if (projectUrl == null) {
+        VirtualFile yiiRoot = getYiiRootVirtualFile(project);
+        if (yiiRoot == null) {
             return "";
         }
 
-        if (virtualFileManager.findFileByUrl(projectUrl + "/web") == null) {
+        if (yiiRoot.findChild("controllers") == null) {
             final String fileUrl = file.getUrl();
-            final int slashPosition = fileUrl.indexOf("/", projectUrl.length() + 1);
-            if (slashPosition == -1) {
+            if (!fileUrl.startsWith(yiiRoot.getUrl())) {
                 return "";
             }
-            return fileUrl.substring(projectUrl.length() + 1, slashPosition);
+
+            int yiiRootLength = yiiRoot.getUrl().length();
+            int slashIndex = fileUrl.indexOf("/", yiiRootLength + 1);
+            if (slashIndex == -1) {
+                return "";
+            }
+
+            return fileUrl.substring(yiiRootLength + 1, slashIndex);
         }
         return "app";
     }
