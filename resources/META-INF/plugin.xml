@@ -149,6 +149,9 @@
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
       <!--  <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/> -->
+
+        <!-- Migrations -->
+        <toolWindow id="Migrations" anchor="bottom" factoryClass="com.nvlad.yii2support.migrations.MigrationsToolWindowFactory"/>
     </extensions>
 
     <actions>
