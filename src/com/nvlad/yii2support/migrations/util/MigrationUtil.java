@@ -37,7 +37,7 @@ public class MigrationUtil {
                 migrationMap.put(path, new HashSet<>());
             }
 
-            migrationMap.get(path).add(new Migration(migration.getName(), path));
+            migrationMap.get(path).add(new Migration(migration, path));
         }
 
         return migrationMap;
