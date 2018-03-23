@@ -20,18 +20,17 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
     private JTree migrationsTree;
     private JPanel mainPanel;
     private JButton refreshButton;
-    private ToolWindow myToolWindow;
     private Map<String, Collection<Migration>> migrationMap;
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        myToolWindow = toolWindow;
 
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(mainPanel, "", false);
         toolWindow.getContentManager().addContent(content);
 
         migrationsTree.setCellRenderer(new MigrationTreeCellRenderer());
+        migrationsTree.addMouseListener(new MigrationsMouseListener());
 
         refreshButton.addActionListener(e -> {
             Map<String, Collection<Migration>> newMigrationsMap = MigrationUtil.getMigrations(project);
@@ -41,7 +40,6 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 //            }
             migrationsTree.getSelectionModel().setSelectionMode(TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
         });
-
 
         migrationMap = MigrationUtil.getMigrations(project);
         updateTree(migrationMap);
