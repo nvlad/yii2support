@@ -4,6 +4,7 @@ import com.nvlad.yii2support.migrations.entities.Migration;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -12,7 +13,12 @@ public class MigrationsMouseListener implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
             JTree migrationsTree = (JTree) e.getComponent();
-            DefaultMutableTreeNode object = (DefaultMutableTreeNode) migrationsTree.getLeadSelectionPath().getLastPathComponent();
+            TreePath leadSelectionPath =  migrationsTree.getLeadSelectionPath();
+            if (leadSelectionPath == null)  {
+                return;
+            }
+
+            DefaultMutableTreeNode object = (DefaultMutableTreeNode) leadSelectionPath.getLastPathComponent();
             if (!(object.getUserObject() instanceof Migration)) {
                 return;
             }
