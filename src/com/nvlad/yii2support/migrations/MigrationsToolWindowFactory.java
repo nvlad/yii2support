@@ -19,7 +19,6 @@ import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -54,7 +53,7 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 //            migrationPanel.updateUI();
 //        });
 
-        migrationMap = MigrationUtil.getMigrations(project);
+        migrationMap = MigrationManager.getInstance(project).getMigrations();
         MigrationUtil.updateTree(migrationsTree, migrationMap);
 
         initToolbar();
@@ -80,7 +79,7 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 //    }
 
     private void initToolbar() {
-        JPanel parentPanel = ((JPanel) toolbarPanel.getParent());
+        JPanel parentPanel = (JPanel) toolbarPanel.getParent();
         parentPanel.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 0, 1));
 
         DefaultActionGroup actions = new DefaultActionGroup();

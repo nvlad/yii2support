@@ -3,6 +3,7 @@ package com.nvlad.yii2support.migrations.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.ui.AnActionButton;
+import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 
@@ -23,7 +24,7 @@ public class RefreshAction extends AnActionButton {
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
-            Map<String, Collection<Migration>> newMigrationsMap = MigrationUtil.getMigrations(anActionEvent.getProject());
+            Map<String, Collection<Migration>> newMigrationsMap = MigrationManager.getInstance(anActionEvent.getProject()).getMigrations();
 //            if (!newMigrationsMap.equals(migrationMap)) {
             migrationMap = newMigrationsMap;
             MigrationUtil.updateTree(tree, migrationMap);
