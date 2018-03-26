@@ -15,12 +15,14 @@
           </grid>
         </constraints>
         <properties>
+          <autoscrolls value="true"/>
           <requestFocusEnabled value="true"/>
           <rootVisible value="false"/>
           <rowHeight value="20"/>
+          <scrollsOnExpand value="false"/>
         </properties>
       </component>
-      <grid id="d19f5" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="95586" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -28,27 +30,14 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="d91b2" class="javax.swing.JButton" binding="refreshButton">
+          <grid id="b4734" binding="toolbarPanel" layout-manager="GridBagLayout">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <alignmentY value="0.0"/>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <focusPainted value="false"/>
-              <icon value="actions/refresh.png"/>
-              <margin top="2" left="2" bottom="2" right="2"/>
-              <opaque value="true"/>
-              <text value=""/>
-              <verifyInputWhenFocusTarget value="false"/>
-            </properties>
-          </component>
-          <vspacer id="12122">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </vspacer>
+            <properties/>
+            <border type="none"/>
+            <children/>
+          </grid>
         </children>
       </grid>
     </children>
