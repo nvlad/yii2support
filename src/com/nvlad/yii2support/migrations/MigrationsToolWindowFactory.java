@@ -81,8 +81,7 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 
     private void initToolbar() {
         JPanel parentPanel = ((JPanel) toolbarPanel.getParent());
-        Color color = JBColor.background().brighter();
-        parentPanel.setBorder(JBUI.Borders.customLine(color, 0, 0, 0, 1));
+        parentPanel.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 0, 1));
 
         DefaultActionGroup actions = new DefaultActionGroup();
         RefreshAction refreshButton = new RefreshAction(migrationsTree);
