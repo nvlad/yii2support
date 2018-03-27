@@ -9,38 +9,48 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.AnActionButton;
+import com.intellij.ui.CheckboxTree;
+import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.ui.JBUI;
 import com.nvlad.yii2support.migrations.actions.RefreshAction;
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.migrations.ui.MigrationPanel;
+import com.nvlad.yii2support.migrations.ui.MigrationTreeCellRenderer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
 
 public class MigrationsToolWindowFactory implements ToolWindowFactory {
     private JPanel mainPanel;
 //    private JButton refreshButton;
-    private JTree migrationsTree;
+    private CheckboxTree migrationsTree;
     private JPanel toolbarPanel;
+    private JPanel treePanel;
     //    private JPanel forToolbars;
     private ActionToolbar toolbar;
     private Map<String, Collection<Migration>> migrationMap;
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-//        initToolbar();
-
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(mainPanel, "", false);
+        MigrationPanel migrationPanel = new MigrationPanel(project);
+        Content content = ContentFactory.SERVICE.getInstance().createContent(migrationPanel, "", false);
         toolWindow.getContentManager().addContent(content);
 
-        migrationsTree.setCellRenderer(new MigrationTreeCellRenderer());
-        migrationsTree.addMouseListener(new MigrationsMouseListener());
+//        initToolbar();
+
+//        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+//        Content content = contentFactory.createContent(mainPanel, "", false);
+//        toolWindow.getContentManager().addContent(content);
+
+//        migrationsTree.setCellRenderer(new MigrationTreeCellRenderer());
+//        migrationsTree.addMouseListener(new MigrationsMouseListener());
 
 //        refreshButton.addActionListener(e -> {
 //            Map<String, Collection<Migration>> newMigrationsMap = MigrationUtil.getMigrations(project);
@@ -53,10 +63,12 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 //            migrationPanel.updateUI();
 //        });
 
-        migrationMap = MigrationManager.getInstance(project).getMigrations();
-        MigrationUtil.updateTree(migrationsTree, migrationMap);
+//        migrationMap = MigrationManager.getInstance(project).getMigrations();
+//        MigrationUtil.updateTree(migrationsTree, migrationMap);
+//
+//        initToolbar();
 
-        initToolbar();
+//        createUIComponents();
     }
 
 //    private void updateTree(Map<String, Collection<Migration>> migrationMap) {
@@ -107,5 +119,19 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 
         JComponent component = toolbar.getComponent();
         toolbarPanel.add(component, 0);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+
+        CheckedTreeNode myRootNode = new CheckedTreeNode("");
+        myRootNode.add(new DefaultMutableTreeNode("ajsdhkajshdasd"));
+
+//        migrationsTree = new CheckboxTree(new MigrationTreeCellRenderer(), myRootNode);
+
+        treePanel.setLayout(new GridLayout());
+        treePanel.add(migrationsTree);
+
+//        ActionToolbar toolbar = createToolbar();
     }
 }
