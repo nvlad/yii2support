@@ -19,7 +19,12 @@ public class MigrationsMouseListener implements MouseListener {
             }
 
             DefaultMutableTreeNode object = (DefaultMutableTreeNode) leadSelectionPath.getLastPathComponent();
-            if (!(object.getUserObject() instanceof Migration)) {
+            if (object.getUserObject() instanceof String) {
+                if (migrationsTree.isExpanded(leadSelectionPath)) {
+                    migrationsTree.collapsePath(leadSelectionPath);
+                } else {
+                    migrationsTree.expandPath(leadSelectionPath);
+                }
                 return;
             }
 

@@ -1,8 +1,6 @@
 package com.nvlad.yii2support.migrations.util;
 
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.entities.MigrationStatus;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -10,7 +8,6 @@ import java.util.Collection;
 import java.util.Map;
 
 public class MigrationUtil {
-    @NotNull
     public static void updateTree(JTree tree, Map<String, Collection<Migration>> migrationMap) {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
         if (root == null) {
@@ -23,7 +20,6 @@ public class MigrationUtil {
             root.add(node);
 
             for (Migration migration : entry.getValue()) {
-                migration.status = MigrationStatus.Unknown;
                 node.add(new DefaultMutableTreeNode(migration));
             }
         }

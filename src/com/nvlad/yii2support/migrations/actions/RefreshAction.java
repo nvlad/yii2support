@@ -8,7 +8,6 @@ import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 
 import javax.swing.*;
-import javax.swing.tree.TreeSelectionModel;
 import java.util.Collection;
 import java.util.Map;
 
@@ -29,8 +28,6 @@ public class RefreshAction extends AnActionButton {
             migrationMap = newMigrationsMap;
             MigrationUtil.updateTree(tree, migrationMap);
 //            }
-            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
-
 
         System.out.println("RefreshAction.actionPerformed()");
     }
