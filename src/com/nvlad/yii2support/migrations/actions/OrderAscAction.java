@@ -5,14 +5,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Toggleable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
-import com.nvlad.yii2support.migrations.MigrationManager;
-import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
-
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Map;
 
 public class OrderAscAction extends AnActionButton implements Toggleable {
     public OrderAscAction() {
@@ -32,8 +26,7 @@ public class OrderAscAction extends AnActionButton implements Toggleable {
         settings.newestFirst = !settings.newestFirst;
         anActionEvent.getPresentation().putClientProperty(SELECTED_PROPERTY, settings.newestFirst);
 
-        Map<String, Collection<Migration>> migrationMap = MigrationManager.getInstance(project).getMigrations();
-        MigrationUtil.updateTree((JTree) getContextComponent(), migrationMap, false, settings.newestFirst);
+        ((MigrationPanel) getContextComponent()).updateMigrations();
     }
 
     @Override
