@@ -32,6 +32,9 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     @MapAnnotation(sortBeforeSave = false)
     public Map<String, String> viewPathMap;
 
+    // Migrations
+    public boolean newestFirst = false;
+
     public Yii2SupportSettings() {
         viewPathMap = new LinkedHashMap<>();
         viewPathMap.put("@app/themes/*/modules", "@app/modules");

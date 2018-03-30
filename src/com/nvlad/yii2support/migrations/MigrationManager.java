@@ -9,7 +9,10 @@ import com.nvlad.yii2support.common.FileUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class MigrationManager {
     private static final Map<Project, MigrationManager> migrationManagerMap = new HashMap<>();
@@ -51,10 +54,6 @@ public class MigrationManager {
             migrationMap.get(path).add(new Migration(migration, path));
         }
 
-        for (Map.Entry<String, Collection<Migration>> entry : migrationMap.entrySet()) {
-            ((LinkedList<Migration>) entry.getValue()).sort(new MigrationComparator());
-        }
-
         return migrationMap;
     }
 
@@ -65,18 +64,5 @@ public class MigrationManager {
         }
 
         return null;
-    }
-
-    class MigrationComparator implements Comparator<Migration> {
-        @Override
-        public int compare(Migration m1, Migration m2) {
-//            return m1.createdAt.compareTo(m2.createdAt);
-            return m2.createdAt.compareTo(m1.createdAt);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return false;
-        }
     }
 }
