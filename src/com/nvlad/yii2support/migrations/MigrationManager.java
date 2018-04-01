@@ -6,6 +6,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.DatabaseUtils;
 import com.nvlad.yii2support.common.FileUtil;
+import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,6 +30,12 @@ public class MigrationManager {
 
     private MigrationManager(Project project) {
         myProject = project;
+    }
+
+    public Map<String, Collection<Migration>> getMigrationsWithStatus() {
+        Map<String, Collection<Migration>> migrations = getMigrations();
+        YiiCommandLineUtil.executeCommand(myProject, "migrate/history");
+        return migrations;
     }
 
     public Map<String, Collection<Migration>> getMigrations() {
