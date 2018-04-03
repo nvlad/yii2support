@@ -11,6 +11,7 @@ import icons.DatabaseIcons;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.text.DateFormat;
 
 public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
     @Override
@@ -42,6 +43,8 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                     renderer.setIcon(AllIcons.RunConfigurations.TestPassed);
                     SimpleTextAttributes successAttributes = new SimpleTextAttributes(0, JBColor.green);
                     renderer.append(migration.name, successAttributes, true);
+                    String applyDate = DateFormat.getDateTimeInstance().format(migration.applyAt);
+                    renderer.append("  " + applyDate, SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
                     break;
                 case Error:
                     renderer.setIcon(AllIcons.RunConfigurations.TestError);

@@ -60,6 +60,7 @@ public class MigrationPanel extends SimpleToolWindowPanel {
                 migration.status = MigrationStatus.NotApply;
                 if (history.containsKey(migration.name)) {
                     migration.status = MigrationStatus.Success;
+                    migration.applyAt = history.get(migration.name);
                     break;
                 }
             }

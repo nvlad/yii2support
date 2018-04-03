@@ -12,6 +12,7 @@ public class Migration implements Comparable<Migration> {
     public String path;
     public MigrationStatus status;
     public Date createdAt;
+    public Date applyAt;
 
     public Migration(PhpClass clazz, String path) {
         this.migrationClass = clazz;
