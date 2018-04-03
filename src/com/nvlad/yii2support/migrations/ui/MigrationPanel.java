@@ -17,14 +17,13 @@ import com.nvlad.yii2support.migrations.MigrationsMouseListener;
 import com.nvlad.yii2support.migrations.actions.OrderAscAction;
 import com.nvlad.yii2support.migrations.actions.RefreshAction;
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 public class MigrationPanel extends SimpleToolWindowPanel {
@@ -42,30 +41,16 @@ public class MigrationPanel extends SimpleToolWindowPanel {
         initActivationListener(toolWindow);
     }
 
-    public void updateMigrations() {
-        Map<String, Collection<Migration>> newMigrationsMap = MigrationManager.getInstance(myProject).getMigrations();
-        boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
-        if (true || !newMigrationsMap.equals(migrationMap)) {
-            migrationMap = newMigrationsMap;
-            MigrationUtil.updateTree(myTree, migrationMap, false, newestFirst);
-        }
+    public JTree getTree() {
+        return myTree;
+    }
 
-        final Map<String, Date> history = MigrationManager.getInstance(myProject).migrateHistory();
-        if (history == null) {
-            return;
-        }
+    public Map<String, Collection<Migration>> getMigrationMap() {
+        return migrationMap;
+    }
 
-        migrationMap.forEach((path, migrations) -> {
-            for (Migration migration : migrations) {
-                migration.status = MigrationStatus.NotApply;
-                if (history.containsKey(migration.name)) {
-                    migration.status = MigrationStatus.Success;
-                    migration.applyAt = history.get(migration.name);
-                }
-            }
-        });
-
-        MigrationUtil.updateTree(myTree, migrationMap, false, newestFirst);
+    public void setMigrationMap(Map<String, Collection<Migration>> migrationMap) {
+        this.migrationMap = migrationMap;
     }
 
     private void initActivationListener(ToolWindow toolWindow) {
