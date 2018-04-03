@@ -5,56 +5,25 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.SystemInfo;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 public class YiiCommandLineUtil {
-    public static void executeCommand(Project project, String command) {
-        executeCommand(project, command, null);
+    public static Process executeCommand(Project project, String command) throws ExecutionException {
+        return executeCommand(project, command, (String[]) null);
     }
 
-    public static void executeCommand(Project project, String command, String[] parameters) {
-        String path = YiiApplicationUtils.getYiiRootPath(project) + "/yii";
+    public static Process executeCommand(Project project, String command, String... parameters) throws ExecutionException {
+        String path = YiiApplicationUtils.getYiiRootPath(project);
+        String yii = path + "/yii";
         if (SystemInfo.isWindows) {
-            path += ".bat";
+            yii += ".bat";
         }
-        GeneralCommandLine commandLine = new GeneralCommandLine(path);
+        GeneralCommandLine commandLine = new GeneralCommandLine(yii);
         commandLine.setWorkDirectory(path);
         commandLine.addParameter(command);
         if (parameters != null) {
             commandLine.addParameters(parameters);
         }
+        commandLine.addParameters("--color");
 
-        try {
-            Process process = commandLine.createProcess();
-            InputStream stream = process.getInputStream();
-            InputStream errorStream = process.getErrorStream();
-            try {
-                process.waitFor();
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-
-            System.out.println("Process exit value: " + process.exitValue());
-            try {
-                int available = stream.available();
-                byte[] data = new byte[available];
-                stream.read(data);
-                System.out.println(new String(data));
-
-                available = errorStream.available();
-                if (available > 0) {
-                    byte[] errorData = new byte[available];
-                    int readed = errorStream.read(errorData);
-                    String string = new String(errorData);
-                    System.out.println(string);
-                }
-
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        } catch (ExecutionException e1) {
-            e1.printStackTrace();
-        }
+        return commandLine.createProcess();
     }
 }
