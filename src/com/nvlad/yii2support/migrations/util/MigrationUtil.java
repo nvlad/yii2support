@@ -2,10 +2,15 @@ package com.nvlad.yii2support.migrations.util;
 
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationComparator;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MigrationUtil {
     public static void updateTree(JTree tree, Map<String, Collection<Migration>> migrationMap, boolean clear, boolean newestFirst) {
@@ -59,5 +64,33 @@ public class MigrationUtil {
         }
 
         tree.updateUI();
+    }
+
+    private static final Pattern dateFromName = Pattern.compile("m(\\d{6}_\\d{6})_.+");
+    private static final SimpleDateFormat migrationCreateDateFormat = new SimpleDateFormat("yyMMdd_HHmmss");
+
+    @Nullable
+    public static Date createDateFromName(String name) {
+        Matcher matcher = dateFromName.matcher(name);
+        if (!matcher.find()) {
+            return null;
+        }
+
+        try {
+            return migrationCreateDateFormat.parse(matcher.group(1));
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    private static final SimpleDateFormat migrationApplyDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    @Nullable
+    public static Date applyDate(String date) {
+        try {
+            return migrationApplyDateFormat.parse(date);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }
