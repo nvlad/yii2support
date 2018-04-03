@@ -31,22 +31,22 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 
             @Override
             public void fileDeleted(@NotNull VirtualFileEvent event) {
-                migrationPanel.updateMigrations();
+//                migrationPanel.updateMigrations();
             }
 
             @Override
             public void fileMoved(@NotNull VirtualFileMoveEvent event) {
-                migrationPanel.updateMigrations();
+//                migrationPanel.updateMigrations();
             }
 
             @Override
             public void fileCopied(@NotNull VirtualFileCopyEvent event) {
-                updateMigrations();
+//                updateMigrations();
             }
 
             private void updateMigrations() {
-                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-                executor.schedule(migrationPanel::updateMigrations, 1, TimeUnit.SECONDS);
+//                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+//                executor.schedule(migrationPanel::updateMigrations, 1, TimeUnit.SECONDS);
             }
         });
     }
