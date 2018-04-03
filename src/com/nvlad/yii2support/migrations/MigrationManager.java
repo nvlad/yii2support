@@ -9,6 +9,7 @@ import com.nvlad.yii2support.common.FileUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class MigrationManager {
                 continue;
             }
 
-            String path = virtualFile.getUrl().substring(baseUrlLength);
+            String path = virtualFile.getUrl().substring(baseUrlLength + 1);
             int pathLength = path.length();
             path = path.substring(0, pathLength - virtualFile.getName().length() - 1);
 
@@ -66,7 +67,7 @@ public class MigrationManager {
     @Nullable
     public Map<String, Date> migrateHistory() {
         try {
-            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", "all", "-t=migration");
+            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", "all");
             if (process.waitFor() != 0) {
                 return null;
             }
@@ -91,6 +92,54 @@ public class MigrationManager {
                 if (entryMatcher.find()) {
                     result.put(entryMatcher.group(2), MigrationUtil.applyDate(entryMatcher.group(1)));
                 }
+            }
+
+            return result;
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    Pattern migrateUpPattern = Pattern.compile("\\*\\*\\* applied (m\\d{6}_\\d{6}_.+?) \\(time: ");
+
+    public Set<String> migrateUp(String path, int count) {
+        try {
+            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
+            LinkedList<String> params = new LinkedList<>();
+            params.push(String.valueOf(count));
+            if (settings.dbConnection != null) {
+                params.push("--db=" + settings.dbConnection);
+            }
+            if (settings.migrationTable != null) {
+                params.push("--migrationTable=" + settings.migrationTable);
+            }
+            params.push("--migrationPath=" + path);
+            params.push("--interactive=0");
+            params.push("--color");
+
+            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/up", params.toArray(new String[0]));
+            if (process.waitFor() != 0) {
+                return null;
+            }
+            String error = readStream(process.getErrorStream());
+            if (error != null) {
+                return null;
+            }
+            String stream = readStream(process.getInputStream());
+            if (stream == null) {
+                return null;
+            }
+
+            Set<String> result = new HashSet<>();
+            if (stream.contains("No new migrations found. Your system is up-to-date.")) {
+                return result;
+            }
+
+            Matcher matcher = migrateUpPattern.matcher(stream);
+            while (matcher.find()) {
+                result.add(matcher.group(1));
             }
 
             return result;

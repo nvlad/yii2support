@@ -34,6 +34,8 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
 
     // Migrations
     public boolean newestFirst = false;
+    public String dbConnection = null;
+    public String migrationTable = null;
 
     public Yii2SupportSettings() {
         viewPathMap = new LinkedHashMap<>();
