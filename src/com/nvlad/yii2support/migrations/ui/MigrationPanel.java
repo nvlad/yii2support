@@ -29,7 +29,7 @@ import java.util.Map;
 public class MigrationPanel extends SimpleToolWindowPanel {
     private final Project myProject;
     private CheckboxTree myTree;
-    private Map<String, Collection<Migration>> migrationMap;
+    private Map<String, Collection<Migration>> myMigrationMap;
 
     public MigrationPanel(Project project, ToolWindow toolWindow) {
         super(false);
@@ -46,11 +46,11 @@ public class MigrationPanel extends SimpleToolWindowPanel {
     }
 
     public Map<String, Collection<Migration>> getMigrationMap() {
-        return migrationMap;
+        return myMigrationMap;
     }
 
     public void setMigrationMap(Map<String, Collection<Migration>> migrationMap) {
-        this.migrationMap = migrationMap;
+        myMigrationMap = migrationMap;
     }
 
     private void initActivationListener(ToolWindow toolWindow) {

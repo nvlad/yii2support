@@ -38,6 +38,7 @@ public class RefreshAction extends AnActionButton {
             return;
         }
 
+        migrationMap = panel.getMigrationMap();
         migrationMap.forEach((path, migrations) -> {
             for (Migration migration : migrations) {
                 migration.status = MigrationStatus.NotApply;

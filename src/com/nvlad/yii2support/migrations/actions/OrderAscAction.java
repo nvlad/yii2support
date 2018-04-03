@@ -6,8 +6,10 @@ import com.intellij.openapi.actionSystem.Toggleable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
+import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
+@SuppressWarnings("ComponentNotRegistered")
 public class OrderAscAction extends AnActionButton implements Toggleable {
     public OrderAscAction() {
         super("Newest migrations first", AllIcons.RunConfigurations.SortbyDuration);
@@ -26,7 +28,9 @@ public class OrderAscAction extends AnActionButton implements Toggleable {
         settings.newestFirst = !settings.newestFirst;
         anActionEvent.getPresentation().putClientProperty(SELECTED_PROPERTY, settings.newestFirst);
 
-        ((MigrationPanel) getContextComponent()).updateMigrations();
+        MigrationPanel panel = (MigrationPanel) getContextComponent();
+
+        MigrationUtil.updateTree(panel.getTree(), panel.getMigrationMap(), false, settings.newestFirst);
     }
 
     @Override
