@@ -60,13 +60,13 @@ public class MigrationManager {
         return migrationMap;
     }
 
-    private static Pattern historyPattern = Pattern.compile("(\\(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\) m\\d{6}_\\d{6}_[\\w+_-]+)");
+    private static Pattern historyPattern = Pattern.compile("(\\(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\) m\\d{6}_\\d{6}_[\\w+_-]+)", Pattern.MULTILINE);
     private static Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) (m\\d{6}_\\d{6}_[\\w+_-]+)");
 
     @Nullable
     public Map<String, Date> migrateHistory() {
         try {
-            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", "all");
+            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", "all", "-t=migration");
             if (process.waitFor() != 0) {
                 return null;
             }
@@ -79,23 +79,20 @@ public class MigrationManager {
                 return null;
             }
 
+            Map<String, Date> result = new HashMap<>();
             if (stream.contains("No migration has been done before.")) {
-                return new HashMap<>();
+                return result;
             }
 
             Matcher matcher = historyPattern.matcher(stream);
-            if (!matcher.find()) {
-                return null;
-            }
-
-            Map<String, Date> result = new HashMap<>();
-            for (int i = matcher.groupCount(); i > 0; i--) {
-                String historyEntry = matcher.group(i);
+            while (matcher.find()) {
+                String historyEntry = matcher.group(1);
                 Matcher entryMatcher = historyEntryPattern.matcher(historyEntry);
                 if (entryMatcher.find()) {
                     result.put(entryMatcher.group(2), MigrationUtil.applyDate(entryMatcher.group(1)));
                 }
             }
+
             return result;
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();

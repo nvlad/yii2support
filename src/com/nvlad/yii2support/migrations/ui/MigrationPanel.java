@@ -61,7 +61,6 @@ public class MigrationPanel extends SimpleToolWindowPanel {
                 if (history.containsKey(migration.name)) {
                     migration.status = MigrationStatus.Success;
                     migration.applyAt = history.get(migration.name);
-                    break;
                 }
             }
         });
