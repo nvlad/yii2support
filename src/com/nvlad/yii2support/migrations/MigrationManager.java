@@ -67,7 +67,17 @@ public class MigrationManager {
     @Nullable
     public Map<String, Date> migrateHistory() {
         try {
-            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", "all");
+            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
+            LinkedList<String> params = new LinkedList<>();
+            params.push("all");
+            if (settings.dbConnection != null) {
+                params.push("--db=" + settings.dbConnection);
+            }
+            if (settings.migrationTable != null) {
+                params.push("--migrationTable=" + settings.migrationTable);
+            }
+
+            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", params);
             if (process.waitFor() != 0) {
                 return null;
             }
