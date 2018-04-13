@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
+import io.netty.util.internal.StringUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +18,7 @@ public class SettingsForm implements Configurable {
     private JTextField tablePrefixTextbox;
     private JCheckBox insertTableNamesWithCheckBox;
     private JPanel panel;
+    private JTextField migrationTable;
     private Yii2SupportSettings settings;
 
     public SettingsForm(Project project) {
@@ -59,13 +61,29 @@ public class SettingsForm implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !tablePrefixTextbox.getText().equals(settings.tablePrefix) || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected();
+        boolean migrationTableChanged = true;
+        if (settings.migrationTable == null && StringUtil.isNullOrEmpty(migrationTable.getText())) {
+            migrationTableChanged = false;
+        }
+        if (settings.migrationTable != null && !settings.migrationTable.equals(migrationTable.getText())) {
+            migrationTableChanged = false;
+        }
+
+        return !tablePrefixTextbox.getText().equals(settings.tablePrefix)
+                || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected()
+                || migrationTableChanged;
     }
 
     @Override
     public void apply() {
         settings.tablePrefix = tablePrefixTextbox.getText();
         settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
+
+        if (StringUtil.isNullOrEmpty(migrationTable.getText())) {
+            settings.migrationTable = null;
+        } else {
+            settings.migrationTable = migrationTable.getText();
+        }
     }
 
     private void createUIComponents() {
@@ -76,6 +94,7 @@ public class SettingsForm implements Configurable {
     public void reset() {
         tablePrefixTextbox.setText(settings.tablePrefix);
         insertTableNamesWithCheckBox.setSelected(settings.insertWithTablePrefix);
+        migrationTable.setText(settings.migrationTable == null ? "" : settings.migrationTable);
         adjustInputs();
     }
 
