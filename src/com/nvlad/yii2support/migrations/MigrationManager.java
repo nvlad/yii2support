@@ -119,7 +119,7 @@ public class MigrationManager {
             params.push("--interactive=0");
             params.push("--color");
 
-            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/up", params.toArray(new String[0]));
+            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/up", params);
             if (process.waitFor() != 0) {
                 return null;
             }
