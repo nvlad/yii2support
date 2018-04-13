@@ -28,7 +28,7 @@
         <li>Add setup Yii Root Path in project</li>
         <li>Add settings page for Views (Theme paths, View file extension, Default View class)</li>
         <li>Action for go to render method call this View (by default Ctrl + Alt + R / Cmd + Alt + R, or Navigate -> Goto View render call)</li>
-        <li>Inspection for missed variable declaration in View + QuickFix</li>
+        <li>Inspection for missed variable declaration in View + QuickFix (disabled by default, massive using CPU)</li>
         <li>Support relative path to Yii root</li>
         <li>Path to missed View file in error message</li>
       </ul>
@@ -88,7 +88,7 @@
         <localInspection language="PHP" shortName="ViewMissedPhpDocInspection"
                          displayName="Missed PhpDoc variable declaration"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
-                         enabledByDefault="true" level="WARNING"
+                         enabledByDefault="false" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.ViewMissedPhpDocInspection"/>
 
         <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex" id="view-index"/>

@@ -1,6 +1,10 @@
 Yii2 Support Change Log
 =======================
 
+0.8.42.6 April 13, 2018
+-----------------------
+- Disable "Inspection for missed variable declaration" feature high load of CPU
+
 0.8.42.5 March 20, 2018
 -----------------------
 - Fix View path resolving
