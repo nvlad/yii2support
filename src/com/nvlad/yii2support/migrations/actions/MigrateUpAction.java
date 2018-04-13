@@ -63,6 +63,33 @@ public class MigrateUpAction extends AnActionButton {
         }
     }
 
+    @Override
+    public boolean isEnabled() {
+        DefaultMutableTreeNode treeNode = getSelectedNode();
+        if (treeNode == null) {
+            return false;
+        }
+
+        Object userObject = treeNode.getUserObject();
+        if (userObject instanceof Migration) {
+            return ((Migration) userObject).status != MigrationStatus.Success;
+        }
+
+        if (userObject instanceof String) {
+            Enumeration migrationEnumeration = treeNode.children();
+            while (migrationEnumeration.hasMoreElements()) {
+                Object tmp = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (tmp instanceof Migration) {
+                    if (((Migration) tmp).status != MigrationStatus.Success) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     @Nullable
     private DefaultMutableTreeNode getSelectedNode() {
         MigrationPanel panel = (MigrationPanel) getContextComponent();
