@@ -7,12 +7,15 @@ import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 @SuppressWarnings("ComponentNotRegistered")
@@ -28,10 +31,11 @@ public class MigrateUpAction extends AnActionButton {
             return;
         }
 
+        Set<String> migrations = null;
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof String) {
             MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
-            Set<String> migrations = manager.migrateUp((String) userObject, 0);
+            migrations = manager.migrateUp((String) userObject, 0);
         }
 
         if (userObject instanceof Migration) {
@@ -40,11 +44,18 @@ public class MigrateUpAction extends AnActionButton {
                 return;
             }
 
-            int count = 0;
+            LinkedList<Migration> migrationList = new LinkedList<>();
             Enumeration migrationEnumeration = treeNode.getParent().children();
             while (migrationEnumeration.hasMoreElements()) {
-                Migration tmp = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
-                if (migration.status != MigrationStatus.Success) {
+                migrationList.add((Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject());
+            }
+
+            int count = 0;
+            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(anActionEvent.getProject());
+            Iterator<Migration> migrationIterator = settings.newestFirst ? migrationList.descendingIterator() : migrationList.iterator();
+            while (migrationIterator.hasNext()) {
+                Migration tmp = migrationIterator.next();
+                if (tmp.status != MigrationStatus.Success) {
                     count++;
                 }
 
@@ -59,7 +70,7 @@ public class MigrateUpAction extends AnActionButton {
 
             MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
             Object parentUserObject = ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
-            Set<String> migrations = manager.migrateUp((String) parentUserObject, count);
+            migrations = manager.migrateUp((String) parentUserObject, count);
         }
     }
 
