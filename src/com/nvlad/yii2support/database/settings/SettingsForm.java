@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
-import io.netty.util.internal.StringUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,8 +16,10 @@ public class SettingsForm implements Configurable {
     private JPanel mainPanel;
     private JTextField tablePrefixTextbox;
     private JCheckBox insertTableNamesWithCheckBox;
-    private JPanel panel;
+    private JPanel tablePanel;
     private JTextField migrationTable;
+    private JPanel migrationPanel;
+    private JTextField dbConnection;
     private Yii2SupportSettings settings;
 
     public SettingsForm(Project project) {
@@ -32,7 +33,8 @@ public class SettingsForm implements Configurable {
             }
         });
 
-        UIUtil.addBorder(panel, IdeBorderFactory.createTitledBorder("Table Prefix Support", false));
+        UIUtil.addBorder(tablePanel, IdeBorderFactory.createTitledBorder("Table Prefix Support", false));
+        UIUtil.addBorder(migrationPanel, IdeBorderFactory.createTitledBorder("Migrations", false));
     }
 
     private void adjustInputs() {
@@ -61,17 +63,13 @@ public class SettingsForm implements Configurable {
 
     @Override
     public boolean isModified() {
-        boolean migrationTableChanged = true;
-        if (settings.migrationTable == null && StringUtil.isNullOrEmpty(migrationTable.getText())) {
-            migrationTableChanged = false;
-        }
-        if (settings.migrationTable != null && !settings.migrationTable.equals(migrationTable.getText())) {
-            migrationTableChanged = false;
-        }
+        boolean migrationTableChanged = !settings.migrationTable.equals(migrationTable.getText());
+        boolean dbConnectionChanged = !settings.dbConnection.equals(dbConnection.getText());
 
         return !tablePrefixTextbox.getText().equals(settings.tablePrefix)
                 || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected()
-                || migrationTableChanged;
+                || migrationTableChanged
+                || dbConnectionChanged;
     }
 
     @Override
@@ -79,11 +77,8 @@ public class SettingsForm implements Configurable {
         settings.tablePrefix = tablePrefixTextbox.getText();
         settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
 
-        if (StringUtil.isNullOrEmpty(migrationTable.getText())) {
-            settings.migrationTable = null;
-        } else {
-            settings.migrationTable = migrationTable.getText();
-        }
+        settings.migrationTable = migrationTable.getText();
+        settings.dbConnection = dbConnection.getText();
     }
 
     private void createUIComponents() {
@@ -94,7 +89,8 @@ public class SettingsForm implements Configurable {
     public void reset() {
         tablePrefixTextbox.setText(settings.tablePrefix);
         insertTableNamesWithCheckBox.setSelected(settings.insertWithTablePrefix);
-        migrationTable.setText(settings.migrationTable == null ? "" : settings.migrationTable);
+        migrationTable.setText(settings.migrationTable);
+        dbConnection.setText(settings.dbConnection);
         adjustInputs();
     }
 
