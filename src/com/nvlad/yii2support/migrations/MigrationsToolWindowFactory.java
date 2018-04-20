@@ -8,8 +8,12 @@ import com.intellij.openapi.wm.ex.ToolWindowManagerEx;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import com.jediterm.terminal.model.StyleState;
+import com.jediterm.terminal.model.TerminalTextBuffer;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.terminal.JBTerminalPanel;
+import org.jetbrains.plugins.terminal.JBTerminalSystemSettingsProvider;
 
 public class MigrationsToolWindowFactory implements ToolWindowFactory {
     public static final String TOOL_WINDOW_ID = "Migrations";
@@ -17,10 +21,18 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         MigrationPanel migrationPanel = new MigrationPanel(project, toolWindow);
-        Content content = ContentFactory.SERVICE.getInstance().createContent(migrationPanel, "", false);
-        toolWindow.getContentManager().addContent(content);
+        Content navigator = ContentFactory.SERVICE.getInstance().createContent(migrationPanel, "Navigator", false);
+        toolWindow.getContentManager().addContent(navigator);
 
-        ((ToolWindowManagerEx)ToolWindowManager.getInstance(project)).addToolWindowManagerListener(new ToolWindowManagerListener() {
+        JBTerminalSystemSettingsProvider settingsProvider = new JBTerminalSystemSettingsProvider();
+        StyleState styleState = new StyleState();
+        styleState.setDefaultStyle(settingsProvider.getDefaultStyle());
+        TerminalTextBuffer terminalTextBuffer = new TerminalTextBuffer(80, 50, styleState);
+        JBTerminalPanel terminalPanel = new JBTerminalPanel(settingsProvider, terminalTextBuffer, styleState);
+        Content terminal = ContentFactory.SERVICE.getInstance().createContent(terminalPanel, "Output", false);
+        toolWindow.getContentManager().addContent(terminal);
+
+        ((ToolWindowManagerEx) ToolWindowManager.getInstance(project)).addToolWindowManagerListener(new ToolWindowManagerListener() {
             private boolean myToolWindowVisible = true;
             private boolean myToolWindowActive = true;
 
