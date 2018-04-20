@@ -72,6 +72,11 @@ public class MigrateUpAction extends AnActionButton {
             Object parentUserObject = ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
             migrations = manager.migrateUp((String) parentUserObject, count);
         }
+
+        if(migrations != null && migrations.size() > 0) {
+            MigrationPanel panel = (MigrationPanel) getContextComponent();
+            panel.updateMigrations();
+        }
     }
 
     @Override
