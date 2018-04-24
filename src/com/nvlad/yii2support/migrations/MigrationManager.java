@@ -2,11 +2,15 @@ package com.nvlad.yii2support.migrations;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.OutputListener;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -18,8 +22,14 @@ import com.jediterm.terminal.model.CharBuffer;
 import com.jediterm.terminal.model.TerminalLine;
 import com.jediterm.terminal.model.TerminalTextBuffer;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.config.commandLine.PhpCommandLineCommand;
+import com.jetbrains.php.config.commandLine.PhpCommandSettings;
+import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.run.PhpCommandLineSettings;
+import com.jetbrains.php.run.script.PhpScriptRunConfiguration;
 import com.nvlad.yii2support.common.FileUtil;
+import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
@@ -89,63 +99,89 @@ public class MigrationManager {
     public Map<String, Date> migrateHistory() {
         try {
             Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-            LinkedList<String> params = new LinkedList<>();
-            params.push("all");
+//            LinkedList<String> params = new LinkedList<>();
+//            params.push("all");
+//            if (settings.dbConnection != null) {
+//                params.push("--db=" + settings.dbConnection);
+//            }
+//            if (settings.migrationTable != null) {
+//                params.push("--migrationTable=" + settings.migrationTable);
+//            }
+
+            PhpCommandSettings commandSettings = PhpCommandSettingsBuilder.create(myProject, false);
+            String workDirectory = YiiApplicationUtils.getYiiRootPath(myProject);
+            String script = workDirectory + "/yii";
+            commandSettings.setScript(script);
+            commandSettings.addArgument("migrate/history");
+            commandSettings.addArgument("all");
             if (settings.dbConnection != null) {
-                params.push("--db=" + settings.dbConnection);
+                commandSettings.addArgument("--db=" + settings.dbConnection);
             }
             if (settings.migrationTable != null) {
-                params.push("--migrationTable=" + settings.migrationTable);
+                commandSettings.addArgument("--migrationTable=" + settings.migrationTable);
             }
+//            commandSettings.addArgument("--color");
 
-            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", params);
+            GeneralCommandLine commandLine = commandSettings.createGeneralCommandLine();
+            Process process = commandLine.createProcess();
+            commandLine.setWorkDirectory(workDirectory);
+            myConsoleView.print("> " + commandLine.getCommandLineString() + "\n\n", ConsoleViewContentType.SYSTEM_OUTPUT);
+
+//            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", params);
             if (myConsoleView != null) {
-                ProcessHandler processHandler = new ProcessHandler() {
+//                ProcessHandler processHandler = new ProcessHandler() {
+//                    @Override
+//                    protected void destroyProcessImpl() {
+//                        System.out.println("destroyProcessImpl");
+//                    }
+//
+//                    @Override
+//                    protected void detachProcessImpl() {
+//                        System.out.println("detachProcessImpl");
+//                    }
+//
+//                    @Override
+//                    public boolean detachIsDefault() {
+//                        System.out.println("detachIsDefault");
+//                        return true;
+//                    }
+//
+//                    @Nullable
+//                    @Override
+//                    public OutputStream getProcessInput() {
+//                        System.out.println("getProcessInput");
+//                        return process.getOutputStream();
+//                    }
+//                };
+//                processHandler.addProcessListener(new ProcessListener() {
+//                    @Override
+//                    public void startNotified(ProcessEvent processEvent) {
+//                        System.out.println("startNotified");
+//                    }
+//
+//                    @Override
+//                    public void processTerminated(ProcessEvent processEvent) {
+//                        System.out.println("processTerminated");
+//                    }
+//
+//                    @Override
+//                    public void processWillTerminate(ProcessEvent processEvent, boolean b) {
+//                        System.out.println("processWillTerminate");
+//                    }
+//
+//                    @Override
+//                    public void onTextAvailable(ProcessEvent processEvent, Key key) {
+//                        System.out.println(key);
+//                    }
+//                });
+//
+//                myConsoleView.attachToProcess(processHandler);
+                ProcessHandler processHandler = new OSProcessHandler(commandLine) {
                     @Override
-                    protected void destroyProcessImpl() {
-                        System.out.println("destroyProcessImpl");
-                    }
-
-                    @Override
-                    protected void detachProcessImpl() {
-                        System.out.println("detachProcessImpl");
-                    }
-
-                    @Override
-                    public boolean detachIsDefault() {
-                        System.out.println("detachIsDefault");
+                    public boolean isSilentlyDestroyOnClose() {
                         return true;
                     }
-
-                    @Nullable
-                    @Override
-                    public OutputStream getProcessInput() {
-                        System.out.println("getProcessInput");
-                        return process.getOutputStream();
-                    }
                 };
-                processHandler.addProcessListener(new ProcessListener() {
-                    @Override
-                    public void startNotified(ProcessEvent processEvent) {
-                        System.out.println("startNotified");
-                    }
-
-                    @Override
-                    public void processTerminated(ProcessEvent processEvent) {
-                        System.out.println("processTerminated");
-                    }
-
-                    @Override
-                    public void processWillTerminate(ProcessEvent processEvent, boolean b) {
-                        System.out.println("processWillTerminate");
-                    }
-
-                    @Override
-                    public void onTextAvailable(ProcessEvent processEvent, Key key) {
-                        System.out.println(key);
-                    }
-                });
-
                 myConsoleView.attachToProcess(processHandler);
             }
 
