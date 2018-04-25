@@ -1,33 +1,18 @@
 package com.nvlad.yii2support.migrations;
 
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.OutputListener;
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.filters.TextConsoleBuilderFactory;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.process.ProcessListener;
+import com.intellij.execution.process.AnsiEscapeDecoder;
+import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
-import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.JBColor;
-import com.jediterm.terminal.TerminalDataStream;
-import com.jediterm.terminal.TerminalOutputStream;
-import com.jediterm.terminal.TextStyle;
-import com.jediterm.terminal.model.CharBuffer;
-import com.jediterm.terminal.model.TerminalLine;
-import com.jediterm.terminal.model.TerminalTextBuffer;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.config.commandLine.PhpCommandLineCommand;
 import com.jetbrains.php.config.commandLine.PhpCommandSettings;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.run.PhpCommandLineSettings;
-import com.jetbrains.php.run.script.PhpScriptRunConfiguration;
 import com.nvlad.yii2support.common.FileUtil;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
@@ -35,11 +20,9 @@ import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.terminal.JBTerminalPanel;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -120,7 +103,7 @@ public class MigrationManager {
             if (settings.migrationTable != null) {
                 commandSettings.addArgument("--migrationTable=" + settings.migrationTable);
             }
-//            commandSettings.addArgument("--color");
+            commandSettings.addArgument("--color");
 
             GeneralCommandLine commandLine = commandSettings.createGeneralCommandLine();
             Process process = commandLine.createProcess();
@@ -176,24 +159,28 @@ public class MigrationManager {
 //                });
 //
 //                myConsoleView.attachToProcess(processHandler);
-                ProcessHandler processHandler = new OSProcessHandler(commandLine) {
-                    @Override
-                    public boolean isSilentlyDestroyOnClose() {
-                        return true;
-                    }
-                };
-                myConsoleView.attachToProcess(processHandler);
+//                ProcessHandler processHandler = new OSProcessHandler(commandLine) {
+//                    @Override
+//                    public boolean isSilentlyDestroyOnClose() {
+//                        return true;
+//                    }
+//                };
+//                myConsoleView.attachToProcess(processHandler);
             }
 
-            if (process.waitFor() != 0) {
-                return null;
-            }
-            String stream = readStream(process.getInputStream());
-            if (stream == null) {
+            process.waitFor();
+//            if (process.waitFor() != 0) {
+//                myConsoleView.print("Process exit with code: " + process.exitValue(), ConsoleViewContentType.ERROR_OUTPUT);
+//            }
+
+            String processOutput = readStream(process.getInputStream());
+            if (processOutput == null) {
                 return null;
             }
 
-            myConsoleView.print(stream, ConsoleViewContentType.NORMAL_OUTPUT);
+            printStreamToConsole(processOutput, ProcessOutputTypes.STDOUT);
+
+//            myConsoleView.print(stream, ConsoleViewContentType.NORMAL_OUTPUT);
 //            if (myTerminalPanel != null) {
 //                TerminalOutputStream outputStream = myTerminalPanel.getTerminalOutputStream();
 //                TerminalTextBuffer buffer = myTerminalPanel.getTerminalTextBuffer();
@@ -209,17 +196,19 @@ public class MigrationManager {
 //                myTerminalPanel.setAutoscrolls(true);
 //            }
 
-            String error = readStream(process.getErrorStream());
-            if (error != null) {
+            String processError = readStream(process.getErrorStream());
+            if (processError != null) {
+                printStreamToConsole(processError, ProcessOutputTypes.STDERR);
                 return null;
             }
 
+
             Map<String, Date> result = new HashMap<>();
-            if (stream.contains("No migration has been done before.")) {
+            if (processOutput.contains("No migration has been done before.")) {
                 return result;
             }
 
-            Matcher matcher = historyPattern.matcher(stream);
+            Matcher matcher = historyPattern.matcher(processOutput);
             while (matcher.find()) {
                 String historyEntry = matcher.group(1);
                 Matcher entryMatcher = historyEntryPattern.matcher(historyEntry);
@@ -299,5 +288,13 @@ public class MigrationManager {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    private void printStreamToConsole(String streamData, Key processOutputTypes) {
+        AnsiEscapeDecoder escapeDecoder = new AnsiEscapeDecoder();
+        escapeDecoder.escapeText(streamData, processOutputTypes, (text, key) -> {
+            ConsoleViewContentType viewContentType = ConsoleViewContentType.getConsoleViewType(key);
+            myConsoleView.print(text, viewContentType);
+        });
     }
 }
