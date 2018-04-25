@@ -1,8 +1,5 @@
 package com.nvlad.yii2support.migrations;
 
-import com.intellij.execution.impl.ConsoleViewImpl;
-import com.intellij.execution.impl.ConsoleViewUtil;
-import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -11,16 +8,9 @@ import com.intellij.openapi.wm.ex.ToolWindowManagerEx;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.jediterm.terminal.model.StyleState;
-import com.jediterm.terminal.model.TerminalTextBuffer;
-import com.jediterm.terminal.ui.TerminalPanel;
+import com.nvlad.yii2support.migrations.ui.ConsolePanel;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.terminal.JBTerminalPanel;
-import org.jetbrains.plugins.terminal.JBTerminalSystemSettingsProvider;
-import org.jetbrains.plugins.terminal.TerminalView;
-
-import javax.swing.*;
 
 public class MigrationsToolWindowFactory implements ToolWindowFactory {
     public static final String TOOL_WINDOW_ID = "Migrations";
@@ -31,21 +21,11 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
         Content navigator = ContentFactory.SERVICE.getInstance().createContent(migrationPanel, "Navigator", false);
         toolWindow.getContentManager().addContent(navigator);
 
-//        JBTerminalSystemSettingsProvider settingsProvider = new JBTerminalSystemSettingsProvider();
-//        StyleState styleState = new StyleState();
-//        styleState.setDefaultStyle(settingsProvider.getDefaultStyle());
-//        TerminalTextBuffer terminalTextBuffer = new TerminalTextBuffer(80, 50, styleState);
-//        JBTerminalPanel terminalPanel = new JBTerminalPanel(settingsProvider, terminalTextBuffer, styleState);
-//        Content terminal = ContentFactory.SERVICE.getInstance().createContent(terminalPanel, "Output", false);
-//        toolWindow.getContentManager().addContent(terminal);
-//        MigrationManager.getInstance(project).setTerminalPanel(terminalPanel);
-
-//        TerminalView terminalView = TerminalView.getInstance(project);
-
-        ConsoleView consoleView = new ConsoleViewImpl(project, true);
-        Content console = ContentFactory.SERVICE.getInstance().createContent(consoleView.getComponent(), "Output", false);
+        ConsolePanel consolePanel = new ConsolePanel(project);
+        Content console = ContentFactory.SERVICE.getInstance().createContent(consolePanel, "Output", false);
         toolWindow.getContentManager().addContent(console);
-        MigrationManager.getInstance(project).setConsoleView(consoleView);
+
+        MigrationManager.getInstance(project).setConsoleView(consolePanel.getConsoleView());
 
         ((ToolWindowManagerEx) ToolWindowManager.getInstance(project)).addToolWindowManagerListener(new ToolWindowManagerListener() {
             private boolean myToolWindowVisible = true;
