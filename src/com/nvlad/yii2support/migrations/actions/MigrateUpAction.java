@@ -2,24 +2,20 @@ package com.nvlad.yii2support.migrations.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.ui.AnActionButton;
 import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
-import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
 @SuppressWarnings("ComponentNotRegistered")
-public class MigrateUpAction extends AnActionButton {
+public class MigrateUpAction extends MigrateBaseAction {
     public MigrateUpAction() {
         super("Migrate Up", AllIcons.Actions.Execute);
     }
@@ -104,22 +100,5 @@ public class MigrateUpAction extends AnActionButton {
         }
 
         return false;
-    }
-
-    @Nullable
-    private DefaultMutableTreeNode getSelectedNode() {
-        MigrationPanel panel = (MigrationPanel) getContextComponent();
-        JTree tree = panel.getTree();
-
-        if (tree.getSelectionModel().getSelectionCount() > 0) {
-            TreePath leadSelectionPath = tree.getLeadSelectionPath();
-            if (leadSelectionPath == null) {
-                return null;
-            }
-
-            return (DefaultMutableTreeNode) leadSelectionPath.getLastPathComponent();
-        }
-
-        return null;
     }
 }
