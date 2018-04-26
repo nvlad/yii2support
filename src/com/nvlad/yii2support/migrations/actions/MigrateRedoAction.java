@@ -15,9 +15,9 @@ import java.util.LinkedList;
 import java.util.Set;
 
 @SuppressWarnings("ComponentNotRegistered")
-public class MigrateDownAction extends MigrateBaseAction {
-    public MigrateDownAction() {
-        super("Migrate Down", AllIcons.Actions.Undo);
+public class MigrateRedoAction extends MigrateBaseAction {
+    public MigrateRedoAction() {
+        super("Redo Migrate", AllIcons.Actions.Rollback);
     }
 
     @Override
@@ -66,14 +66,16 @@ public class MigrateDownAction extends MigrateBaseAction {
 
             MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
             Object parentUserObject = ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
-            migrations = manager.migrateDown((String) parentUserObject, count);
+            migrations = manager.migrateRedo((String) parentUserObject, count);
         }
 
         if (migrations != null && migrations.size() > 0) {
             MigrationPanel panel = (MigrationPanel) getContextComponent();
             panel.updateMigrations();
         }
+
     }
+
 
     @Override
     public boolean isEnabled() {

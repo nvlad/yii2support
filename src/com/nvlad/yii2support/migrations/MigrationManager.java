@@ -217,6 +217,54 @@ public class MigrationManager {
         return null;
     }
 
+
+    private Pattern migrateRedoPattern = Pattern.compile("\\*\\*\\* applied (m\\d{6}_\\d{6}_.+?) \\(time: ");
+
+    public Set<String> migrateRedo(String path, int count) {
+        try {
+            LinkedList<String> params = new LinkedList<>();
+            params.add(count > 0 ? String.valueOf(count) : "all");
+            fillParams(params);
+            params.add("--migrationPath=" + path);
+            params.add("--interactive=0");
+
+            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/redo", params);
+            myConsoleView.print("> " + commandLine.getCommandLineString() + "\n\n", ConsoleViewContentType.SYSTEM_OUTPUT);
+
+            Process process = commandLine.createProcess();
+            process.waitFor();
+
+            String processOutput = readStream(process.getInputStream());
+            if (processOutput == null) {
+                return null;
+            }
+
+            printStreamToConsole(processOutput, ProcessOutputTypes.STDOUT);
+
+            String processError = readStream(process.getErrorStream());
+            if (processError != null) {
+                printStreamToConsole(processError, ProcessOutputTypes.STDERR);
+                return null;
+            }
+
+            Set<String> result = new HashSet<>();
+            if (processOutput.contains("No migration has been done before.")) {
+                return result;
+            }
+
+            Matcher matcher = migrateRedoPattern.matcher(processOutput);
+            while (matcher.find()) {
+                result.add(matcher.group(1));
+            }
+
+            return result;
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     private static String readStream(InputStream stream) {
         try {
             int available = stream.available();

@@ -14,10 +14,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.MigrationsMouseListener;
-import com.nvlad.yii2support.migrations.actions.MigrateDownAction;
-import com.nvlad.yii2support.migrations.actions.MigrateUpAction;
-import com.nvlad.yii2support.migrations.actions.OrderAscAction;
-import com.nvlad.yii2support.migrations.actions.RefreshAction;
+import com.nvlad.yii2support.migrations.actions.*;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
@@ -116,6 +113,7 @@ public class MigrationPanel extends SimpleToolWindowPanel {
             group.add(new Separator());
             group.add(createAction(MigrateUpAction.class));
             group.add(createAction(MigrateDownAction.class));
+            group.add(createAction(MigrateRedoAction.class));
             group.add(new Separator());
             group.add(createAction(OrderAscAction.class));
         } catch (IllegalAccessException | InstantiationException e) {
