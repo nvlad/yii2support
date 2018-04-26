@@ -10,11 +10,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.config.commandLine.PhpCommandSettings;
-import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.FileUtil;
-import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
@@ -81,97 +78,15 @@ public class MigrationManager {
     @Nullable
     public Map<String, Date> migrateHistory() {
         try {
-            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-//            LinkedList<String> params = new LinkedList<>();
-//            params.push("all");
-//            if (settings.dbConnection != null) {
-//                params.push("--db=" + settings.dbConnection);
-//            }
-//            if (settings.migrationTable != null) {
-//                params.push("--migrationTable=" + settings.migrationTable);
-//            }
+            LinkedList<String> params = new LinkedList<>();
+            params.push("all");
+            fillParams(params);
 
-            PhpCommandSettings commandSettings = PhpCommandSettingsBuilder.create(myProject, false);
-            String workDirectory = YiiApplicationUtils.getYiiRootPath(myProject);
-            String script = workDirectory + "/yii";
-            commandSettings.setScript(script);
-            commandSettings.addArgument("migrate/history");
-            commandSettings.addArgument("all");
-            if (settings.dbConnection != null) {
-                commandSettings.addArgument("--db=" + settings.dbConnection);
-            }
-            if (settings.migrationTable != null) {
-                commandSettings.addArgument("--migrationTable=" + settings.migrationTable);
-            }
-            commandSettings.addArgument("--color");
-
-            GeneralCommandLine commandLine = commandSettings.createGeneralCommandLine();
-            Process process = commandLine.createProcess();
-            commandLine.setWorkDirectory(workDirectory);
+            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/history", params);
             myConsoleView.print("> " + commandLine.getCommandLineString() + "\n\n", ConsoleViewContentType.SYSTEM_OUTPUT);
 
-//            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/history", params);
-            if (myConsoleView != null) {
-//                ProcessHandler processHandler = new ProcessHandler() {
-//                    @Override
-//                    protected void destroyProcessImpl() {
-//                        System.out.println("destroyProcessImpl");
-//                    }
-//
-//                    @Override
-//                    protected void detachProcessImpl() {
-//                        System.out.println("detachProcessImpl");
-//                    }
-//
-//                    @Override
-//                    public boolean detachIsDefault() {
-//                        System.out.println("detachIsDefault");
-//                        return true;
-//                    }
-//
-//                    @Nullable
-//                    @Override
-//                    public OutputStream getProcessInput() {
-//                        System.out.println("getProcessInput");
-//                        return process.getOutputStream();
-//                    }
-//                };
-//                processHandler.addProcessListener(new ProcessListener() {
-//                    @Override
-//                    public void startNotified(ProcessEvent processEvent) {
-//                        System.out.println("startNotified");
-//                    }
-//
-//                    @Override
-//                    public void processTerminated(ProcessEvent processEvent) {
-//                        System.out.println("processTerminated");
-//                    }
-//
-//                    @Override
-//                    public void processWillTerminate(ProcessEvent processEvent, boolean b) {
-//                        System.out.println("processWillTerminate");
-//                    }
-//
-//                    @Override
-//                    public void onTextAvailable(ProcessEvent processEvent, Key key) {
-//                        System.out.println(key);
-//                    }
-//                });
-//
-//                myConsoleView.attachToProcess(processHandler);
-//                ProcessHandler processHandler = new OSProcessHandler(commandLine) {
-//                    @Override
-//                    public boolean isSilentlyDestroyOnClose() {
-//                        return true;
-//                    }
-//                };
-//                myConsoleView.attachToProcess(processHandler);
-            }
-
+            Process process = commandLine.createProcess();
             process.waitFor();
-//            if (process.waitFor() != 0) {
-//                myConsoleView.print("Process exit with code: " + process.exitValue(), ConsoleViewContentType.ERROR_OUTPUT);
-//            }
 
             String processOutput = readStream(process.getInputStream());
             if (processOutput == null) {
@@ -180,28 +95,11 @@ public class MigrationManager {
 
             printStreamToConsole(processOutput, ProcessOutputTypes.STDOUT);
 
-//            myConsoleView.print(stream, ConsoleViewContentType.NORMAL_OUTPUT);
-//            if (myTerminalPanel != null) {
-//                TerminalOutputStream outputStream = myTerminalPanel.getTerminalOutputStream();
-//                TerminalTextBuffer buffer = myTerminalPanel.getTerminalTextBuffer();
-////                TerminalLine terminalLine = new TerminalLine();
-////                TextStyle textStyle = buffer.getStyleAt(0, 0);
-////                terminalLine.writeString(0, new CharBuffer("Test"), textStyle);
-////                buffer.addLine(terminalLine);
-//                myTerminalPanel.setForeground(JBColor.RED);
-//                buffer.writeString(1, 1, new CharBuffer("Test"));
-////                outputStream.sendString(stream);
-//                myTerminalPanel.updateUI();
-//                myTerminalPanel.setBlinkingCursor(true);
-//                myTerminalPanel.setAutoscrolls(true);
-//            }
-
             String processError = readStream(process.getErrorStream());
             if (processError != null) {
                 printStreamToConsole(processError, ProcessOutputTypes.STDERR);
                 return null;
             }
-
 
             Map<String, Date> result = new HashMap<>();
             if (processOutput.contains("No migration has been done before.")) {
@@ -225,42 +123,41 @@ public class MigrationManager {
         return null;
     }
 
-    Pattern migrateUpPattern = Pattern.compile("\\*\\*\\* applied (m\\d{6}_\\d{6}_.+?) \\(time: ");
+    private Pattern migrateUpPattern = Pattern.compile("\\*\\*\\* applied (m\\d{6}_\\d{6}_.+?) \\(time: ");
 
     public Set<String> migrateUp(String path, int count) {
         try {
-            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
             LinkedList<String> params = new LinkedList<>();
             params.push(String.valueOf(count));
-            if (settings.dbConnection != null) {
-                params.push("--db=" + settings.dbConnection);
-            }
-            if (settings.migrationTable != null) {
-                params.push("--migrationTable=" + settings.migrationTable);
-            }
+            fillParams(params);
             params.push("--migrationPath=" + path);
             params.push("--interactive=0");
-            params.push("--color");
 
-            Process process = YiiCommandLineUtil.executeCommand(myProject, "migrate/up", params);
-            if (process.waitFor() != 0) {
+            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/up", params);
+            myConsoleView.print("> " + commandLine.getCommandLineString() + "\n\n", ConsoleViewContentType.SYSTEM_OUTPUT);
+
+            Process process = commandLine.createProcess();
+            process.waitFor();
+
+            String processOutput = readStream(process.getInputStream());
+            if (processOutput == null) {
                 return null;
             }
-            String error = readStream(process.getErrorStream());
-            if (error != null) {
-                return null;
-            }
-            String stream = readStream(process.getInputStream());
-            if (stream == null) {
+
+            printStreamToConsole(processOutput, ProcessOutputTypes.STDOUT);
+
+            String processError = readStream(process.getErrorStream());
+            if (processError != null) {
+                printStreamToConsole(processError, ProcessOutputTypes.STDERR);
                 return null;
             }
 
             Set<String> result = new HashSet<>();
-            if (stream.contains("No new migrations found. Your system is up-to-date.")) {
+            if (processOutput.contains("No new migrations found. Your system is up-to-date.")) {
                 return result;
             }
 
-            Matcher matcher = migrateUpPattern.matcher(stream);
+            Matcher matcher = migrateUpPattern.matcher(processOutput);
             while (matcher.find()) {
                 result.add(matcher.group(1));
             }
@@ -296,5 +193,15 @@ public class MigrationManager {
             ConsoleViewContentType viewContentType = ConsoleViewContentType.getConsoleViewType(key);
             myConsoleView.print(text, viewContentType);
         });
+    }
+
+    private void fillParams(LinkedList<String> params) {
+        Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
+        if (settings.dbConnection != null) {
+            params.push("--db=" + settings.dbConnection);
+        }
+        if (settings.migrationTable != null) {
+            params.push("--migrationTable=" + settings.migrationTable);
+        }
     }
 }
