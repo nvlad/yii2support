@@ -79,7 +79,7 @@ public class MigrationManager {
     public Map<String, Date> migrateHistory() {
         try {
             LinkedList<String> params = new LinkedList<>();
-            params.push("all");
+            params.add("all");
             fillParams(params);
 
             GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/history", params);
@@ -128,10 +128,10 @@ public class MigrationManager {
     public Set<String> migrateUp(String path, int count) {
         try {
             LinkedList<String> params = new LinkedList<>();
-            params.push(String.valueOf(count));
+            params.add(String.valueOf(count));
             fillParams(params);
-            params.push("--migrationPath=" + path);
-            params.push("--interactive=0");
+            params.add("--migrationPath=" + path);
+            params.add("--interactive=0");
 
             GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/up", params);
             myConsoleView.print("> " + commandLine.getCommandLineString() + "\n\n", ConsoleViewContentType.SYSTEM_OUTPUT);
@@ -242,13 +242,13 @@ public class MigrationManager {
         });
     }
 
-    private void fillParams(LinkedList<String> params) {
+    private void fillParams(List<String> params) {
         Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
         if (settings.dbConnection != null) {
-            params.push("--db=" + settings.dbConnection);
+            params.add("--db=" + settings.dbConnection);
         }
         if (settings.migrationTable != null) {
-            params.push("--migrationTable=" + settings.migrationTable);
+            params.add("--migrationTable=" + settings.migrationTable);
         }
     }
 }
