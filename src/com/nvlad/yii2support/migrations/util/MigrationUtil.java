@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -29,24 +31,26 @@ public class MigrationUtil {
         Enumeration enumeration = root.children();
         while (enumeration.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumeration.nextElement();
-            String nodePath = (String) node.getUserObject();
-            if (!paths.contains(nodePath)) {
+            String migrationsPath = (String) node.getUserObject();
+            if (!paths.contains(migrationsPath)) {
                 node.removeFromParent();
                 enumeration = root.children();
             }
         }
+
         int index = 0;
         for (String path : paths) {
             enumeration = root.children();
             DefaultMutableTreeNode node = null;
             while (enumeration.hasMoreElements()) {
                 DefaultMutableTreeNode nextElement = (DefaultMutableTreeNode) enumeration.nextElement();
-                String nodePath = (String) nextElement.getUserObject();
-                if (nodePath.equals(path)) {
+                String migrationsPath = (String) nextElement.getUserObject();
+                if (migrationsPath.equals(path)) {
                     node = nextElement;
                     break;
                 }
             }
+
             if (node == null) {
                 node = new DefaultMutableTreeNode(path);
                 root.insert(node, index);
@@ -57,13 +61,37 @@ public class MigrationUtil {
             migrations.addAll(migrationMap.get(path));
             migrations.sort(new MigrationComparator(newestFirst));
 
-            node.removeAllChildren();
+            int migrationIndex = 0;
             for (Migration migration : migrations) {
-                node.add(new DefaultMutableTreeNode(migration));
+                MutableTreeNode treeNode = findMigrationTreeNode(migration, node);
+                if (treeNode == null) {
+                    node.insert(new DefaultMutableTreeNode(migration), migrationIndex);
+                } else {
+                    node.insert(treeNode, migrationIndex);
+                }
+
+                migrationIndex++;
             }
         }
 
         tree.updateUI();
+    }
+
+    private static MutableTreeNode findMigrationTreeNode(Migration migration, TreeNode node) {
+        Enumeration nodeEnumeration = node.children();
+        while (nodeEnumeration.hasMoreElements()) {
+            DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) nodeEnumeration.nextElement();
+            Migration treeNodeMigration = (Migration) treeNode.getUserObject();
+            if (treeNodeMigration.name.equals(migration.name)) {
+                treeNodeMigration.status = migration.status;
+                treeNodeMigration.applyAt = migration.applyAt;
+                treeNodeMigration.createdAt = migration.createdAt;
+
+                return treeNode;
+            }
+        }
+
+        return null;
     }
 
     private static final Pattern dateFromName = Pattern.compile("m(\\d{6}_\\d{6})_.+");
