@@ -38,6 +38,10 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
             @Override
             public void stateChanged() {
                 ToolWindow window = ToolWindowManager.getInstance(project).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
+                if (window == null) {
+                    return;
+                }
+
                 boolean toolWindowVisible = window.isVisible();
                 boolean toolWindowActive = window.isActive();
 
