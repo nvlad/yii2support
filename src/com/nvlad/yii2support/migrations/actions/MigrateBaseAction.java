@@ -13,10 +13,14 @@ abstract class MigrateBaseAction extends AnActionButton {
         super(name, icon);
     }
 
+    JTree getTree() {
+        MigrationPanel panel = (MigrationPanel) getContextComponent();
+        return panel.getTree();
+    }
+
     @Nullable
     DefaultMutableTreeNode getSelectedNode() {
-        MigrationPanel panel = (MigrationPanel) getContextComponent();
-        JTree tree = panel.getTree();
+        JTree tree = getTree();
 
         if (tree.getSelectionModel().getSelectionCount() > 0) {
             TreePath leadSelectionPath = tree.getLeadSelectionPath();

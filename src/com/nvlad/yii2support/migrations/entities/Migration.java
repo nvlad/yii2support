@@ -4,6 +4,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.Date;
 
 public class Migration implements Comparable<Migration> {
@@ -13,6 +14,8 @@ public class Migration implements Comparable<Migration> {
     public MigrationStatus status;
     public Date createdAt;
     public Date applyAt;
+    public Duration downDuration;
+    public Duration upDuration;
 
     public Migration(PhpClass clazz, String path) {
         this.migrationClass = clazz;

@@ -18,14 +18,14 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         MigrationPanel migrationPanel = new MigrationPanel(project, toolWindow);
-        Content navigator = ContentFactory.SERVICE.getInstance().createContent(migrationPanel, "Navigator", false);
+        Content navigator = ContentFactory.SERVICE.getInstance().createContent(migrationPanel, "Explorer", false);
         toolWindow.getContentManager().addContent(navigator);
 
         ConsolePanel consolePanel = new ConsolePanel(project);
         Content console = ContentFactory.SERVICE.getInstance().createContent(consolePanel, "Output", false);
         toolWindow.getContentManager().addContent(console);
 
-        MigrationManager.getInstance(project).setConsoleView(consolePanel.getConsoleView());
+//        MigrationManager.getInstance(project).setConsoleView(myConsolePanel.getConsoleView());
 
         ((ToolWindowManagerEx) ToolWindowManager.getInstance(project)).addToolWindowManagerListener(new ToolWindowManagerListener() {
             private boolean myToolWindowVisible = true;
@@ -63,19 +63,19 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 //                if (psiFile instanceof PhpFile) {
 //                    ToolWindow window = ToolWindowManager.getInstance(project).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
 //                    if (window.isVisible()) {
-//                        migrationPanel.updateMigrations();
+//                        myMigrationPanel.updateMigrations();
 //                    }
 //                }
 //            }
 //
 //            @Override
 //            public void fileDeleted(@NotNull VirtualFileEvent event) {
-////                migrationPanel.updateMigrations();
+////                myMigrationPanel.updateMigrations();
 //            }
 //
 //            @Override
 //            public void fileMoved(@NotNull VirtualFileMoveEvent event) {
-////                migrationPanel.updateMigrations();
+////                myMigrationPanel.updateMigrations();
 //            }
 //
 //            @Override
@@ -85,7 +85,7 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 //
 //            private void updateMigrations() {
 ////                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-////                executor.schedule(migrationPanel::updateMigrations, 1, TimeUnit.SECONDS);
+////                executor.schedule(myMigrationPanel::updateMigrations, 1, TimeUnit.SECONDS);
 //            }
 //        });
     }

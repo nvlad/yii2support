@@ -7,14 +7,18 @@ import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.content.Content;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.MigrationsMouseListener;
+import com.nvlad.yii2support.migrations.MigrationsToolWindowFactory;
 import com.nvlad.yii2support.migrations.actions.*;
+import com.nvlad.yii2support.migrations.commands.MigrationHistory;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
@@ -40,6 +44,8 @@ public class MigrationPanel extends SimpleToolWindowPanel {
         initContent();
         initToolBar();
         initActivationListener(toolWindow);
+
+        myMigrationMap = MigrationManager.getInstance(myProject).getMigrations();
     }
 
     public JTree getTree() {
@@ -51,31 +57,41 @@ public class MigrationPanel extends SimpleToolWindowPanel {
     }
 
     public void updateMigrations() {
-        Map<String, Collection<Migration>> newMigrationsMap = MigrationManager.getInstance(myProject).getMigrations();
         boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
-        if (!newMigrationsMap.equals(myMigrationMap)) {
-            myMigrationMap = newMigrationsMap;
-            MigrationUtil.updateTree(myTree, newMigrationsMap, false, newestFirst);
-        }
 
-        final Map<String, Date> history = MigrationManager.getInstance(myProject).migrateHistory();
-        if (history == null) {
-            return;
-        }
-
-        myMigrationMap = getMigrationMap();
-        myMigrationMap.forEach((path, migrations) -> {
-            for (Migration migration : migrations) {
-                migration.status = MigrationStatus.NotApply;
-                if (history.containsKey(migration.name)) {
-                    migration.status = MigrationStatus.Success;
-                    migration.applyAt = history.get(migration.name);
-                }
-            }
-        });
-
+        MigrationManager manager = MigrationManager.getInstance(myProject);
+        manager.refresh();
         MigrationUtil.updateTree(myTree, myMigrationMap, false, newestFirst);
 
+//        final Map<String, Date> history = manager.migrateHistory();
+//        if (history == null) {
+//            return;
+//        }
+
+        MigrationHistory migrationHistory = new MigrationHistory(myProject);
+        ToolWindow window = ToolWindowManager
+                .getInstance(myProject).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
+        if (window != null) {
+            Content content = window.getContentManager().getContent(1);
+            if (content != null) {
+                ConsolePanel consolePanel = (ConsolePanel) content.getComponent();
+                migrationHistory.setConsoleView(consolePanel.getConsoleView());
+            }
+        }
+
+        migrationHistory.run();
+
+//        myMigrationMap.forEach((path, migrations) -> {
+//            for (Migration migration : migrations) {
+//                migration.status = MigrationStatus.NotApply;
+//                if (history.containsKey(migration.name)) {
+//                    migration.status = MigrationStatus.Success;
+//                    migration.applyAt = history.get(migration.name);
+//                }
+//            }
+//        });
+
+        MigrationUtil.updateTree(myTree, myMigrationMap, false, newestFirst);
     }
 
     private void initActivationListener(ToolWindow toolWindow) {

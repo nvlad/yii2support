@@ -12,8 +12,24 @@ import icons.DatabaseIcons;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.text.DateFormat;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
+    private final List<Icon> progressIcons;
+
+    public MigrationTreeCellRenderer() {
+        progressIcons = new LinkedList<>();
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress1);
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress2);
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress3);
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress4);
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress5);
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress6);
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress7);
+        progressIcons.add(AllIcons.RunConfigurations.TestInProgress8);
+    }
+
     @Override
     public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) value;
@@ -31,6 +47,9 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
         if (object instanceof Migration) {
             Migration migration = (Migration) object;
             switch (migration.status) {
+                case Progress:
+                    renderer.setIcon(getProgressIcon());
+                    break;
                 case Unknown:
                     renderer.setIcon(AllIcons.RunConfigurations.Unknown);
                     renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
@@ -53,5 +72,10 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                     break;
             }
         }
+    }
+
+    private Icon getProgressIcon() {
+        int frameIndex = (int) ((System.currentTimeMillis() % 1000) / 125);
+        return progressIcons.get(frameIndex);
     }
 }

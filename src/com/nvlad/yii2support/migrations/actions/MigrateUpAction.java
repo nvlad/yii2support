@@ -2,12 +2,15 @@ package com.nvlad.yii2support.migrations.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.util.Alarm;
 import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -27,11 +30,12 @@ public class MigrateUpAction extends MigrateBaseAction {
             return;
         }
 
-        Set<String> migrations = null;
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof String) {
             MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
-            migrations = manager.migrateUp((String) userObject, 0);
+//            migrations = manager.migrateUp((String) userObject, 0);
+            ApplicationManager.getApplication()
+                    .executeOnPooledThread(new MigrationUp(getTree(), manager, (String) userObject, 0));
         }
 
         if (userObject instanceof Migration) {
@@ -66,12 +70,9 @@ public class MigrateUpAction extends MigrateBaseAction {
 
             MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
             Object parentUserObject = ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
-            migrations = manager.migrateUp((String) parentUserObject, count);
-        }
 
-        if(migrations != null && migrations.size() > 0) {
-            MigrationPanel panel = (MigrationPanel) getContextComponent();
-            panel.updateMigrations();
+            ApplicationManager.getApplication()
+                    .executeOnPooledThread(new MigrationUp(getTree(), manager, (String) parentUserObject, count));
         }
     }
 
@@ -100,5 +101,38 @@ public class MigrateUpAction extends MigrateBaseAction {
         }
 
         return false;
+    }
+
+    class MigrationUp implements Runnable {
+        private final JTree myTree;
+        private final MigrationManager myManager;
+        private final String myPath;
+        private final int myCount;
+        private Alarm myAlarm;
+
+        MigrationUp(JTree tree, MigrationManager manager, String path, int count) {
+            myTree = tree;
+            myManager = manager;
+            myPath = path;
+            myCount = count;
+            myAlarm = new Alarm();
+        }
+
+        @Override
+        public void run() {
+            myAlarm.addRequest(this::repaintTree, 125);
+            Set<String> migrations = myManager.migrateUp(myPath, myCount);
+            myAlarm.cancelAllRequests();
+
+            if(migrations != null && migrations.size() > 0) {
+                MigrationPanel panel = (MigrationPanel) getContextComponent();
+                panel.updateMigrations();
+            }
+        }
+
+        void repaintTree() {
+            myAlarm.addRequest(this::repaintTree, 125);
+            myTree.updateUI();
+        }
     }
 }
