@@ -12,6 +12,7 @@ import icons.DatabaseIcons;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.text.DateFormat;
+import java.time.Duration;
 
 public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
     private static final Icon[] progressIcons = {
@@ -58,8 +59,19 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                     renderer.setIcon(AllIcons.RunConfigurations.TestPassed);
                     SimpleTextAttributes successAttributes = new SimpleTextAttributes(0, JBColor.green);
                     renderer.append(migration.name, successAttributes, true);
-                    String applyDate = DateFormat.getDateTimeInstance().format(migration.applyAt);
-                    renderer.append("  apply at " + applyDate, SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
+
+                    if (migration.applyAt != null) {
+                        String applyDate = DateFormat.getDateTimeInstance().format(migration.applyAt);
+                        renderer.append("  apply at " + applyDate, SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
+                    } else {
+                        if (migration.downDuration != null) {
+                            renderer.append("  down time " + formatDuration(migration.downDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
+                        }
+                        if (migration.upDuration != null) {
+                            renderer.append("  up time " + formatDuration(migration.upDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
+                        }
+                    }
+
                     break;
                 case Error:
                     renderer.setIcon(AllIcons.RunConfigurations.TestError);
@@ -68,6 +80,13 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                     break;
             }
         }
+    }
+
+    private String formatDuration(Duration duration) {
+        return duration.toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
     }
 
     private Icon getProgressIcon() {

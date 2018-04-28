@@ -64,6 +64,8 @@ public class MigrationHistory extends CommandBase {
         for (Collection<Migration> migrationCollection : migrationMap.values()) {
             for (Migration migration : migrationCollection) {
                 if (migration.name.equals(name)) {
+                    migration.upDuration = null;
+                    migration.downDuration = null;
                     migration.applyAt = date;
                     migration.status = MigrationStatus.Success;
 
