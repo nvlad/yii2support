@@ -44,6 +44,7 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
             switch (migration.status) {
                 case Progress:
                     renderer.setIcon(getProgressIcon());
+                    renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     break;
                 case Unknown:
                     renderer.setIcon(AllIcons.RunConfigurations.Unknown);
