@@ -109,7 +109,7 @@ public class MigrationPanel extends SimpleToolWindowPanel {
 
         myTree = new CheckboxTree(renderer, myRootNode);
         myTree.addMouseListener(new MigrationsMouseListener());
-        myTree.getSelectionModel().setSelectionMode(TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
+        myTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         JBScrollPane scrollPane = new JBScrollPane(myTree);
         UIUtil.removeScrollBorder(scrollPane);
