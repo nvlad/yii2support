@@ -12,23 +12,18 @@ import icons.DatabaseIcons;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.text.DateFormat;
-import java.util.LinkedList;
-import java.util.List;
 
 public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
-    private final List<Icon> progressIcons;
-
-    public MigrationTreeCellRenderer() {
-        progressIcons = new LinkedList<>();
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress1);
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress2);
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress3);
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress4);
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress5);
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress6);
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress7);
-        progressIcons.add(AllIcons.RunConfigurations.TestInProgress8);
-    }
+    private static final Icon[] progressIcons = {
+            AllIcons.RunConfigurations.TestInProgress1,
+            AllIcons.RunConfigurations.TestInProgress2,
+            AllIcons.RunConfigurations.TestInProgress3,
+            AllIcons.RunConfigurations.TestInProgress4,
+            AllIcons.RunConfigurations.TestInProgress5,
+            AllIcons.RunConfigurations.TestInProgress6,
+            AllIcons.RunConfigurations.TestInProgress7,
+            AllIcons.RunConfigurations.TestInProgress8,
+    };
 
     @Override
     public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -76,6 +71,6 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
 
     private Icon getProgressIcon() {
         int frameIndex = (int) ((System.currentTimeMillis() % 1000) / 125);
-        return progressIcons.get(frameIndex);
+        return progressIcons[frameIndex];
     }
 }
