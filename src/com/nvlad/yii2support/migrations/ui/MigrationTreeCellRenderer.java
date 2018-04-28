@@ -51,7 +51,7 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                     renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     break;
                 case NotApply:
-                    renderer.setIcon(AllIcons.RunConfigurations.TestNotRan);
+                    renderer.setIcon(AllIcons.General.Bullet);
                     renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     break;
                 case Success:
