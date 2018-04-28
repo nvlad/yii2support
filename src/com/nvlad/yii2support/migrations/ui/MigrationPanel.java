@@ -7,28 +7,22 @@ import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.content.Content;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.MigrationsMouseListener;
-import com.nvlad.yii2support.migrations.MigrationsToolWindowFactory;
 import com.nvlad.yii2support.migrations.actions.*;
-import com.nvlad.yii2support.migrations.commands.MigrationHistory;
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 public class MigrationPanel extends SimpleToolWindowPanel {
@@ -62,24 +56,26 @@ public class MigrationPanel extends SimpleToolWindowPanel {
         MigrationManager manager = MigrationManager.getInstance(myProject);
         manager.refresh();
         MigrationUtil.updateTree(myTree, myMigrationMap, false, newestFirst);
+        ((DefaultTreeModel) myTree.getModel()).reload();
+//        SwingUtilities.updateComponentTreeUI(myTree);
 
 //        final Map<String, Date> history = manager.migrateHistory();
 //        if (history == null) {
 //            return;
 //        }
-
-        MigrationHistory migrationHistory = new MigrationHistory(myProject);
-        ToolWindow window = ToolWindowManager
-                .getInstance(myProject).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
-        if (window != null) {
-            Content content = window.getContentManager().getContent(1);
-            if (content != null) {
-                ConsolePanel consolePanel = (ConsolePanel) content.getComponent();
-                migrationHistory.setConsoleView(consolePanel.getConsoleView());
-            }
-        }
-
-        migrationHistory.run();
+//
+//        MigrationHistory migrationHistory = new MigrationHistory(myProject);
+//        ToolWindow window = ToolWindowManager
+//                .getInstance(myProject).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
+//        if (window != null) {
+//            Content content = window.getContentManager().getContent(1);
+//            if (content != null) {
+//                ConsolePanel consolePanel = (ConsolePanel) content.getComponent();
+//                migrationHistory.setConsoleView(consolePanel.getConsoleView());
+//            }
+//        }
+//
+//        migrationHistory.run();
 
 //        myMigrationMap.forEach((path, migrations) -> {
 //            for (Migration migration : migrations) {
@@ -91,7 +87,8 @@ public class MigrationPanel extends SimpleToolWindowPanel {
 //            }
 //        });
 
-        MigrationUtil.updateTree(myTree, myMigrationMap, false, newestFirst);
+//        MigrationUtil.updateTree(myTree, myMigrationMap, false, newestFirst);
+//        SwingUtilities.updateComponentTreeUI(myTree);
     }
 
     private void initActivationListener(ToolWindow toolWindow) {
@@ -105,7 +102,7 @@ public class MigrationPanel extends SimpleToolWindowPanel {
     private void initContent() {
         MigrationTreeCellRenderer renderer = new MigrationTreeCellRenderer();
         CheckedTreeNode myRootNode = new CheckedTreeNode("");
-        myRootNode.add(new DefaultMutableTreeNode("Init"));
+//        myRootNode.add(new DefaultMutableTreeNode("Init"));
 
         myTree = new CheckboxTree(renderer, myRootNode);
         myTree.addMouseListener(new MigrationsMouseListener());

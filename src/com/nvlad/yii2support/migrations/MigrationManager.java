@@ -114,56 +114,56 @@ public class MigrationManager {
         return false;
     }
 
-    @Nullable
-    public Map<String, Date> migrateHistory() {
-        MigrationHistory migrationHistory = new MigrationHistory(myProject);
-        migrationHistory.run();
-
-//        try {
-//            LinkedList<String> params = new LinkedList<>();
-//            params.add("all");
-//            fillParams(params);
+//    @Nullable
+//    public Map<String, Date> migrateHistory() {
+//        MigrationHistory migrationHistory = new MigrationHistory(myProject);
+//        migrationHistory.run();
 //
-//            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/history", params);
-////            myConsoleView.print("> " + commandLine.getCommandLineString() + "\n\n", ConsoleViewContentType.SYSTEM_OUTPUT);
+////        try {
+////            LinkedList<String> params = new LinkedList<>();
+////            params.add("all");
+////            fillParams(params);
+////
+////            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/history", params);
+//////            myConsoleView.print("> " + commandLine.getCommandLineString() + "\n\n", ConsoleViewContentType.SYSTEM_OUTPUT);
+////
+////            Process process = commandLine.createProcess();
+////            process.waitFor();
+////
+////            String processOutput = readStream(process.getInputStream());
+////            if (processOutput == null) {
+////                return null;
+////            }
+////
+////            printToConsole(processOutput, ProcessOutputTypes.STDOUT);
+////
+////            String processError = readStream(process.getErrorStream());
+////            if (processError != null) {
+////                printToConsole(processError, ProcessOutputTypes.STDERR);
+////                return null;
+////            }
+////
+////            Map<String, Date> result = new HashMap<>();
+////            if (processOutput.contains("No migration has been done before.")) {
+////                return result;
+////            }
+////
+////            Matcher matcher = historyPattern.matcher(processOutput);
+////            while (matcher.find()) {
+////                String historyEntry = matcher.group(1);
+////                Matcher entryMatcher = historyEntryPattern.matcher(historyEntry);
+////                if (entryMatcher.find()) {
+////                    result.put(entryMatcher.group(2), MigrationUtil.applyDate(entryMatcher.group(1)));
+////                }
+////            }
+////
+////            return result;
+////        } catch (ExecutionException | InterruptedException e) {
+////            e.printStackTrace();
+////        }
 //
-//            Process process = commandLine.createProcess();
-//            process.waitFor();
-//
-//            String processOutput = readStream(process.getInputStream());
-//            if (processOutput == null) {
-//                return null;
-//            }
-//
-//            printToConsole(processOutput, ProcessOutputTypes.STDOUT);
-//
-//            String processError = readStream(process.getErrorStream());
-//            if (processError != null) {
-//                printToConsole(processError, ProcessOutputTypes.STDERR);
-//                return null;
-//            }
-//
-//            Map<String, Date> result = new HashMap<>();
-//            if (processOutput.contains("No migration has been done before.")) {
-//                return result;
-//            }
-//
-//            Matcher matcher = historyPattern.matcher(processOutput);
-//            while (matcher.find()) {
-//                String historyEntry = matcher.group(1);
-//                Matcher entryMatcher = historyEntryPattern.matcher(historyEntry);
-//                if (entryMatcher.find()) {
-//                    result.put(entryMatcher.group(2), MigrationUtil.applyDate(entryMatcher.group(1)));
-//                }
-//            }
-//
-//            return result;
-//        } catch (ExecutionException | InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-        return null;
-    }
+//        return null;
+//    }
 
     private Pattern migrateUpPattern = Pattern.compile("\\*\\*\\* applied (m\\d{6}_\\d{6}_.+?) \\(time: ");
 

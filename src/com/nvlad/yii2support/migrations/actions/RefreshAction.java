@@ -16,7 +16,7 @@ public class RefreshAction extends AnActionButton {
     public void actionPerformed(AnActionEvent anActionEvent) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             MigrationPanel panel = (MigrationPanel) getContextComponent();
-            panel.updateMigrations();
+//            panel.updateMigrations();
         });
     }
 

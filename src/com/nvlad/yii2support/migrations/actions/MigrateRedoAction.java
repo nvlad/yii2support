@@ -71,7 +71,7 @@ public class MigrateRedoAction extends MigrateBaseAction {
 
         if (migrations != null && migrations.size() > 0) {
             MigrationPanel panel = (MigrationPanel) getContextComponent();
-            panel.updateMigrations();
+//            panel.updateMigrations();
         }
 
     }

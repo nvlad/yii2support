@@ -7,13 +7,17 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.util.Alarm;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
+import javax.swing.*;
 import java.util.List;
 
 abstract class CommandBase implements Runnable {
     final Project myProject;
     ConsoleView myConsoleView;
+    Alarm myAlarm;
+    JComponent myComponent;
 
     CommandBase(Project project) {
         myProject = project;
@@ -27,6 +31,11 @@ abstract class CommandBase implements Runnable {
         this.myConsoleView = myConsoleView;
     }
 
+    public void repaintComponent(JComponent component) {
+        myComponent = component;
+        this.myAlarm = new Alarm();
+    }
+
     abstract void processOutput(String text);
 
     void executeCommandLine(GeneralCommandLine commandLine) throws ExecutionException {
@@ -37,7 +46,16 @@ abstract class CommandBase implements Runnable {
         processHandler.startNotify();
 
         try {
+            if (myAlarm != null) {
+                myAlarm.addRequest(this::updateComponent, 125);
+            }
+
             process.waitFor();
+
+            if (myAlarm != null) {
+                SwingUtilities.updateComponentTreeUI(myComponent);
+                myAlarm.cancelAllRequests();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -51,6 +69,11 @@ abstract class CommandBase implements Runnable {
         if (settings.migrationTable != null) {
             params.add("--migrationTable=" + settings.migrationTable);
         }
+    }
+
+    private void updateComponent() {
+        myComponent.repaint();
+        myAlarm.addRequest(this::updateComponent, 125);
     }
 
     class CommandProcessListener implements ProcessListener {

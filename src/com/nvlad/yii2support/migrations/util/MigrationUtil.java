@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.text.ParseException;
@@ -37,6 +38,8 @@ public class MigrationUtil {
                 enumeration = root.children();
             }
         }
+//        ((DefaultTreeModel) tree.getModel()).nodeChanged(root);
+//        ((DefaultTreeModel) tree.getModel()).reload();
 
         int index = 0;
         for (String path : paths) {
@@ -73,8 +76,6 @@ public class MigrationUtil {
                 migrationIndex++;
             }
         }
-
-        tree.updateUI();
     }
 
     private static MutableTreeNode findMigrationTreeNode(Migration migration, TreeNode node) {
