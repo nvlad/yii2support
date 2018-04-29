@@ -13,7 +13,7 @@ import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import javax.swing.*;
 import java.util.List;
 
-abstract class CommandBase implements Runnable {
+public abstract class CommandBase implements Runnable {
     final Project myProject;
     ConsoleView myConsoleView;
     Alarm myAlarm;

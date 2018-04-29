@@ -2,16 +2,10 @@ package com.nvlad.yii2support.migrations.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.content.Content;
-import com.nvlad.yii2support.migrations.MigrationsToolWindowFactory;
 import com.nvlad.yii2support.migrations.commands.MigrationDown;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
-import com.nvlad.yii2support.migrations.ui.ConsolePanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -99,19 +93,7 @@ public class MigrateDownAction extends MigrateBaseAction {
 
 
         if (migrationDown != null) {
-            ToolWindow window = ToolWindowManager
-                    .getInstance(project).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
-            if (window != null) {
-                Content content = window.getContentManager().getContent(1);
-                if (content != null) {
-                    ConsolePanel consolePanel = (ConsolePanel) content.getComponent();
-                    migrationDown.setConsoleView(consolePanel.getConsoleView());
-                }
-            }
-
-            migrationDown.repaintComponent(getTree());
-
-            ApplicationManager.getApplication().executeOnPooledThread(migrationDown);
+            executeCommand(project, migrationDown);
         }
 
 //        DefaultMutableTreeNode treeNode = getSelectedNode();
