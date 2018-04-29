@@ -55,8 +55,8 @@ public class MigrationPanel extends SimpleToolWindowPanel {
 
         MigrationManager manager = MigrationManager.getInstance(myProject);
         manager.refresh();
-        MigrationUtil.updateTree(myTree, myMigrationMap, false, newestFirst);
-        ((DefaultTreeModel) myTree.getModel()).reload();
+        MigrationUtil.updateTree(myTree, myMigrationMap, newestFirst);
+//        ((DefaultTreeModel) myTree.getModel()).reload();
 //        SwingUtilities.updateComponentTreeUI(myTree);
 
 //        final Map<String, Date> history = manager.migrateHistory();
@@ -93,9 +93,16 @@ public class MigrationPanel extends SimpleToolWindowPanel {
 
     private void initActivationListener(ToolWindow toolWindow) {
         toolWindow.getActivation().doWhenDone(() -> {
-            Map<String, Collection<Migration>> migrationTree = MigrationManager.getInstance(myProject).getMigrations();
+//            Map<String, Collection<Migration>> migrationTree = MigrationManager.getInstance(myProject).getMigrations();
+//            boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
+//            MigrationUtil.updateTree(myTree, migrationTree, true, newestFirst);
             boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
-            MigrationUtil.updateTree(myTree, migrationTree, true, newestFirst);
+            MigrationManager manager = MigrationManager.getInstance(myProject);
+
+            manager.refresh();
+            MigrationUtil.updateTree(myTree, manager.getMigrations(), newestFirst);
+
+            ((DefaultTreeModel) myTree.getModel()).reload();
         });
     }
 

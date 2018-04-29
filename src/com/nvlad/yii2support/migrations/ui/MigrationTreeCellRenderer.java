@@ -54,6 +54,9 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                 case NotApply:
                     renderer.setIcon(AllIcons.General.Bullet);
                     renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+                    if (migration.downDuration != null) {
+                        renderer.append("  down time " + formatDuration(migration.downDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
+                    }
                     break;
                 case Success:
                     renderer.setIcon(AllIcons.RunConfigurations.TestPassed);

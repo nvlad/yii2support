@@ -16,16 +16,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MigrationUtil {
-    public static void updateTree(JTree tree, Map<String, Collection<Migration>> migrationMap, boolean clear, boolean newestFirst) {
+    public static void updateTree(JTree tree, Map<String, Collection<Migration>> migrationMap, boolean newestFirst) {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
         if (root == null) {
             return;
         }
 
-        if (clear) {
-            root.removeAllChildren();
-        }
+//        if (clear) {
+//            root.removeAllChildren();
+//        }
 
+        DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
         List<String> paths = new LinkedList<>();
         paths.addAll(migrationMap.keySet());
         paths.sort(String.CASE_INSENSITIVE_ORDER);
@@ -36,7 +37,10 @@ public class MigrationUtil {
             if (!paths.contains(migrationsPath)) {
                 node.removeFromParent();
                 enumeration = root.children();
+                continue;
             }
+
+            treeModel.nodeChanged(node);
         }
 //        ((DefaultTreeModel) tree.getModel()).nodeChanged(root);
 //        ((DefaultTreeModel) tree.getModel()).reload();
@@ -68,10 +72,10 @@ public class MigrationUtil {
             for (Migration migration : migrations) {
                 MutableTreeNode treeNode = findMigrationTreeNode(migration, node);
                 if (treeNode == null) {
-                    node.insert(new DefaultMutableTreeNode(migration), migrationIndex);
-                } else {
-                    node.insert(treeNode, migrationIndex);
+                    treeNode = new DefaultMutableTreeNode(migration);
                 }
+                node.insert(treeNode, migrationIndex);
+                treeModel.nodeChanged(treeNode);
 
                 migrationIndex++;
             }

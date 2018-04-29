@@ -53,7 +53,7 @@ abstract class CommandBase implements Runnable {
             process.waitFor();
 
             if (myAlarm != null) {
-                SwingUtilities.updateComponentTreeUI(myComponent);
+                myComponent.repaint();
                 myAlarm.cancelAllRequests();
             }
         } catch (InterruptedException e) {
@@ -80,7 +80,7 @@ abstract class CommandBase implements Runnable {
         private final AnsiEscapeDecoder decoder = new AnsiEscapeDecoder();
         private final CommandBase myProcessor;
 
-        public CommandProcessListener(CommandBase processor) {
+        CommandProcessListener(CommandBase processor) {
             myProcessor = processor;
         }
 

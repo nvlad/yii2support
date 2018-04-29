@@ -9,6 +9,9 @@ import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +21,7 @@ public class MigrationHistory extends CommandBase {
 
     private final Map<String, Collection<Migration>> migrationMap;
     private Set<Migration> migrations;
+    private Map<String, DefaultMutableTreeNode> treeNodeMap;
 
     public MigrationHistory(Project project) {
         super(project);
@@ -42,6 +46,9 @@ public class MigrationHistory extends CommandBase {
 
             for (Migration migration : migrations) {
                 migration.status = MigrationStatus.NotApply;
+                migration.upDuration = null;
+                migration.downDuration = null;
+                migration.applyAt = null;
             }
 
             migrations.clear();
@@ -64,15 +71,48 @@ public class MigrationHistory extends CommandBase {
         for (Collection<Migration> migrationCollection : migrationMap.values()) {
             for (Migration migration : migrationCollection) {
                 if (migration.name.equals(name)) {
+                    migration.status = MigrationStatus.Success;
+                    migration.applyAt = date;
                     migration.upDuration = null;
                     migration.downDuration = null;
-                    migration.applyAt = date;
-                    migration.status = MigrationStatus.Success;
 
                     migrations.remove(migration);
+
+                    repaintMigrationNode(migration);
                     return;
                 }
             }
         }
+    }
+
+    private void repaintMigrationNode(Migration migration) {
+        DefaultMutableTreeNode treeNode = findTreeNode(migration);
+        if (treeNode != null) {
+            ((DefaultTreeModel) ((JTree) myComponent).getModel()).nodeChanged(treeNode);
+        }
+    }
+
+    private DefaultMutableTreeNode findTreeNode(Migration migration) {
+        if (myComponent instanceof JTree) {
+            if (treeNodeMap == null) {
+                JTree tree = (JTree) myComponent;
+                DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+                Enumeration pathEnumeration = root.children();
+
+                treeNodeMap = new HashMap<>();
+                while (pathEnumeration.hasMoreElements()) {
+                    DefaultMutableTreeNode pathNode = ((DefaultMutableTreeNode) pathEnumeration.nextElement());
+                    Enumeration migrationEnumeration = pathNode.children();
+                    while (migrationEnumeration.hasMoreElements()) {
+                        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) migrationEnumeration.nextElement();
+                        treeNodeMap.put(((Migration) treeNode.getUserObject()).name, treeNode);
+                    }
+                }
+            }
+
+            return treeNodeMap.get(migration.name);
+        }
+
+        return null;
     }
 }

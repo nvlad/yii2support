@@ -115,9 +115,7 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
             MigrationManager manager = MigrationManager.getInstance(myProject);
 
             manager.refresh();
-            MigrationUtil.updateTree(myTree, manager.getMigrations(), false, newestFirst);
-
-            ((DefaultTreeModel) myTree.getModel()).reload();
+            MigrationUtil.updateTree(myTree, manager.getMigrations(), newestFirst);
         }
     }
 }

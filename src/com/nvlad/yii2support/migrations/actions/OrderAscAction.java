@@ -30,7 +30,7 @@ public class OrderAscAction extends AnActionButton implements Toggleable {
 
         MigrationPanel panel = (MigrationPanel) getContextComponent();
 
-        MigrationUtil.updateTree(panel.getTree(), panel.getMigrationMap(), false, settings.newestFirst);
+        MigrationUtil.updateTree(panel.getTree(), panel.getMigrationMap(), settings.newestFirst);
     }
 
     @Override
