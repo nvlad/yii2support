@@ -8,6 +8,8 @@ import com.intellij.ui.AnActionButton;
 import com.intellij.ui.content.Content;
 import com.nvlad.yii2support.migrations.MigrationsToolWindowFactory;
 import com.nvlad.yii2support.migrations.commands.CommandBase;
+import com.nvlad.yii2support.migrations.entities.Migration;
+import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.ui.ConsolePanel;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.util.Enumeration;
 
 abstract class MigrateBaseAction extends AnActionButton {
     MigrateBaseAction(String name, Icon icon) {
@@ -57,5 +60,26 @@ abstract class MigrateBaseAction extends AnActionButton {
         command.repaintComponent(getTree());
 
         ApplicationManager.getApplication().executeOnPooledThread(command);
+    }
+
+    boolean isAppliedMigration(DefaultMutableTreeNode treeNode) {
+        Object userObject = treeNode.getUserObject();
+        if (userObject instanceof Migration) {
+            return ((Migration) userObject).status == MigrationStatus.Success;
+        }
+
+        if (userObject instanceof String) {
+            Enumeration migrationEnumeration = treeNode.children();
+            while (migrationEnumeration.hasMoreElements()) {
+                Object tmp = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (tmp instanceof Migration) {
+                    if (((Migration) tmp).status == MigrationStatus.Success) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

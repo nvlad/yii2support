@@ -84,23 +84,6 @@ public class MigrateRedoAction extends MigrateBaseAction {
             return false;
         }
 
-        Object userObject = treeNode.getUserObject();
-        if (userObject instanceof Migration) {
-            return ((Migration) userObject).status == MigrationStatus.Success;
-        }
-
-        if (userObject instanceof String) {
-            Enumeration migrationEnumeration = treeNode.children();
-            while (migrationEnumeration.hasMoreElements()) {
-                Object tmp = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
-                if (tmp instanceof Migration) {
-                    if (((Migration) tmp).status == MigrationStatus.Success) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return isAppliedMigration(treeNode);
     }
 }
