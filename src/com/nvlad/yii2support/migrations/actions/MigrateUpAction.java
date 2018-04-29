@@ -37,8 +37,6 @@ public class MigrateUpAction extends MigrateBaseAction {
 
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof String) {
-//            MigrationManager manager = MigrationManager.getInstance(project);
-
             Enumeration migrationEnumeration = treeNode.children();
             while (migrationEnumeration.hasMoreElements()) {
                 Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
@@ -49,10 +47,6 @@ public class MigrateUpAction extends MigrateBaseAction {
 
             migrationPath = (String) userObject;
             migrationUp = new MigrationUp(project, migrationPath, migrationsToUp);
-
-//            migrations = manager.migrateUp((String) userObject, 0);
-//            ApplicationManager.getApplication()
-//                    .executeOnPooledThread(new MigrationUp(getTree(), manager, (String) userObject, 0));
         }
 
         if (userObject instanceof Migration) {
@@ -84,11 +78,8 @@ public class MigrateUpAction extends MigrateBaseAction {
                 return;
             }
 
-//            MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
             migrationPath = (String) ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
             migrationUp = new MigrationUp(project, migrationPath, migrationsToUp);
-//            ApplicationManager.getApplication()
-//                    .executeOnPooledThread(new MigrationUp(getTree(), manager, (String) parentUserObject, count));
         }
 
 
@@ -106,37 +97,4 @@ public class MigrateUpAction extends MigrateBaseAction {
 
         return enableUpButtons(treeNode);
     }
-
-//    class MigrationUp implements Runnable {
-//        private final JTree myTree;
-//        private final MigrationManager myManager;
-//        private final String myPath;
-//        private final int myCount;
-//        private Alarm myAlarm;
-//
-//        MigrationUp(JTree tree, MigrationManager manager, String path, int count) {
-//            myTree = tree;
-//            myManager = manager;
-//            myPath = path;
-//            myCount = count;
-//            myAlarm = new Alarm();
-//        }
-//
-//        @Override
-//        public void run() {
-//            myAlarm.addRequest(this::repaintTree, 125);
-//            Set<String> migrations = myManager.migrateUp(myPath, myCount);
-//            myAlarm.cancelAllRequests();
-//
-//            if(migrations != null && migrations.size() > 0) {
-//                MigrationPanel panel = (MigrationPanel) getContextComponent();
-//                panel.updateMigrations();
-//            }
-//        }
-//
-//        void repaintTree() {
-//            myAlarm.addRequest(this::repaintTree, 125);
-//            myTree.updateUI();
-//        }
-//    }
 }

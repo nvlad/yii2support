@@ -20,12 +20,6 @@ public class RefreshAction extends MigrateBaseAction {
         }
 
         MigrationHistory migrationHistory = new MigrationHistory(project);
-//        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-//            MigrationPanel panel = (MigrationPanel) getContextComponent();
-////            panel.updateMigrations();
-//
-//
-//        });
         executeCommand(project, migrationHistory);
     }
 

@@ -37,8 +37,6 @@ public class MigrateDownAction extends MigrateBaseAction {
 
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof String) {
-//            MigrationManager manager = MigrationManager.getInstance(project);
-
             Enumeration migrationEnumeration = treeNode.children();
             while (migrationEnumeration.hasMoreElements()) {
                 Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
@@ -49,10 +47,6 @@ public class MigrateDownAction extends MigrateBaseAction {
 
             migrationPath = (String) userObject;
             migrationDown = new MigrationDown(project, migrationPath, migrationsToDown);
-
-//            migrations = manager.migrateUp((String) userObject, 0);
-//            ApplicationManager.getApplication()
-//                    .executeOnPooledThread(new MigrationUp(getTree(), manager, (String) userObject, 0));
         }
 
         if (userObject instanceof Migration) {
@@ -84,69 +78,14 @@ public class MigrateDownAction extends MigrateBaseAction {
                 return;
             }
 
-//            MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
             migrationPath = (String) ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
             migrationDown = new MigrationDown(project, migrationPath, migrationsToDown);
-//            ApplicationManager.getApplication()
-//                    .executeOnPooledThread(new MigrationUp(getTree(), manager, (String) parentUserObject, count));
         }
 
 
         if (migrationDown != null) {
             executeCommand(project, migrationDown);
         }
-
-//        DefaultMutableTreeNode treeNode = getSelectedNode();
-//        if (treeNode == null) {
-//            return;
-//        }
-//
-//        Set<String> migrations = null;
-//        Object userObject = treeNode.getUserObject();
-//        if (userObject instanceof String) {
-//            MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
-//            migrations = manager.migrateDown((String) userObject, 0);
-//        }
-//
-//        if (userObject instanceof Migration) {
-//            Migration migration = (Migration) userObject;
-//            if (migration.status != MigrationStatus.Success) {
-//                return;
-//            }
-//
-//            LinkedList<Migration> migrationList = new LinkedList<>();
-//            Enumeration migrationEnumeration = treeNode.getParent().children();
-//            while (migrationEnumeration.hasMoreElements()) {
-//                migrationList.add((Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject());
-//            }
-//
-//            int count = 0;
-//            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(anActionEvent.getProject());
-//            Iterator<Migration> migrationIterator = settings.newestFirst ? migrationList.iterator() : migrationList.descendingIterator();
-//            while (migrationIterator.hasNext()) {
-//                Migration tmp = migrationIterator.next();
-//                if (tmp.status == MigrationStatus.Success) {
-//                    count++;
-//                }
-//
-//                if (tmp == migration) {
-//                    break;
-//                }
-//            }
-//
-//            if (count == 0) {
-//                return;
-//            }
-//
-//            MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
-//            Object parentUserObject = ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
-//            migrations = manager.migrateDown((String) parentUserObject, count);
-//        }
-//
-//        if (migrations != null && migrations.size() > 0) {
-//            MigrationPanel panel = (MigrationPanel) getContextComponent();
-////            panel.updateMigrations();
-//        }
     }
 
     @Override
