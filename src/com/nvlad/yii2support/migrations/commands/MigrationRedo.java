@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MigrationUp extends CommandUpDownRedoBase {
-    MigrationUp(Project project, String path, @NotNull List<Migration> migrations) {
+public class MigrationRedo extends CommandUpDownRedoBase {
+    MigrationRedo(Project project, String path, @NotNull List<Migration> migrations) {
         super(project, path, migrations);
     }
 
@@ -24,11 +24,16 @@ public class MigrationUp extends CommandUpDownRedoBase {
         params.add("--interactive=0");
 
         try {
-            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/up", params);
+            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/redo", params);
 
             executeCommandLine(commandLine);
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Override
+    void processOutput(String text) {
     }
 }
