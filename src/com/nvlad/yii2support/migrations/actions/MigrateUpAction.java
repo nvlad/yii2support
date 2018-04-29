@@ -100,7 +100,7 @@ public class MigrateUpAction extends MigrateBaseAction {
     @Override
     public boolean isEnabled() {
         DefaultMutableTreeNode treeNode = getSelectedNode();
-        if (treeNode == null) {
+        if (treeNode == null || !getTree().isEnabled()) {
             return false;
         }
 

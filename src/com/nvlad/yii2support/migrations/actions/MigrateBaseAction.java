@@ -12,6 +12,7 @@ import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.ui.ConsolePanel;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -24,9 +25,14 @@ abstract class MigrateBaseAction extends AnActionButton {
         super(name, icon);
     }
 
+    @NotNull
+    MigrationPanel getPanel() {
+        return (MigrationPanel) getContextComponent();
+    }
+
+    @NotNull
     JTree getTree() {
-        MigrationPanel panel = (MigrationPanel) getContextComponent();
-        return panel.getTree();
+        return getPanel().getTree();
     }
 
     @Nullable

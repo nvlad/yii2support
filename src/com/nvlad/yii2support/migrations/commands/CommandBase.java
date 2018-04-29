@@ -8,6 +8,7 @@ import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.util.Alarm;
+import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
@@ -46,18 +47,26 @@ public abstract class CommandBase implements Runnable {
         processHandler.startNotify();
 
         try {
-            if (myAlarm != null) {
+            if (myComponent != null) {
+                myComponent.setEnabled(false);
+
                 myAlarm.addRequest(this::updateComponent, 125);
             }
 
             process.waitFor();
 
-            if (myAlarm != null) {
+            if (myComponent != null) {
                 myComponent.repaint();
                 myAlarm.cancelAllRequests();
+
+                myComponent.setEnabled(true);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+
+            if (myComponent != null) {
+                ((MigrationPanel) myComponent).inProgress = false;
+            }
         }
     }
 
