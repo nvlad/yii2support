@@ -8,7 +8,6 @@ import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.util.Alarm;
-import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
@@ -65,7 +64,7 @@ public abstract class CommandBase implements Runnable {
             e.printStackTrace();
 
             if (myComponent != null) {
-                ((MigrationPanel) myComponent).inProgress = false;
+                myComponent.setEnabled(true);
             }
         }
     }
