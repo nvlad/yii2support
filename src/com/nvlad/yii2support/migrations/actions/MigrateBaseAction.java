@@ -62,7 +62,7 @@ abstract class MigrateBaseAction extends AnActionButton {
         ApplicationManager.getApplication().executeOnPooledThread(command);
     }
 
-    boolean isAppliedMigration(DefaultMutableTreeNode treeNode) {
+    boolean enableDownButtons(DefaultMutableTreeNode treeNode) {
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof Migration) {
             return ((Migration) userObject).status == MigrationStatus.Success;
@@ -71,9 +71,30 @@ abstract class MigrateBaseAction extends AnActionButton {
         if (userObject instanceof String) {
             Enumeration migrationEnumeration = treeNode.children();
             while (migrationEnumeration.hasMoreElements()) {
-                Object tmp = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
-                if (tmp instanceof Migration) {
-                    if (((Migration) tmp).status == MigrationStatus.Success) {
+                Object migration = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (migration instanceof Migration) {
+                    if (((Migration) migration).status == MigrationStatus.Success) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    boolean enableUpButtons(DefaultMutableTreeNode treeNode) {
+        Object userObject = treeNode.getUserObject();
+        if (userObject instanceof Migration) {
+            return ((Migration) userObject).status != MigrationStatus.Success;
+        }
+
+        if (userObject instanceof String) {
+            Enumeration migrationEnumeration = treeNode.children();
+            while (migrationEnumeration.hasMoreElements()) {
+                Object migration = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (migration instanceof Migration) {
+                    if (((Migration) migration).status != MigrationStatus.Success) {
                         return true;
                     }
                 }

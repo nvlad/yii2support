@@ -156,6 +156,6 @@ public class MigrateDownAction extends MigrateBaseAction {
             return false;
         }
 
-        return isAppliedMigration(treeNode);
+        return enableDownButtons(treeNode);
     }
 }

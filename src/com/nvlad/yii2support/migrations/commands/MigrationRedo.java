@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MigrationRedo extends CommandUpDownRedoBase {
-    MigrationRedo(Project project, String path, @NotNull List<Migration> migrations) {
+    public MigrationRedo(Project project, String path, @NotNull List<Migration> migrations) {
         super(project, path, migrations);
     }
 
@@ -31,9 +31,5 @@ public class MigrationRedo extends CommandUpDownRedoBase {
             e.printStackTrace();
         }
 
-    }
-
-    @Override
-    void processOutput(String text) {
     }
 }

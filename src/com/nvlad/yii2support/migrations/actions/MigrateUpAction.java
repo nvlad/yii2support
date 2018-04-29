@@ -104,7 +104,7 @@ public class MigrateUpAction extends MigrateBaseAction {
             return false;
         }
 
-        return !isAppliedMigration(treeNode);
+        return enableUpButtons(treeNode);
     }
 
 //    class MigrationUp implements Runnable {

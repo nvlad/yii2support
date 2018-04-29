@@ -46,6 +46,9 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                 case Progress:
                     renderer.setIcon(getProgressIcon());
                     renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+                    if (migration.downDuration != null) {
+                        renderer.append("  down time " + formatDuration(migration.downDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
+                    }
                     break;
                 case Unknown:
                     renderer.setIcon(AllIcons.RunConfigurations.Unknown);

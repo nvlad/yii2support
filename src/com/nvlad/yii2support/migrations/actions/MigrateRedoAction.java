@@ -2,17 +2,16 @@ package com.nvlad.yii2support.migrations.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.nvlad.yii2support.migrations.MigrationManager;
+import com.intellij.openapi.project.Project;
+import com.nvlad.yii2support.migrations.commands.MigrationRedo;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
-import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
 @SuppressWarnings("ComponentNotRegistered")
 public class MigrateRedoAction extends MigrateBaseAction {
@@ -27,16 +26,32 @@ public class MigrateRedoAction extends MigrateBaseAction {
             return;
         }
 
-        Set<String> migrations = null;
+        LinkedList<Migration> migrationsToRedo = new LinkedList<>();
+        String migrationPath;
+        MigrationRedo migrationRedo = null;
+
+        Project project = anActionEvent.getProject();
+        if (project == null) {
+            return;
+        }
+
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof String) {
-            MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
-            migrations = manager.migrateDown((String) userObject, 0);
+            Enumeration migrationEnumeration = treeNode.children();
+            while (migrationEnumeration.hasMoreElements()) {
+                Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (migration.status == MigrationStatus.Success) {
+                    migrationsToRedo.add(migration);
+                }
+            }
+
+            migrationPath = (String) userObject;
+            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
         }
 
         if (userObject instanceof Migration) {
-            Migration migration = (Migration) userObject;
-            if (migration.status != MigrationStatus.Success) {
+            Migration selectedMigration = (Migration) userObject;
+            if (selectedMigration.status != MigrationStatus.Success) {
                 return;
             }
 
@@ -46,36 +61,32 @@ public class MigrateRedoAction extends MigrateBaseAction {
                 migrationList.add((Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject());
             }
 
-            int count = 0;
             Yii2SupportSettings settings = Yii2SupportSettings.getInstance(anActionEvent.getProject());
             Iterator<Migration> migrationIterator = settings.newestFirst ? migrationList.iterator() : migrationList.descendingIterator();
             while (migrationIterator.hasNext()) {
-                Migration tmp = migrationIterator.next();
-                if (tmp.status == MigrationStatus.Success) {
-                    count++;
+                Migration migration = migrationIterator.next();
+                if (migration.status == MigrationStatus.Success) {
+                    migrationsToRedo.add(migration);
                 }
 
-                if (tmp == migration) {
+                if (migration == selectedMigration) {
                     break;
                 }
             }
 
-            if (count == 0) {
+            if (migrationsToRedo.size() == 0) {
                 return;
             }
 
-            MigrationManager manager = MigrationManager.getInstance(anActionEvent.getProject());
-            Object parentUserObject = ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
-            migrations = manager.migrateRedo((String) parentUserObject, count);
+            migrationPath = (String) ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
+            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
         }
 
-        if (migrations != null && migrations.size() > 0) {
-            MigrationPanel panel = (MigrationPanel) getContextComponent();
-//            panel.updateMigrations();
-        }
 
+        if (migrationRedo != null) {
+            executeCommand(project, migrationRedo);
+        }
     }
-
 
     @Override
     public boolean isEnabled() {
@@ -84,6 +95,6 @@ public class MigrateRedoAction extends MigrateBaseAction {
             return false;
         }
 
-        return isAppliedMigration(treeNode);
+        return enableDownButtons(treeNode);
     }
 }
