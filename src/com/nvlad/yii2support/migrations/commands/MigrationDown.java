@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MigrationDown extends CommandUpDownRedoBase {
-    MigrationDown(Project project, String path, @NotNull List<Migration> migrations) {
+    public MigrationDown(Project project, String path, @NotNull List<Migration> migrations) {
         super(project, path, migrations);
     }
 
