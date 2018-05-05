@@ -28,7 +28,7 @@ public class MigrationDown extends CommandUpDownRedoBase {
 
             executeCommandLine(commandLine);
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            processExecutionException(e);
         }
     }
 }

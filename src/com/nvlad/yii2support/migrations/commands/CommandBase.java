@@ -8,6 +8,7 @@ import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.util.Alarm;
+import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
@@ -76,6 +77,16 @@ public abstract class CommandBase implements Runnable {
         }
         if (settings.migrationTable != null) {
             params.add("--migrationTable=" + settings.migrationTable);
+        }
+    }
+
+    void processExecutionException(ExecutionException e) {
+        if (PhpCommandSettingsBuilder.INTERPRETER_NOT_FOUND_ERROR.equals(e.getMessage())) {
+            if (myConsoleView != null) {
+                myConsoleView.print(e.getMessage() + "\n", ConsoleViewContentType.ERROR_OUTPUT);
+            }
+
+            e.printStackTrace();
         }
     }
 

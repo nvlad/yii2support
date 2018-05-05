@@ -53,7 +53,7 @@ public class MigrationHistory extends CommandBase {
 
             migrations.clear();
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            processExecutionException(e);
         }
     }
 
