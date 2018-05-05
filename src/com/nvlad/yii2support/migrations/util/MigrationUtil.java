@@ -37,10 +37,10 @@ public class MigrationUtil {
             if (!paths.contains(migrationsPath)) {
                 node.removeFromParent();
                 enumeration = root.children();
-                continue;
+//                continue;
             }
 
-            treeModel.nodeChanged(node);
+//            treeModel.nodeChanged(root);
         }
 //        ((DefaultTreeModel) tree.getModel()).nodeChanged(root);
 //        ((DefaultTreeModel) tree.getModel()).reload();
@@ -75,11 +75,13 @@ public class MigrationUtil {
                     treeNode = new DefaultMutableTreeNode(migration);
                 }
                 node.insert(treeNode, migrationIndex);
-                treeModel.nodeChanged(treeNode);
+                treeModel.nodeChanged(node);
 
                 migrationIndex++;
             }
         }
+
+        treeModel.nodeStructureChanged(root);
     }
 
     private static MutableTreeNode findMigrationTreeNode(Migration migration, TreeNode node) {

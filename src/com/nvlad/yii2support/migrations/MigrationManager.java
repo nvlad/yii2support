@@ -11,10 +11,8 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.FileUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
-import com.nvlad.yii2support.migrations.commands.MigrationHistory;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +73,10 @@ public class MigrationManager {
             }
 
             migrationMap.get(path).add(new Migration(migration, path));
+        }
+
+        if (myMigrationMap == null) {
+            myMigrationMap = migrationMap;
         }
 
         for (String path : myMigrationMap.keySet()) {

@@ -3,8 +3,8 @@ package com.nvlad.yii2support.migrations.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.commands.MigrationHistory;
-import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 
 @SuppressWarnings("ComponentNotRegistered")
 public class RefreshAction extends MigrateBaseAction {
@@ -18,6 +18,9 @@ public class RefreshAction extends MigrateBaseAction {
         if (project == null) {
             return;
         }
+
+        MigrationManager migrationManager = MigrationManager.getInstance(project);
+        migrationManager.refresh();
 
         MigrationHistory migrationHistory = new MigrationHistory(project);
         executeCommand(project, migrationHistory);
