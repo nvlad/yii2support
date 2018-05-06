@@ -11,6 +11,8 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.util.Alarm;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
+import com.nvlad.yii2support.migrations.MigrationManager;
+import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
@@ -105,6 +107,14 @@ public abstract class CommandBase implements Runnable {
     private void updateComponent() {
         myComponent.repaint();
         myAlarm.addRequest(this::updateComponent, 125);
+    }
+
+    public void updateTree() {
+        if (myComponent instanceof JTree) {
+            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
+            MigrationManager manager = MigrationManager.getInstance(myProject);
+            MigrationUtil.updateTree((JTree) myComponent, manager.getMigrations(), settings.newestFirst);
+        }
     }
 
     public void setApplication(Application application) {

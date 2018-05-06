@@ -5,6 +5,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.nvlad.yii2support.migrations.MigrationManager;
 import com.nvlad.yii2support.migrations.commands.MigrationHistory;
+import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
+
+import javax.swing.*;
 
 @SuppressWarnings("ComponentNotRegistered")
 public class RefreshAction extends MigrateBaseAction {
@@ -21,6 +25,11 @@ public class RefreshAction extends MigrateBaseAction {
 
         MigrationManager migrationManager = MigrationManager.getInstance(project);
         migrationManager.refresh();
+
+        JTree tree = getTree();
+        Yii2SupportSettings settings = Yii2SupportSettings.getInstance(project);
+        MigrationManager manager = MigrationManager.getInstance(project);
+        MigrationUtil.updateTree(tree, manager.getMigrations(), settings.newestFirst);
 
         MigrationHistory migrationHistory = new MigrationHistory(project);
         executeCommand(project, migrationHistory);
