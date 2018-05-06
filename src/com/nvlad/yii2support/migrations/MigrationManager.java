@@ -4,6 +4,7 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.*;
 import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -32,7 +33,7 @@ public class MigrationManager {
     }
 
     private final Project myProject;
-//    private ConsoleView myConsoleView;
+    //    private ConsoleView myConsoleView;
     private Map<String, Collection<Migration>> myMigrationMap;
 
     private MigrationManager(Project project) {
@@ -54,7 +55,13 @@ public class MigrationManager {
 
     public void refresh() {
         PhpIndex phpIndex = PhpIndex.getInstance(myProject);
-        Collection<PhpClass> migrations = phpIndex.getAllSubclasses("\\yii\\db\\Migration");
+        Collection<PhpClass> migrations;
+        try {
+            migrations = phpIndex.getAllSubclasses("\\yii\\db\\Migration");
+        } catch (IndexNotReadyException e) {
+            return;
+        }
+
         int baseUrlLength = myProject.getBaseDir().getUrl().length();
 
         Map<String, Collection<Migration>> migrationMap = new HashMap<>();
