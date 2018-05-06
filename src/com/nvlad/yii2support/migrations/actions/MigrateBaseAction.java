@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.migrations.actions;
 
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -65,7 +66,10 @@ abstract class MigrateBaseAction extends AnActionButton {
 
         command.repaintComponent(getTree());
 
-        ApplicationManager.getApplication().executeOnPooledThread(command);
+        Application application = ApplicationManager.getApplication();
+        command.setApplication(application);
+
+        application.executeOnPooledThread(command);
     }
 
     boolean enableDownButtons(DefaultMutableTreeNode treeNode) {

@@ -5,7 +5,9 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.*;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.util.Alarm;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
@@ -19,6 +21,7 @@ public abstract class CommandBase implements Runnable {
     ConsoleView myConsoleView;
     Alarm myAlarm;
     JComponent myComponent;
+    Application myApplication;
 
     CommandBase(Project project) {
         myProject = project;
@@ -86,13 +89,26 @@ public abstract class CommandBase implements Runnable {
                 myConsoleView.print(e.getMessage() + "\n", ConsoleViewContentType.ERROR_OUTPUT);
             }
 
-            e.printStackTrace();
+            if (myApplication != null) {
+                myApplication.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Messages.showErrorDialog(e.getMessage(), "Command Error");
+                    }
+                });
+            }
+
+//            e.printStackTrace();
         }
     }
 
     private void updateComponent() {
         myComponent.repaint();
         myAlarm.addRequest(this::updateComponent, 125);
+    }
+
+    public void setApplication(Application application) {
+        myApplication = application;
     }
 
     class CommandProcessListener implements ProcessListener {
