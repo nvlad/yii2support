@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 abstract class CommandUpDownRedoBase extends CommandBase {
-    private static Pattern migratePattern = Pattern.compile("\\*\\*\\* (applying|applied|reverting|reverted) (m\\d{6}_\\d{6}_.+?)\\s+(\\(time: ([\\d.]+)s\\))?");
+    private static Pattern migratePattern = Pattern.compile("\\*\\*\\* (applying|applied|reverting|reverted|failed to apply|failed to revert) (m\\d{6}_\\d{6}_.+?)\\s+(\\(time: ([\\d.]+)s\\))?");
 
     final String myPath;
     final List<Migration> myMigrations;
@@ -50,6 +50,9 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                     migration.status = MigrationStatus.Success;
                     migration.upDuration = Duration.parse("PT" + matcher.group(4) + "S");
                     break;
+                case "failed to apply":
+                    migration.status = MigrationStatus.ApplyError;
+                    break;
                 case "reverting":
                     migration.status = MigrationStatus.Progress;
                     migration.applyAt = null;
@@ -59,6 +62,9 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                 case "reverted":
                     migration.status = MigrationStatus.NotApply;
                     migration.downDuration = Duration.parse("PT" + matcher.group(4) + "S");
+                    break;
+                case "failed to revert":
+                    migration.status = MigrationStatus.RollbackError;
                     break;
             }
 

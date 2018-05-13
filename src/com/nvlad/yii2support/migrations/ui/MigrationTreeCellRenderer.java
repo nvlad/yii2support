@@ -77,9 +77,9 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
                             renderer.append("  up time " + formatDuration(migration.upDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
                         }
                     }
-
                     break;
-                case Error:
+                case ApplyError:
+                case RollbackError:
                     renderer.setIcon(AllIcons.RunConfigurations.TestError);
                     SimpleTextAttributes errorAttributes = new SimpleTextAttributes(0, JBColor.red);
                     renderer.append(migration.name, errorAttributes, true);

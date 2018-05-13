@@ -75,7 +75,8 @@ abstract class MigrateBaseAction extends AnActionButton {
     boolean enableDownButtons(DefaultMutableTreeNode treeNode) {
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof Migration) {
-            return ((Migration) userObject).status == MigrationStatus.Success;
+            MigrationStatus status = ((Migration) userObject).status;
+            return status == MigrationStatus.Success || status == MigrationStatus.RollbackError;
         }
 
         if (userObject instanceof String) {
@@ -83,7 +84,8 @@ abstract class MigrateBaseAction extends AnActionButton {
             while (migrationEnumeration.hasMoreElements()) {
                 Object migration = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
                 if (migration instanceof Migration) {
-                    if (((Migration) migration).status == MigrationStatus.Success) {
+                    MigrationStatus status = ((Migration) migration).status;
+                    if (status == MigrationStatus.Success || status == MigrationStatus.RollbackError) {
                         return true;
                     }
                 }
@@ -96,7 +98,8 @@ abstract class MigrateBaseAction extends AnActionButton {
     boolean enableUpButtons(DefaultMutableTreeNode treeNode) {
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof Migration) {
-            return ((Migration) userObject).status != MigrationStatus.Success;
+            MigrationStatus status = ((Migration) userObject).status;
+            return ((Migration) userObject).status != MigrationStatus.Success && status != MigrationStatus.RollbackError;
         }
 
         if (userObject instanceof String) {
@@ -104,7 +107,8 @@ abstract class MigrateBaseAction extends AnActionButton {
             while (migrationEnumeration.hasMoreElements()) {
                 Object migration = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
                 if (migration instanceof Migration) {
-                    if (((Migration) migration).status != MigrationStatus.Success) {
+                    MigrationStatus status = ((Migration) migration).status;
+                    if (status != MigrationStatus.Success && status != MigrationStatus.RollbackError) {
                         return true;
                     }
                 }

@@ -5,5 +5,6 @@ public enum MigrationStatus {
     Unknown,
     NotApply,
     Success,
-    Error,
+    ApplyError,
+    RollbackError,
 }

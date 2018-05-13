@@ -40,7 +40,7 @@ public class MigrateDownAction extends MigrateBaseAction {
             Enumeration migrationEnumeration = treeNode.children();
             while (migrationEnumeration.hasMoreElements()) {
                 Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
-                if (migration.status == MigrationStatus.Success) {
+                if (migration.status == MigrationStatus.Success || migration.status == MigrationStatus.RollbackError) {
                     migrationsToDown.add(migration);
                 }
             }
@@ -51,7 +51,7 @@ public class MigrateDownAction extends MigrateBaseAction {
 
         if (userObject instanceof Migration) {
             Migration selectedMigration = (Migration) userObject;
-            if (selectedMigration.status != MigrationStatus.Success) {
+            if (selectedMigration.status != MigrationStatus.Success && selectedMigration.status != MigrationStatus.RollbackError) {
                 return;
             }
 
@@ -65,7 +65,7 @@ public class MigrateDownAction extends MigrateBaseAction {
             Iterator<Migration> migrationIterator = settings.newestFirst ? migrationList.iterator() : migrationList.descendingIterator();
             while (migrationIterator.hasNext()) {
                 Migration migration = migrationIterator.next();
-                if (migration.status == MigrationStatus.Success) {
+                if (migration.status == MigrationStatus.Success || migration.status == MigrationStatus.RollbackError) {
                     migrationsToDown.add(migration);
                 }
 
