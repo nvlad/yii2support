@@ -48,7 +48,6 @@ public class MigrationUtil {
             treeModel.nodesWereRemoved(root, nodeIndices, nodes.toArray());
         }
 
-
         int index = 0;
         for (String path : paths) {
             final MutableTreeNode node = getPathNode(treeModel, root, path, index++);
@@ -116,13 +115,13 @@ public class MigrationUtil {
                 migrationIndex++;
             }
 
-            if (changeIndices.size() > 0) {
-                treeModel.nodesChanged(node, changeIndices.stream().distinct().sorted().mapToInt(v -> v).toArray());
-            }
-
             if (insertIndices.size() > 0) {
                 int[] childIndices = insertIndices.stream().distinct().sorted().mapToInt(v -> v).toArray();
                 treeModel.nodesWereInserted(node, childIndices);
+            }
+
+            if (changeIndices.size() > 0) {
+                treeModel.nodesChanged(node, changeIndices.stream().distinct().sorted().mapToInt(v -> v).toArray());
             }
         }
 
