@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Separator;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
@@ -51,7 +50,8 @@ public class MigrationPanel extends SimpleToolWindowPanel {
 //            MigrationUtil.updateTree(myTree, manager.getMigrations(), newestFirst);
 //        });
 //
-        toolWindow.hide(() -> {});
+        toolWindow.hide(() -> {
+        });
     }
 
     public JTree getTree() {
@@ -62,52 +62,8 @@ public class MigrationPanel extends SimpleToolWindowPanel {
         return myMigrationMap;
     }
 
-    public void updateMigrations() {
-        boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
-
-        MigrationManager manager = MigrationManager.getInstance(myProject);
-        manager.refresh();
-        MigrationUtil.updateTree(myTree, myMigrationMap, newestFirst);
-//        ((DefaultTreeModel) myTree.getModel()).reload();
-//        SwingUtilities.updateComponentTreeUI(myTree);
-
-//        final Map<String, Date> history = manager.migrateHistory();
-//        if (history == null) {
-//            return;
-//        }
-//
-//        MigrationHistory migrationHistory = new MigrationHistory(myProject);
-//        ToolWindow window = ToolWindowManager
-//                .getInstance(myProject).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
-//        if (window != null) {
-//            Content content = window.getContentManager().getContent(1);
-//            if (content != null) {
-//                ConsolePanel consolePanel = (ConsolePanel) content.getComponent();
-//                migrationHistory.setConsoleView(consolePanel.getConsoleView());
-//            }
-//        }
-//
-//        migrationHistory.run();
-
-//        myMigrationMap.forEach((path, migrations) -> {
-//            for (Migration migration : migrations) {
-//                migration.status = MigrationStatus.NotApply;
-//                if (history.containsKey(migration.name)) {
-//                    migration.status = MigrationStatus.Success;
-//                    migration.applyAt = history.get(migration.name);
-//                }
-//            }
-//        });
-
-//        MigrationUtil.updateTree(myTree, myMigrationMap, false, newestFirst);
-//        SwingUtilities.updateComponentTreeUI(myTree);
-    }
-
     private void initActivationListener(ToolWindow toolWindow) {
         toolWindow.getActivation().doWhenDone(() -> {
-//            Map<String, Collection<Migration>> migrationTree = MigrationManager.getInstance(myProject).getMigrations();
-//            boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
-//            MigrationUtil.updateTree(myTree, migrationTree, true, newestFirst);
             boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
             MigrationManager manager = MigrationManager.getInstance(myProject);
 
