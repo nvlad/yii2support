@@ -93,6 +93,7 @@ public class MigrationUtil {
             }
 
             Vector<Integer> insertIndices = new Vector<>();
+            Vector<Integer> changeIndices = new Vector<>();
             int migrationIndex = 0;
             for (Migration migration : migrations) {
                 MutableTreeNode treeNode = findMigrationTreeNode(migration, node);
@@ -109,14 +110,18 @@ public class MigrationUtil {
 //                        treeModel.nodeChanged(treeNode);
                         node.insert(treeNode, migrationIndex);
                     }
-                    treeModel.nodeChanged(treeNode);
+                    changeIndices.add(migrationIndex);
                 }
 
                 migrationIndex++;
             }
 
+            if (changeIndices.size() > 0) {
+                treeModel.nodesChanged(node, changeIndices.stream().distinct().sorted().mapToInt(v -> v).toArray());
+            }
+
             if (insertIndices.size() > 0) {
-                int[] childIndices = insertIndices.stream().distinct().sorted().mapToInt(value -> value).toArray();
+                int[] childIndices = insertIndices.stream().distinct().sorted().mapToInt(v -> v).toArray();
                 treeModel.nodesWereInserted(node, childIndices);
             }
         }
