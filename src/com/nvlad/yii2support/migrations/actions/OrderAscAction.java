@@ -3,11 +3,15 @@ package com.nvlad.yii2support.migrations.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Toggleable;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
+
+import javax.swing.*;
 
 @SuppressWarnings("ComponentNotRegistered")
 public class OrderAscAction extends AnActionButton implements Toggleable {
@@ -29,8 +33,12 @@ public class OrderAscAction extends AnActionButton implements Toggleable {
         anActionEvent.getPresentation().putClientProperty(SELECTED_PROPERTY, settings.newestFirst);
 
         MigrationPanel panel = (MigrationPanel) getContextComponent();
+        JTree tree = panel.getTree();
 
-        MigrationUtil.updateTree(panel.getTree(), panel.getMigrationMap(), settings.newestFirst);
+        MigrationUtil.updateTree(tree, panel.getMigrationMap(), settings.newestFirst);
+
+        Application application = ApplicationManager.getApplication();
+        application.invokeLater(tree::updateUI);
     }
 
     @Override
