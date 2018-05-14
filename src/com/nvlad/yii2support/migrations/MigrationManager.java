@@ -8,10 +8,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.FileUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class MigrationManager {
     private static final Map<Project, MigrationManager> migrationManagerMap = new HashMap<>();
@@ -87,8 +84,11 @@ public class MigrationManager {
 
             migrationCollection = myMigrationMap.get(path);
             for (Migration migration : migrationMap.get(path)) {
-                if (isNotContains(migrationCollection, migration)) {
+                Migration founded = findMigration(migrationCollection, migration);
+                if (founded == null) {
                     migrationCollection.add(migration);
+                } else {
+                    founded.migrationClass = migration.migrationClass;
                 }
             }
         }
@@ -98,6 +98,13 @@ public class MigrationManager {
                 myMigrationMap.put(path, migrationMap.get(path));
             }
         }
+    }
+
+    private Migration findMigration(Collection<Migration> migrations, Migration required) {
+        return migrations.stream()
+                .filter(migration -> migration.name.equals(required.name))
+                .findFirst()
+                .orElse(null);
     }
 
     private boolean isNotContains(Collection<Migration> migrations, Migration required) {
