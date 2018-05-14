@@ -12,6 +12,8 @@ import com.intellij.openapi.util.Key;
 import com.intellij.util.Alarm;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.nvlad.yii2support.migrations.MigrationManager;
+import com.nvlad.yii2support.migrations.entities.Migration;
+import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 

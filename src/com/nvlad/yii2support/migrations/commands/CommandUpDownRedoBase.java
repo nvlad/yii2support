@@ -72,6 +72,16 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
     }
 
+    void clearProgressStatus() {
+        if (myMigrations.size() > 0) {
+            for (Migration migration : myMigrations) {
+                if (migration.status == MigrationStatus.Progress) {
+                    migration.status = MigrationStatus.Unknown;
+                }
+            }
+        }
+    }
+
     private Migration findMigration(String name) {
         for (Migration migration : myMigrations) {
             if (migration.name.equals(name)) {

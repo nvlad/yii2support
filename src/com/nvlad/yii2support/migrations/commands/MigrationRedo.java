@@ -27,6 +27,8 @@ public class MigrationRedo extends CommandUpDownRedoBase {
             GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/redo", params);
 
             executeCommandLine(commandLine);
+
+            clearProgressStatus();
         } catch (ExecutionException e) {
             processExecutionException(e);
         }
