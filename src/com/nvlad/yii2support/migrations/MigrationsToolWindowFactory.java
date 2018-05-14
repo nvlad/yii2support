@@ -24,8 +24,8 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
         MigrationPanel migrationPanel = new MigrationPanel(project, toolWindow);
         ConsolePanel consolePanel = new ConsolePanel(project);
 
-        ((ToolWindowManagerEx) ToolWindowManager.getInstance(project))
-                .addToolWindowManagerListener(new MigrationToolWindowManagerListener(project, migrationPanel.getTree()));
+//        ((ToolWindowManagerEx) ToolWindowManager.getInstance(project))
+//                .addToolWindowManagerListener(new MigrationToolWindowManagerListener(project, migrationPanel.getTree()));
 
         Content navigator = ContentFactory.SERVICE.getInstance().createContent(migrationPanel, "Explorer", false);
         toolWindow.getContentManager().addContent(navigator);
@@ -34,7 +34,8 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
         toolWindow.getContentManager().addContent(console);
 
 
-        project.getBaseDir().getFileSystem().addVirtualFileListener(new MigrationsVirtualFileMonitor(project));
+        project.getBaseDir().getFileSystem()
+                .addVirtualFileListener(new MigrationsVirtualFileMonitor(project, migrationPanel.getTree()));
 //        project.getBaseDir().getFileSystem().addVirtualFileListener(new VirtualFileAdapter() {
 //            @Override
 //            public void fileCreated(@NotNull VirtualFileEvent event) {
