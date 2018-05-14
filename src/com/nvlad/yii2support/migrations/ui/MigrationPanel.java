@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
@@ -21,6 +22,7 @@ import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import java.util.Collection;
 import java.util.Map;
@@ -40,6 +42,16 @@ public class MigrationPanel extends SimpleToolWindowPanel {
         initActivationListener(toolWindow);
 
         myMigrationMap = MigrationManager.getInstance(myProject).getMigrations();
+
+//        DumbService.getInstance(project).runWhenSmart(() -> {
+//            boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
+//            MigrationManager manager = MigrationManager.getInstance(myProject);
+//
+//            manager.refresh();
+//            MigrationUtil.updateTree(myTree, manager.getMigrations(), newestFirst);
+//        });
+//
+        toolWindow.hide(() -> {});
     }
 
     public JTree getTree() {
@@ -102,13 +114,14 @@ public class MigrationPanel extends SimpleToolWindowPanel {
             manager.refresh();
             MigrationUtil.updateTree(myTree, manager.getMigrations(), newestFirst);
 
-            ((DefaultTreeModel) myTree.getModel()).reload();
+            DefaultTreeModel treeModel = ((DefaultTreeModel) myTree.getModel());
+            treeModel.nodeStructureChanged((TreeNode) treeModel.getRoot());
         });
     }
 
     private void initContent() {
         MigrationTreeCellRenderer renderer = new MigrationTreeCellRenderer();
-        CheckedTreeNode myRootNode = new CheckedTreeNode("");
+        CheckedTreeNode myRootNode = new CheckedTreeNode();
 //        myRootNode.add(new DefaultMutableTreeNode("Init"));
 
         myTree = new CheckboxTree(renderer, myRootNode);
