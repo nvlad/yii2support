@@ -28,7 +28,7 @@ public class MigrationUp extends CommandUpDownRedoBase {
 
             executeCommandLine(commandLine);
 
-            clearProgressStatus();
+            setErrorStatusForMigrationInProgress();
         } catch (ExecutionException e) {
             processExecutionException(e);
         }
