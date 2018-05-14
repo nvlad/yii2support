@@ -55,7 +55,7 @@ public abstract class CommandBase implements Runnable {
 
         try {
             if (myComponent != null) {
-                myComponent.setEnabled(false);
+                myApplication.invokeLater(() -> myComponent.setEnabled(false));
 
                 myAlarm.addRequest(this::updateComponent, 125);
             }
@@ -63,16 +63,19 @@ public abstract class CommandBase implements Runnable {
             process.waitFor();
 
             if (myComponent != null) {
-                myComponent.repaint();
                 myAlarm.cancelAllRequests();
 
-                myComponent.setEnabled(true);
+                myApplication.invokeLater(() -> {
+                    myComponent.repaint();
+
+                    myComponent.setEnabled(true);
+                });
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
 
             if (myComponent != null) {
-                myComponent.setEnabled(true);
+                myApplication.invokeLater(() -> myComponent.setEnabled(true));
             }
         }
     }
