@@ -15,7 +15,6 @@ import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
 
 public class MigrationsToolWindowFactory implements ToolWindowFactory {
     public static final String TOOL_WINDOW_ID = "Migrations";
@@ -34,6 +33,8 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
         Content console = ContentFactory.SERVICE.getInstance().createContent(consolePanel, "Output", false);
         toolWindow.getContentManager().addContent(console);
 
+
+        project.getBaseDir().getFileSystem().addVirtualFileListener(new MigrationsVirtualFileMonitor(project));
 //        project.getBaseDir().getFileSystem().addVirtualFileListener(new VirtualFileAdapter() {
 //            @Override
 //            public void fileCreated(@NotNull VirtualFileEvent event) {
