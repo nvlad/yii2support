@@ -1,6 +1,7 @@
 package com.nvlad.yii2support.migrations;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.psi.PsiFile;
@@ -30,20 +31,10 @@ public class MigrationsVirtualFileMonitor extends VirtualFileAdapter {
 
     @Override
     public void fileCreated(@NotNull VirtualFileEvent event) {
-        PsiFile psiFile = PsiManager.getInstance(myProject).findFile(event.getFile());
-        if (psiFile instanceof PhpFile) {
-            PhpFile phpFile = (PhpFile) psiFile;
-            for (PhpInstruction instruction : phpFile.getControlFlow().getInstructions()) {
-                if (instruction instanceof PhpClassDeclarationInstruction) {
-                    PhpClass phpClass = ((PhpClassDeclarationInstruction) instruction).getClassDeclaration();
-                    PhpIndex phpIndex = PhpIndex.getInstance(myProject);
-                    if (ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\db\\Migration", phpIndex)) {
-                        MigrationManager manager = MigrationManager.getInstance(myProject);
-                        manager.refresh();
-                        MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
-                    }
-                }
-            }
+        if (isMigrationFile(event.getFile())) {
+            MigrationManager manager = MigrationManager.getInstance(myProject);
+            manager.refresh();
+            MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
         }
     }
 
@@ -52,5 +43,28 @@ public class MigrationsVirtualFileMonitor extends VirtualFileAdapter {
         MigrationManager manager = MigrationManager.getInstance(myProject);
         manager.refresh();
         MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
+    }
+
+    private boolean isMigrationFile(VirtualFile virtualFile) {
+        PsiFile psiFile = PsiManager.getInstance(myProject).findFile(virtualFile);
+        if (!(psiFile instanceof PhpFile)) {
+            return false;
+        }
+
+        for (PhpInstruction instruction : ((PhpFile) psiFile).getControlFlow().getInstructions()) {
+            if (instruction instanceof PhpClassDeclarationInstruction) {
+                PhpClass phpClass = ((PhpClassDeclarationInstruction) instruction).getClassDeclaration();
+                if (phpClass.isAbstract()) {
+                    continue;
+                }
+
+                PhpIndex phpIndex = PhpIndex.getInstance(myProject);
+                if (ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\db\\Migration", phpIndex)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
