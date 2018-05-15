@@ -52,9 +52,9 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
 
     @Override
     public void loadState(Yii2SupportSettings applicationService) {
-        if (this.viewPathMap.hashCode() != applicationService.viewPathMap.hashCode()) {
-            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
-        }
+//        if (this.viewPathMap.hashCode() != applicationService.viewPathMap.hashCode()) {
+//            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
+//        }
         XmlSerializerUtil.copyBean(applicationService, this);
     }
 

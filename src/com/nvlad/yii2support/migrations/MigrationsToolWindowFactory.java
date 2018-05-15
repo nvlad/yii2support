@@ -11,12 +11,18 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.nvlad.yii2support.migrations.ui.ConsolePanel;
 import com.nvlad.yii2support.migrations.ui.MigrationPanel;
+import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
 public class MigrationsToolWindowFactory implements ToolWindowFactory {
     public static final String TOOL_WINDOW_ID = "Migrations";
+
+    public MigrationsToolWindowFactory() {
+        System.out.println("Hohoho");
+    }
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
@@ -64,6 +70,11 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
                 if (myToolWindowVisible) {
                     fileSystem.removeVirtualFileListener(fileMonitor);
                 } else {
+                    MigrationService service = MigrationService.getInstance(myProject);
+                    service.refresh();
+                    Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
+                    MigrationUtil.updateTree(myTree, service.getMigrations(), settings.newestFirst);
+
                     fileSystem.addVirtualFileListener(fileMonitor);
                 }
 
