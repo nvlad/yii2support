@@ -4,7 +4,7 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.openapi.project.Project;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
-import com.nvlad.yii2support.migrations.MigrationManager;
+import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
@@ -25,7 +25,7 @@ public class MigrationHistory extends CommandBase {
 
     public MigrationHistory(Project project) {
         super(project);
-        migrationMap = MigrationManager.getInstance(myProject).getMigrations();
+        migrationMap = MigrationService.getInstance(myProject).getMigrations();
         migrations = new HashSet<>();
     }
 

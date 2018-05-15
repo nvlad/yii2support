@@ -32,7 +32,7 @@ public class MigrationsVirtualFileMonitor extends VirtualFileAdapter {
     @Override
     public void fileCreated(@NotNull VirtualFileEvent event) {
         if (isMigrationFile(event.getFile())) {
-            MigrationManager manager = MigrationManager.getInstance(myProject);
+            MigrationService manager = MigrationService.getInstance(myProject);
             manager.refresh();
             MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
         }
@@ -40,9 +40,9 @@ public class MigrationsVirtualFileMonitor extends VirtualFileAdapter {
 
     @Override
     public void fileDeleted(@NotNull VirtualFileEvent event) {
-        MigrationManager manager = MigrationManager.getInstance(myProject);
-        manager.refresh();
-        MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
+        MigrationService service = MigrationService.getInstance(myProject);
+        service.refresh();
+        MigrationUtil.updateTree(myTree, service.getMigrations(), mySettings.newestFirst);
     }
 
     private boolean isMigrationFile(VirtualFile virtualFile) {

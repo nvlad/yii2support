@@ -10,12 +10,12 @@ import com.nvlad.yii2support.migrations.entities.Migration;
 
 import java.util.*;
 
-public class MigrationManager {
-    private static final Map<Project, MigrationManager> migrationManagerMap = new HashMap<>();
+public class MigrationService {
+    private static final Map<Project, MigrationService> migrationManagerMap = new HashMap<>();
 
-    public static MigrationManager getInstance(Project project) {
+    public static MigrationService getInstance(Project project) {
         if (!migrationManagerMap.containsKey(project)) {
-            migrationManagerMap.put(project, new MigrationManager(project));
+            migrationManagerMap.put(project, new MigrationService(project));
         }
 
         return migrationManagerMap.get(project);
@@ -25,7 +25,7 @@ public class MigrationManager {
     private final int baseUrlLength;
     private Map<String, Collection<Migration>> myMigrationMap;
 
-    private MigrationManager(Project project) {
+    private MigrationService(Project project) {
         myPhpIndex = PhpIndex.getInstance(project);
         baseUrlLength = project.getBaseDir().getUrl().length();
     }

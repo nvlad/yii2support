@@ -3,7 +3,7 @@ package com.nvlad.yii2support.migrations.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.nvlad.yii2support.migrations.MigrationManager;
+import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.commands.MigrationHistory;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
@@ -23,13 +23,12 @@ public class RefreshAction extends MigrateBaseAction {
             return;
         }
 
-        MigrationManager migrationManager = MigrationManager.getInstance(project);
-        migrationManager.refresh();
+        MigrationService service = MigrationService.getInstance(project);
+        service.refresh();
 
         JTree tree = getTree();
         Yii2SupportSettings settings = Yii2SupportSettings.getInstance(project);
-        MigrationManager manager = MigrationManager.getInstance(project);
-        MigrationUtil.updateTree(tree, manager.getMigrations(), settings.newestFirst);
+        MigrationUtil.updateTree(tree, service.getMigrations(), settings.newestFirst);
 
         MigrationHistory migrationHistory = new MigrationHistory(project);
         executeCommand(project, migrationHistory);

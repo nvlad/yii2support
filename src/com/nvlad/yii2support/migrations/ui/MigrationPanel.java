@@ -12,7 +12,7 @@ import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
-import com.nvlad.yii2support.migrations.MigrationManager;
+import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.MigrationsMouseListener;
 import com.nvlad.yii2support.migrations.actions.*;
 import com.nvlad.yii2support.migrations.entities.Migration;
@@ -40,14 +40,14 @@ public class MigrationPanel extends SimpleToolWindowPanel {
         initToolBar();
         initActivationListener(toolWindow);
 
-        myMigrationMap = MigrationManager.getInstance(myProject).getMigrations();
+        myMigrationMap = MigrationService.getInstance(myProject).getMigrations();
 
 //        DumbService.getInstance(project).runWhenSmart(() -> {
 //            boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
-//            MigrationManager manager = MigrationManager.getInstance(myProject);
+//            MigrationService service = MigrationService.getInstance(myProject);
 //
-//            manager.refresh();
-//            MigrationUtil.updateTree(myTree, manager.getMigrations(), newestFirst);
+//            service.refresh();
+//            MigrationUtil.updateTree(myTree, service.getMigrations(), newestFirst);
 //        });
 //
         toolWindow.hide(() -> {
@@ -65,10 +65,10 @@ public class MigrationPanel extends SimpleToolWindowPanel {
     private void initActivationListener(ToolWindow toolWindow) {
         toolWindow.getActivation().doWhenDone(() -> {
             boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
-            MigrationManager manager = MigrationManager.getInstance(myProject);
+            MigrationService service = MigrationService.getInstance(myProject);
 
-            manager.refresh();
-            MigrationUtil.updateTree(myTree, manager.getMigrations(), newestFirst);
+            service.refresh();
+            MigrationUtil.updateTree(myTree, service.getMigrations(), newestFirst);
 
             DefaultTreeModel treeModel = ((DefaultTreeModel) myTree.getModel());
             treeModel.nodeStructureChanged((TreeNode) treeModel.getRoot());
