@@ -1,6 +1,10 @@
 Yii2 Support Change Log
 =======================
 
+0.9.50 May 17, 2018
+-------------------
+- Migration tool
+
 0.8.42.6 April 13, 2018
 -----------------------
 - Disable "Inspection for missed variable declaration" feature high load of CPU

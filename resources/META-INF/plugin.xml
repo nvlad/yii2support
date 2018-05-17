@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.8.42.6</version>
+    <version>0.9.50</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,7 @@
        <li>Autocomplete in model's rules method</li>
        <li>Calculates return type for Yii::createObject call and one/all method calls of ActiveRecord</li>
        <li>Url autocomplete</li>
+       <li>Migration tool</li>
        </ul>
        <br/>
        Detailed information can be found in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a><br/>
@@ -24,18 +25,7 @@
     <change-notes><![CDATA[
       <p><b>Features</b></p>
       <ul>
-        <li>Change plugin settings structure</li>
-        <li>Add setup Yii Root Path in project</li>
-        <li>Add settings page for Views (Theme paths, View file extension, Default View class)</li>
-        <li>Action for go to render method call this View (by default Ctrl + Alt + R / Cmd + Alt + R, or Navigate -> Goto View render call)</li>
-        <li>Inspection for missed variable declaration in View + QuickFix (disabled by default, massive using CPU)</li>
-        <li>Support relative path to Yii root</li>
-        <li>Path to missed View file in error message</li>
-      </ul>
-      <p>&nbsp;</p>
-      <p><b>Fixes</b></p>
-      <ul>
-        <li>Fix View path resolving</li>
+        <li>Migration tool</li>
       </ul>
     ]]>
     </change-notes>
