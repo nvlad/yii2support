@@ -52,6 +52,7 @@
     <depends optional="true">com.jetbrains.twig</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
+    <depends optional="true">org.jetbrains.plugins.terminal</depends>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
@@ -149,6 +150,9 @@
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
       <!--  <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/> -->
+
+        <!-- Migrations -->
+        <toolWindow id="Migrations" anchor="bottom" factoryClass="com.nvlad.yii2support.migrations.MigrationsToolWindowFactory"/>
     </extensions>
 
     <actions>
