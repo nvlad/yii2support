@@ -17,6 +17,8 @@ import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 public abstract class CommandBase implements Runnable {
@@ -50,8 +52,9 @@ public abstract class CommandBase implements Runnable {
             commandLine.getEnvironment().put("ANSICON", "ON");
         }
 
+        Charset outputCharset = Charset.defaultCharset();
         Process process = commandLine.createProcess();
-        ProcessHandler processHandler = new OSProcessHandler(process, "> " + commandLine.getCommandLineString());
+        ProcessHandler processHandler = new OSProcessHandler(process, "> " + commandLine.getCommandLineString(), outputCharset);
 
         processHandler.addProcessListener(new CommandProcessListener(this));
         processHandler.startNotify();
@@ -154,8 +157,16 @@ public abstract class CommandBase implements Runnable {
 
         @Override
         public void onTextAvailable(ProcessEvent processEvent, Key key) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
+            final boolean toUtf8 = SystemInfo.isWindows && key.toString().equals("stdout");
             decoder.escapeText(processEvent.getText(), key, (text, processOutputType) -> {
+                if (toUtf8) {
+                    try {
+                        text = new String(text.getBytes(), "utf-8");
+                    } catch (UnsupportedEncodingException ignored) {
+
+                    }
+                }
                 builder.append(text);
 
                 if (myConsoleView != null) {
