@@ -9,6 +9,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Alarm;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.nvlad.yii2support.migrations.MigrationService;
@@ -45,6 +46,10 @@ public abstract class CommandBase implements Runnable {
     abstract void processOutput(String text);
 
     void executeCommandLine(GeneralCommandLine commandLine) throws ExecutionException {
+        if (SystemInfo.isWindows) {
+            commandLine.getEnvironment().put("ANSICON", "ON");
+        }
+
         Process process = commandLine.createProcess();
         ProcessHandler processHandler = new OSProcessHandler(process, "> " + commandLine.getCommandLineString());
 

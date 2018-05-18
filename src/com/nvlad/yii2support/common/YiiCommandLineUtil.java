@@ -25,7 +25,6 @@ public class YiiCommandLineUtil {
         commandSettings.setScript(yiiRootPath + "/yii");
         commandSettings.addArgument(command);
         commandSettings.addArguments(parameters);
-        commandSettings.addArgument("--color");
 
         GeneralCommandLine commandLine = commandSettings.createGeneralCommandLine();
         commandLine.setWorkDirectory(yiiRootPath);
