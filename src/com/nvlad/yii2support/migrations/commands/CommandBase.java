@@ -48,42 +48,34 @@ public abstract class CommandBase implements Runnable {
     abstract void processOutput(String text);
 
     void executeCommandLine(GeneralCommandLine commandLine) throws ExecutionException {
-        if (SystemInfo.isWindows) {
-            commandLine.getEnvironment().put("ANSICON", "ON");
-        }
-
         Charset outputCharset = Charset.defaultCharset();
         Process process = commandLine.createProcess();
         ProcessHandler processHandler = new OSProcessHandler(process, "> " + commandLine.getCommandLineString(), outputCharset);
+        executeProcess(processHandler);
+    }
 
+    void executeProcess(ProcessHandler processHandler) {
         processHandler.addProcessListener(new CommandProcessListener(this));
         processHandler.startNotify();
 
-        try {
-            if (myComponent != null) {
-                myApplication.invokeLater(() -> myComponent.setEnabled(false));
+        if (myComponent != null) {
+            myApplication.invokeLater(() -> myComponent.setEnabled(false));
 
-                myAlarm.addRequest(this::updateComponent, 125);
-            }
-
-            process.waitFor();
-
-            if (myComponent != null) {
-                myAlarm.cancelAllRequests();
-
-                myApplication.invokeLater(() -> {
-                    myComponent.repaint();
-
-                    myComponent.setEnabled(true);
-                });
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-
-            if (myComponent != null) {
-                myApplication.invokeLater(() -> myComponent.setEnabled(true));
-            }
+            myAlarm.addRequest(this::updateComponent, 125);
         }
+
+        processHandler.waitFor();
+
+        if (myComponent != null) {
+            myAlarm.cancelAllRequests();
+
+            myApplication.invokeLater(() -> {
+                myComponent.repaint();
+
+                myComponent.setEnabled(true);
+            });
+        }
+
     }
 
     void fillParams(List<String> params) {

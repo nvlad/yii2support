@@ -2,6 +2,7 @@ package com.nvlad.yii2support.migrations.commands;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.MigrationService;
@@ -40,9 +41,12 @@ public class MigrationHistory extends CommandBase {
             params.add("all");
             fillParams(params);
 
-            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/history", params);
+//            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/history", params);
 
-            executeCommandLine(commandLine);
+//            executeCommandLine(commandLine);
+
+            ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, "migrate/history", params);
+            executeProcess(processHandler);
 
             for (Migration migration : migrations) {
                 migration.status = MigrationStatus.NotApply;

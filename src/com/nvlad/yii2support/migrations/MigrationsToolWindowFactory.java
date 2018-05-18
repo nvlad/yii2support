@@ -21,7 +21,6 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
     public static final String TOOL_WINDOW_ID = "Migrations";
 
     public MigrationsToolWindowFactory() {
-        System.out.println("Hohoho");
     }
 
     @Override
