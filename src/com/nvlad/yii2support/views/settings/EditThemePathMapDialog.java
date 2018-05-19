@@ -8,24 +8,29 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class EditThemePathMapDialog extends DialogWrapper {
-    private final EditThemePathMapEntry myPanel;
+    private final EditPathMapEntryPanel myPanel;
 
-    protected EditThemePathMapDialog(@Nullable Project project, String path, String alias) {
+    EditThemePathMapDialog(@Nullable Project project, String path, String alias) {
         super(project);
         setTitle("Edit Path Map");
 
-        myPanel = new EditThemePathMapEntry(path, alias);
+        this.setResizable(false);
+
+        myPanel = new EditPathMapEntryPanel(path, alias);
+        myPanel.setAliasLabel("Path Mask:");
+        myPanel.setValueLabel("Alias:");
+
         init();
     }
 
     @NotNull
     public String getPath() {
-        return myPanel.getPath();
+        return myPanel.getAlias();
     }
 
     @NotNull
     public String getAlias() {
-        return myPanel.getAlias();
+        return myPanel.getValue();
     }
 
     @Nullable

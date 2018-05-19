@@ -27,6 +27,10 @@
       <ul>
         <li>Migration tool</li>
       </ul>
+      <p>Fixes</p>
+      <ul>
+        <li>fix UI path map edit popup</li>
+      </ul>
     ]]>
     </change-notes>
 
