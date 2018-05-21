@@ -30,6 +30,7 @@
       - Added info notification on plugin update<br/>
       - Fix UI path map edit popup<br/>
       - Enhance UI for Go to render call<br/>
+      - Set "Alt + R" by default shortcut for Go to View render call
     ]]>
     </change-notes>
 
@@ -154,7 +155,8 @@
         <action id="yii2support.GotoViewCalls" class="com.nvlad.yii2support.views.actions.OpenViewCalls"
                 text="Goto View render call">
             <add-to-group group-id="GoToMenu" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt R"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="alt R"/>
         </action>
     </actions>
 

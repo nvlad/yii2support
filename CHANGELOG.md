@@ -3,8 +3,10 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+- Added info notification on plugin update
 - Fix UI path map edit popup
 - Enhance UI for Go to render call
+- Set "Alt + R" by default shortcut for Go to View render call
 
 0.9.50 May 17, 2018
 -------------------
