@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.yii2support</id>
+    <id>com.nvlad.yii2support</id>
     <name>Yii2 Support</name>
     <version>0.9.50</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
@@ -23,15 +23,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      <p><b>Features</b></p>
-      <ul>
-        <li>Migration tool</li>
-      </ul>
-      <p>Fixes</p>
-      <ul>
-        <li>Fix UI path map edit popup</li>
-        <li>Enhance UI for Go to render call</li>
-      </ul>
+      <b>Features</b><br/>
+      - Migration tool<br/>
+      <br/>
+      <b>Fixes</b><br/>
+      - Added info notification on plugin update<br/>
+      - Fix UI path map edit popup<br/>
+      - Enhance UI for Go to render call<br/>
     ]]>
     </change-notes>
 
@@ -57,6 +55,7 @@
     <extensions defaultExtensionNs="com.intellij">
 
         <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
+        <applicationService serviceImplementation="com.nvlad.yii2support.PluginGlobalSettings"/>
 
         <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
                              displayName="Yii2 Support"
@@ -158,6 +157,12 @@
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
         </action>
     </actions>
+
+    <application-components>
+        <component>
+            <implementation-class>com.nvlad.yii2support.PluginApplicationComponent</implementation-class>
+        </component>
+    </application-components>
 
     <!--
     <project-components>
