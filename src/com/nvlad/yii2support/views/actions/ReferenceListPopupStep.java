@@ -19,38 +19,21 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
-class ReferenceListPopupStep extends BaseListPopupStep {
+class ReferenceListPopupStep extends BaseListPopupStep<PsiReference> {
     ReferenceListPopupStep(@Nullable String title, Collection<PsiReference> values) {
-        List<PsiReference> references = new LinkedList<>();
-        references.addAll(values);
-
-        this.init(title, references, null);
+        super(title, new LinkedList<>(values));
     }
 
     @Override
-    public PopupStep onChosen(Object selectedValue, boolean finalChoice) {
-        openReference((PsiReference) selectedValue);
+    public PopupStep onChosen(PsiReference reference, boolean finalChoice) {
+        openReference(reference);
         return FINAL_CHOICE;
-    }
-
-    public static void openReference(PsiReference reference) {
-        PsiElement psiElement = reference.getElement();
-
-        if (psiElement.getFirstChild() != null && psiElement.getFirstChild().getNextSibling() != null) {
-            psiElement = psiElement.getFirstChild().getNextSibling();
-        }
-
-        if (psiElement instanceof Navigatable && ((Navigatable) psiElement).canNavigate()) {
-            ((Navigatable) psiElement).navigate(true);
-        }
     }
 
     @NotNull
     @Override
-    public String getTextFor(Object value) {
-        PsiReference reference = (PsiReference) value;
+    public String getTextFor(PsiReference reference) {
         if (reference == null) {
             return "(empty)";
         }
@@ -78,7 +61,20 @@ class ReferenceListPopupStep extends BaseListPopupStep {
     }
 
     @Override
-    public Icon getIconFor(Object value) {
+    public Icon getIconFor(PsiReference reference) {
         return PhpIcons.METHOD_ICON;
+    }
+
+
+    static void openReference(PsiReference reference) {
+        PsiElement psiElement = reference.getElement();
+
+        if (psiElement.getFirstChild() != null && psiElement.getFirstChild().getNextSibling() != null) {
+            psiElement = psiElement.getFirstChild().getNextSibling();
+        }
+
+        if (psiElement instanceof Navigatable && ((Navigatable) psiElement).canNavigate()) {
+            ((Navigatable) psiElement).navigate(true);
+        }
     }
 }

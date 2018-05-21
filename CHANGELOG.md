@@ -1,6 +1,11 @@
 Yii2 Support Change Log
 =======================
 
+Waiting for Release
+-------------------
+- Fix UI path map edit popup
+- Enhance UI for Go to render call
+
 0.9.50 May 17, 2018
 -------------------
 - Migration tool

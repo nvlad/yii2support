@@ -29,7 +29,8 @@
       </ul>
       <p>Fixes</p>
       <ul>
-        <li>fix UI path map edit popup</li>
+        <li>Fix UI path map edit popup</li>
+        <li>Enhance UI for Go to render call</li>
       </ul>
     ]]>
     </change-notes>
