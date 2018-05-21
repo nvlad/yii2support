@@ -148,6 +148,8 @@
 
         <!-- Migrations -->
         <toolWindow id="Migrations" anchor="bottom" factoryClass="com.nvlad.yii2support.migrations.MigrationsToolWindowFactory"/>
+
+        <errorHandler implementation="com.nvlad.yii2support.ErrorReportHandler"/>
     </extensions>
 
     <actions>

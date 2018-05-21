@@ -11,5 +11,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="php-openapi" level="project" />
+    <orderEntry type="library" name="rollbar-api-1.2.0" level="project" />
+    <orderEntry type="library" name="rollbar-java-1.2.0" level="project" />
   </component>
 </module>
