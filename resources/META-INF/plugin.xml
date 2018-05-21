@@ -94,6 +94,9 @@
                              parentId="Yii2Support.SettingsForm"
                              nonDefaultProject="true"/>
 
+        <fileTemplateGroup implementation="com.nvlad.yii2support.views.FileTemplateGroup"/>
+        <createFromTemplateHandler implementation="com.nvlad.yii2support.views.CreateFromTemplateHandler"/>
+
         <!-- Object Factory -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
