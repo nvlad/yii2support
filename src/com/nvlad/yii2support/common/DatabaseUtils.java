@@ -177,10 +177,10 @@ public class DatabaseUtils {
                 if (tableSchema instanceof DbNamespaceImpl) {
                     Object dataSource = tableSchema.getDbParent();
                    // DbDataSourceImpl dataSource = (DbDataSourceImpl) ((DbNamespaceImpl) tableSchema).getDbParent();
-                    if (dataSource != null && dataSource instanceof DbDataSourceImpl ) {
+                    if (dataSource instanceof DbDataSourceImpl) {
                         builder = builder.withTypeText(((DbDataSourceImpl)dataSource).getName(), true);
                     }
-                    if (dataSource != null && dataSource instanceof DbDataSourceImpl ) {
+                    if (dataSource instanceof DbDataSourceImpl) {
                         builder = builder.withTypeText(((DbDataSourceImpl)dataSource).getName(), true);
                     }
                 }
@@ -217,7 +217,7 @@ public class DatabaseUtils {
                 if ((element).getChildren().length > 0) {
                     if ((element).getChildren()[0] instanceof ClassConstantReference) {
                         PsiElement resolved = ((ClassConstantReference) (element).getChildren()[0]).resolve();
-                        if (resolved != null && resolved instanceof ClassConstImpl) {
+                        if (resolved instanceof ClassConstImpl) {
                             ClassConstImpl constant = (ClassConstImpl) resolved;
                             if (constant.getChildren().length > 0) {
                                 String table =  ((StringLiteralExpressionImpl) constant.getChildren()[0]).getContents();

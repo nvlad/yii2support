@@ -412,7 +412,7 @@ public class ClassUtils {
         if (ref != null) {
             if (ref instanceof ClassConstantReference) {
                 PsiElement val = ((ClassConstantReference)ref).resolve();
-                if (val != null && val instanceof ClassConstImpl) {
+                if (val instanceof ClassConstImpl) {
                     PsiElement value = ((ClassConstImpl) val).getDefaultValue();
                     if (value != null && value.getText() != null)
                     {
@@ -421,7 +421,7 @@ public class ClassUtils {
                 }
             } else if (ref instanceof ConstantReference) {
                 PsiElement val = ((ConstantReference)ref).resolve();
-                if (val != null && val instanceof PhpDefine) {
+                if (val instanceof PhpDefine) {
                     PhpPsiElement value = ((PhpDefineImpl) val).getValue();
                     if (value != null )
                         return value.getText() ;

@@ -43,7 +43,7 @@ public class PsiUtil {
             next.delete();
         } else {
             PsiElement prev = element.getPrevSibling();
-            if (prev != null && prev instanceof PsiWhiteSpace) {
+            if (prev instanceof PsiWhiteSpace) {
                 prev.delete();
                 prev = element.getPrevSibling();
             }

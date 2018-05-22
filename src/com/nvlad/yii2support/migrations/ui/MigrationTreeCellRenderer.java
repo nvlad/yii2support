@@ -7,12 +7,14 @@ import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.nvlad.yii2support.migrations.entities.Migration;
+import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import icons.DatabaseIcons;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.text.DateFormat;
 import java.time.Duration;
+import java.util.Enumeration;
 
 public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
     private static final Icon[] progressIcons = {
@@ -35,8 +37,18 @@ public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRend
             renderer.setIcon(DatabaseIcons.Catalog);
             renderer.append(treeNode.toString(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES, true);
 
-            String count = "  " + treeNode.getChildCount() + StringUtil.pluralize(" migration", treeNode.getChildCount());
-            renderer.append(count, SimpleTextAttributes.GRAY_ATTRIBUTES, true);
+            Enumeration enumeration = treeNode.children();
+            int appliedCount = 0;
+            while (enumeration.hasMoreElements()) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumeration.nextElement();
+                Migration migration = (Migration) node.getUserObject();
+                if (migration.status == MigrationStatus.Success) {
+                    appliedCount++;
+                }
+            }
+
+            String count = appliedCount + "/" + treeNode.getChildCount() + StringUtil.pluralize(" migration", treeNode.getChildCount());
+            renderer.append("  " + count, SimpleTextAttributes.GRAY_ATTRIBUTES, true);
             return;
         }
 

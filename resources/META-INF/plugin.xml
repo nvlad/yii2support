@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.yii2support</id>
+    <id>com.nvlad.yii2support</id>
     <name>Yii2 Support</name>
     <version>0.9.50</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
@@ -23,12 +23,19 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      <p><b>Features</b></p>
-      <ul>
-        <li>Migration tool</li>
-      </ul>
-    ]]>
-    </change-notes>
+      <b>Features</b><br/>
+      - Migration tool<br/>
+      - Send plugin exceptions from IDE Error Report Dialog<br/>
+      - Added info notification on plugin update<br/>
+      - Update DB schema after Apply/Undo/Redo migration(s)<br/>
+      <br/>
+      <b>Fixes</b><br/>
+      - Fix UI path map edit popup<br/>
+      - Enhance UI for Go to render call<br/>
+      - Set "Alt + R" by default shortcut for Go to View render call<br/>
+      - Applied migration count<br/>
+      - Disable ActiveRecord table inspection for abstract classes<br/>
+    ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="162"/>
@@ -39,9 +46,9 @@
     <depends>com.intellij.modules.lang</depends>
     -->
     <depends>com.jetbrains.php</depends>
-    <depends optional="true">com.jetbrains.twig</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
+    <depends optional="true">com.jetbrains.twig</depends>
     <depends optional="true">org.jetbrains.plugins.terminal</depends>
     <depends optional="true">org.jetbrains.plugins.phpstorm-remote-interpreter</depends>
 
@@ -53,6 +60,7 @@
     <extensions defaultExtensionNs="com.intellij">
 
         <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
+        <applicationService serviceImplementation="com.nvlad.yii2support.PluginGlobalSettings"/>
 
         <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
                              displayName="Yii2 Support"
@@ -144,6 +152,8 @@
 
         <!-- Migrations -->
         <toolWindow id="Migrations" anchor="bottom" factoryClass="com.nvlad.yii2support.migrations.MigrationsToolWindowFactory"/>
+
+        <errorHandler implementation="com.nvlad.yii2support.ErrorReportHandler"/>
     </extensions>
 
     <actions>
@@ -151,9 +161,16 @@
         <action id="yii2support.GotoViewCalls" class="com.nvlad.yii2support.views.actions.OpenViewCalls"
                 text="Goto View render call">
             <add-to-group group-id="GoToMenu" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt R"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="alt R"/>
         </action>
     </actions>
+
+    <application-components>
+        <component>
+            <implementation-class>com.nvlad.yii2support.PluginApplicationComponent</implementation-class>
+        </component>
+    </application-components>
 
     <!--
     <project-components>

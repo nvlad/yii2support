@@ -1,9 +1,8 @@
 package com.nvlad.yii2support.views.util;
 
-import com.google.common.io.Files;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.SearchScope;
@@ -199,7 +198,7 @@ public class ViewUtil {
         Set<String> result = new HashSet<>();
 
         String path = resolve.key;
-        if (Files.getFileExtension(path).isEmpty()) {
+        if (FileUtilRt.getExtension(path).isEmpty()) {
             path = path + '.' + Yii2SupportSettings.getInstance(project).defaultViewExtension;
         }
         if (path.startsWith("@app/")) {

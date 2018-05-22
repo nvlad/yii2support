@@ -1,6 +1,17 @@
 Yii2 Support Change Log
 =======================
 
+Waiting for Release
+-------------------
+- Added info notification on plugin update
+- Fix UI path map edit popup
+- Enhance UI for Go to render call
+- Set "Alt + R" by default shortcut for Go to View render call
+- Send plugin exceptions from IDE Error Report Dialog
+- Applied migration count
+- Update DB schema after Apply/Undo/Redo migration(s)
+- Disable ActiveRecord table inspection for abstract classes
+
 0.9.50 May 17, 2018
 -------------------
 - Migration tool

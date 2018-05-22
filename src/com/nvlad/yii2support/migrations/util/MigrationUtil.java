@@ -25,8 +25,7 @@ public class MigrationUtil {
 
         boolean first = root.getChildCount() == 0;
         DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
-        List<String> paths = new LinkedList<>();
-        paths.addAll(migrationMap.keySet());
+        List<String> paths = new LinkedList<>(migrationMap.keySet());
         paths.sort(String.CASE_INSENSITIVE_ORDER);
 
         Vector<DefaultMutableTreeNode> nodes = new Vector<>();
@@ -68,8 +67,7 @@ public class MigrationUtil {
 //            }
 //            index++;
 
-            List<Migration> migrations = new LinkedList<>();
-            migrations.addAll(migrationMap.get(path));
+            List<Migration> migrations = new LinkedList<>(migrationMap.get(path));
             migrations.sort(new MigrationComparator(newestFirst));
 
             nodes.clear();
