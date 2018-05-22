@@ -32,5 +32,7 @@ public class MigrationUp extends CommandUpDownRedoBase {
         } catch (ExecutionException e) {
             processExecutionException(e);
         }
+
+        syncDataSources();
     }
 }

@@ -27,6 +27,7 @@
       - Migration tool<br/>
       - Send plugin exceptions from IDE Error Report Dialog<br/>
       - Added info notification on plugin update<br/>
+      - Update DB schema after Apply/Undo/Redo migration(s)<br/>
       <br/>
       <b>Fixes</b><br/>
       - Fix UI path map edit popup<br/>
@@ -45,9 +46,9 @@
     <depends>com.intellij.modules.lang</depends>
     -->
     <depends>com.jetbrains.php</depends>
-    <depends optional="true">com.jetbrains.twig</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
+    <depends optional="true">com.jetbrains.twig</depends>
     <depends optional="true">org.jetbrains.plugins.terminal</depends>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

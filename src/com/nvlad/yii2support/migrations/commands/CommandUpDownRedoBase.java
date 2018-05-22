@@ -1,5 +1,10 @@
 package com.nvlad.yii2support.migrations.commands;
 
+import com.intellij.database.dataSource.DataSourceUiUtil;
+import com.intellij.database.dataSource.LocalDataSource;
+import com.intellij.database.psi.DbDataSource;
+import com.intellij.database.psi.DbPsiFacade;
+import com.intellij.database.util.DbImplUtil;
 import com.intellij.openapi.project.Project;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
@@ -86,6 +91,18 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                     } else {
                         migration.status = MigrationStatus.ApplyError;
                     }
+                }
+            }
+        }
+    }
+
+    void syncDataSources() {
+        DbPsiFacade facade = DbPsiFacade.getInstance(myProject);
+        for (DbDataSource dataSource : facade.getDataSources()) {
+            if (dataSource.getDelegate() instanceof LocalDataSource) {
+                if (DbImplUtil.isConnected(dataSource)) {
+                    LocalDataSource localDataSource = (LocalDataSource) dataSource.getDelegate();
+                    DataSourceUiUtil.performAutoSyncTask(myProject, localDataSource);
                 }
             }
         }

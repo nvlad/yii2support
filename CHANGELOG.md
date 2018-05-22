@@ -9,6 +9,7 @@ Waiting for Release
 - Set "Alt + R" by default shortcut for Go to View render call
 - Send plugin exceptions from IDE Error Report Dialog
 - Applied migration count
+- Update DB schema after Apply/Undo/Redo migration(s)
 
 0.9.50 May 17, 2018
 -------------------
