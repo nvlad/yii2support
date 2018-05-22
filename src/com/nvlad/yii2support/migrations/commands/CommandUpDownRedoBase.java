@@ -5,7 +5,10 @@ import com.intellij.database.dataSource.LocalDataSource;
 import com.intellij.database.psi.DbDataSource;
 import com.intellij.database.psi.DbPsiFacade;
 import com.intellij.database.util.DbImplUtil;
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
+import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +29,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
     final String myPath;
     final List<Migration> myMigrations;
     private Map<String, DefaultMutableTreeNode> treeNodeMap;
-    String direction = null;
+    private String direction = null;
 
     CommandUpDownRedoBase(Project project, String path, @NotNull List<Migration> migrations) {
         super(project);
@@ -81,40 +84,17 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
     }
 
-    void setErrorStatusForMigrationInProgress() {
-        if (myMigrations.size() > 0) {
-            for (Migration migration : myMigrations) {
-                if (migration.status == MigrationStatus.Progress) {
-                    if (direction.equals("reverting")) {
-                        migration.status = MigrationStatus.RollbackError;
-                    } else {
-                        migration.status = MigrationStatus.ApplyError;
-                    }
-                }
-            }
-        }
-    }
+    void executeCommandWithParams(String command, List<String> parameters) {
+        try {
+            ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, command, parameters);
+            executeProcess(processHandler);
 
-    void syncDataSources() {
-        DbPsiFacade facade = DbPsiFacade.getInstance(myProject);
-        for (DbDataSource dataSource : facade.getDataSources()) {
-            if (dataSource.getDelegate() instanceof LocalDataSource) {
-                if (DbImplUtil.isConnected(dataSource)) {
-                    LocalDataSource localDataSource = (LocalDataSource) dataSource.getDelegate();
-                    DataSourceUiUtil.performAutoSyncTask(myProject, localDataSource);
-                }
-            }
-        }
-    }
-
-    private Migration findMigration(String name) {
-        for (Migration migration : myMigrations) {
-            if (migration.name.equals(name)) {
-                return migration;
-            }
+            setErrorStatusForMigrationInProgress();
+        } catch (ExecutionException e) {
+            processExecutionException(e);
         }
 
-        return null;
+        syncDataSources();
     }
 
     DefaultMutableTreeNode findTreeNode(Migration migration) {
@@ -139,6 +119,42 @@ abstract class CommandUpDownRedoBase extends CommandBase {
             }
 
             return treeNodeMap.get(migration.name);
+        }
+
+        return null;
+    }
+
+    private void setErrorStatusForMigrationInProgress() {
+        if (myMigrations.size() > 0) {
+            for (Migration migration : myMigrations) {
+                if (migration.status == MigrationStatus.Progress) {
+                    if (direction.equals("reverting")) {
+                        migration.status = MigrationStatus.RollbackError;
+                    } else {
+                        migration.status = MigrationStatus.ApplyError;
+                    }
+                }
+            }
+        }
+    }
+
+    private void syncDataSources() {
+        DbPsiFacade facade = DbPsiFacade.getInstance(myProject);
+        for (DbDataSource dataSource : facade.getDataSources()) {
+            if (dataSource.getDelegate() instanceof LocalDataSource) {
+                if (DbImplUtil.isConnected(dataSource)) {
+                    LocalDataSource localDataSource = (LocalDataSource) dataSource.getDelegate();
+                    DataSourceUiUtil.performAutoSyncTask(myProject, localDataSource);
+                }
+            }
+        }
+    }
+
+    private Migration findMigration(String name) {
+        for (Migration migration : myMigrations) {
+            if (migration.name.equals(name)) {
+                return migration;
+            }
         }
 
         return null;

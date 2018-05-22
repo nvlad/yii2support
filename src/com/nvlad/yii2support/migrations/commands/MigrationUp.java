@@ -1,9 +1,6 @@
 package com.nvlad.yii2support.migrations.commands;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.openapi.project.Project;
-import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,16 +20,6 @@ public class MigrationUp extends CommandUpDownRedoBase {
         params.add("--migrationPath=" + myPath);
         params.add("--interactive=0");
 
-        try {
-            GeneralCommandLine commandLine = YiiCommandLineUtil.create(myProject, "migrate/up", params);
-
-            executeCommandLine(commandLine);
-
-            setErrorStatusForMigrationInProgress();
-        } catch (ExecutionException e) {
-            processExecutionException(e);
-        }
-
-        syncDataSources();
+        executeCommandWithParams("migrate/up", params);
     }
 }

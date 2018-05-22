@@ -1,8 +1,10 @@
 package com.nvlad.yii2support.migrations.commands;
 
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.*;
+import com.intellij.execution.process.AnsiEscapeDecoder;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessListener;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.application.Application;
@@ -11,25 +13,22 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Alarm;
-import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
-import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.List;
 
 public abstract class CommandBase implements Runnable {
     final Project myProject;
-    ConsoleView myConsoleView;
-    Alarm myAlarm;
     JComponent myComponent;
-    Application myApplication;
+    private ConsoleView myConsoleView;
+    private Alarm myAlarm;
+    private Application myApplication;
 
     CommandBase(Project project) {
         myProject = project;
@@ -59,13 +58,6 @@ public abstract class CommandBase implements Runnable {
 
     abstract DefaultMutableTreeNode findTreeNode(Migration migration);
 
-    void executeCommandLine(GeneralCommandLine commandLine) throws ExecutionException {
-        Charset outputCharset = Charset.defaultCharset();
-        Process process = commandLine.createProcess();
-        ProcessHandler processHandler = new OSProcessHandler(process, "> " + commandLine.getCommandLineString(), outputCharset);
-        executeProcess(processHandler);
-    }
-
     void executeProcess(ProcessHandler processHandler) {
         processHandler.addProcessListener(new CommandProcessListener(this));
         processHandler.startNotify();
@@ -87,7 +79,6 @@ public abstract class CommandBase implements Runnable {
                 myComponent.setEnabled(true);
             });
         }
-
     }
 
     void fillParams(List<String> params) {
@@ -101,35 +92,20 @@ public abstract class CommandBase implements Runnable {
     }
 
     void processExecutionException(ExecutionException e) {
-        if (PhpCommandSettingsBuilder.INTERPRETER_NOT_FOUND_ERROR.equals(e.getMessage())) {
-            if (myConsoleView != null) {
-                myConsoleView.print(e.getMessage() + "\n", ConsoleViewContentType.ERROR_OUTPUT);
-            }
-
-            if (myApplication != null) {
-                myApplication.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        Messages.showErrorDialog(e.getMessage(), "Command Error");
-                    }
-                });
-            }
-
-//            e.printStackTrace();
+//        if (PhpCommandSettingsBuilder.INTERPRETER_NOT_FOUND_ERROR.equals(e.getMessage())) {
+        if (myConsoleView != null) {
+            myConsoleView.print(e.getMessage() + "\n", ConsoleViewContentType.ERROR_OUTPUT);
         }
+
+        if (myApplication != null) {
+            myApplication.invokeLater(() -> Messages.showErrorDialog(e.getMessage(), "Command Error"));
+        }
+//        }
     }
 
     private void updateComponent() {
         myComponent.repaint();
         myAlarm.addRequest(this::updateComponent, 125);
-    }
-
-    public void updateTree() {
-        if (myComponent instanceof JTree) {
-            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-            MigrationService service = MigrationService.getInstance(myProject);
-            MigrationUtil.updateTree((JTree) myComponent, service.getMigrations(), settings.newestFirst);
-        }
     }
 
     public void setApplication(Application application) {
@@ -145,22 +121,22 @@ public abstract class CommandBase implements Runnable {
         }
 
         @Override
-        public void startNotified(ProcessEvent processEvent) {
+        public void startNotified(@NotNull ProcessEvent processEvent) {
 
         }
 
         @Override
-        public void processTerminated(ProcessEvent processEvent) {
+        public void processTerminated(@NotNull ProcessEvent processEvent) {
 
         }
 
         @Override
-        public void processWillTerminate(ProcessEvent processEvent, boolean b) {
+        public void processWillTerminate(@NotNull ProcessEvent processEvent, boolean b) {
 
         }
 
         @Override
-        public void onTextAvailable(ProcessEvent processEvent, Key key) {
+        public void onTextAvailable(@NotNull ProcessEvent processEvent, @NotNull Key key) {
             final StringBuilder builder = new StringBuilder();
             final boolean toUtf8 = SystemInfo.isWindows && key.toString().equals("stdout");
             decoder.escapeText(processEvent.getText(), key, (text, processOutputType) -> {
