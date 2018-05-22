@@ -7,6 +7,7 @@ Waiting for Release
 - Fix UI path map edit popup
 - Enhance UI for Go to render call
 - Set "Alt + R" by default shortcut for Go to View render call
+- Send plugin exceptions from IDE Error Report Dialog
 
 0.9.50 May 17, 2018
 -------------------
