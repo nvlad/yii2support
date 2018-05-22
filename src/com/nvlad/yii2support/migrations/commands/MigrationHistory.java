@@ -11,7 +11,6 @@ import com.nvlad.yii2support.migrations.util.MigrationUtil;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,14 +84,7 @@ public class MigrationHistory extends CommandBase {
         }
     }
 
-    private void repaintMigrationNode(Migration migration) {
-        DefaultMutableTreeNode treeNode = findTreeNode(migration);
-        if (treeNode != null) {
-            ((DefaultTreeModel) ((JTree) myComponent).getModel()).nodeChanged(treeNode);
-        }
-    }
-
-    private DefaultMutableTreeNode findTreeNode(Migration migration) {
+    DefaultMutableTreeNode findTreeNode(Migration migration) {
         if (myComponent instanceof JTree) {
             if (treeNodeMap == null) {
                 JTree tree = (JTree) myComponent;

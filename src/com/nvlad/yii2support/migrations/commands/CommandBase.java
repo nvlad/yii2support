@@ -13,10 +13,13 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Alarm;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.nvlad.yii2support.migrations.MigrationService;
+import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -46,6 +49,15 @@ public abstract class CommandBase implements Runnable {
     }
 
     abstract void processOutput(String text);
+
+    void repaintMigrationNode(Migration migration) {
+        DefaultMutableTreeNode treeNode = findTreeNode(migration);
+        if (treeNode != null) {
+            myApplication.invokeLater(() -> ((DefaultTreeModel) ((JTree) myComponent).getModel()).nodeChanged(treeNode));
+        }
+    }
+
+    abstract DefaultMutableTreeNode findTreeNode(Migration migration);
 
     void executeCommandLine(GeneralCommandLine commandLine) throws ExecutionException {
         if (SystemInfo.isWindows) {

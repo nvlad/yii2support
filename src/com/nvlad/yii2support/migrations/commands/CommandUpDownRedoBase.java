@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.time.Duration;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -118,14 +117,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         return null;
     }
 
-    private void repaintMigrationNode(Migration migration) {
-        DefaultMutableTreeNode treeNode = findTreeNode(migration);
-        if (treeNode != null) {
-            ((DefaultTreeModel) ((JTree) myComponent).getModel()).nodeChanged(treeNode);
-        }
-    }
-
-    private DefaultMutableTreeNode findTreeNode(Migration migration) {
+    DefaultMutableTreeNode findTreeNode(Migration migration) {
         if (myComponent instanceof JTree) {
             if (treeNodeMap == null) {
                 JTree tree = (JTree) myComponent;
