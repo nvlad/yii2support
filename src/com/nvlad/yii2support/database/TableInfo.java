@@ -59,10 +59,7 @@ public class TableInfo {
     }
 
     public List<DasColumn> getNonPrimaryColumns() {
-        Set<String> pKNameSet = new HashSet<>();
-        for (String pkName : getPrimaryKeys()) {
-            pKNameSet.add(pkName);
-        }
+        Set<String> pKNameSet = new HashSet<>(getPrimaryKeys());
 
         List<DasColumn> ret = new ArrayList<>();
         for (DasColumn column : columns) {

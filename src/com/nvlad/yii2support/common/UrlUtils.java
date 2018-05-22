@@ -34,8 +34,7 @@ public class UrlUtils {
     }
 
     private static Collection<PhpClass> getControllers(Project project) {
-        Collection<PhpClass> classesByParent = getClassesByParent("\\yii\\web\\Controller", project);
-        return classesByParent;
+        return getClassesByParent("\\yii\\web\\Controller", project);
     }
 
     public static HashMap<String, Method> getRoutes(Project project) {
