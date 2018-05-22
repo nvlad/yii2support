@@ -25,13 +25,14 @@
     <change-notes><![CDATA[
       <b>Features</b><br/>
       - Migration tool<br/>
+      - Send plugin exceptions from IDE Error Report Dialog<br/>
+      - Added info notification on plugin update<br/>
       <br/>
       <b>Fixes</b><br/>
-      - Added info notification on plugin update<br/>
       - Fix UI path map edit popup<br/>
       - Enhance UI for Go to render call<br/>
       - Set "Alt + R" by default shortcut for Go to View render call<br/>
-      - Send plugin exceptions from IDE Error Report Dialog<br/>
+      - Applied migration count<br/>
     ]]>
     </change-notes>
 
