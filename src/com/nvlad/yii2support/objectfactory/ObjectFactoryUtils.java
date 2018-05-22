@@ -21,18 +21,10 @@ public class ObjectFactoryUtils {
 
         for (ArrayHashElement arrayHashElement : arrayCreationExpression.getHashElements()) {
             PhpPsiElement child = arrayHashElement.getKey();
-            if (child != null && ((child instanceof StringLiteralExpression))) {
-                String key;
-                if (child instanceof StringLiteralExpression) {
-                    key = ((StringLiteralExpression) child).getContents();
-                } else {
-                    key = child.getText();
-                }
-
-                Project project = child.getProject();
-
+            if (child instanceof StringLiteralExpression) {
+                String key = ((StringLiteralExpression) child).getContents();
                 if (key.equals("class")) {
-                    String className = "";
+                    Project project = child.getProject();
                     PhpPsiElement value = arrayHashElement.getValue();
                     PhpClass methodRef = ClassUtils.getPhpClassUniversal(project, value);
                     if (methodRef != null) return methodRef;
@@ -230,21 +222,22 @@ public class ObjectFactoryUtils {
                 return null;
 
             PhpClass phpClass = (PhpClass) possiblePhpClass;
-            if (phpClass != null) {
 
-                Method constructor = phpClass.getConstructor();
-
-                PhpClass yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\BaseObject");
-                if (yiiObjectClass == null)
-                    yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\Object");
-                if (!ClassUtils.isClassInheritsOrEqual(phpClass, yiiObjectClass))
-                    return null;
-
-                Parameter[] parameterList = constructor.getParameters();
-                if (parameterList.length > 0 && parameterList[0].getName().equals("config") && ClassUtils.indexForElementInParameterList(element) == 0)
-                    return phpClass;
-
+            Method constructor = phpClass.getConstructor();
+            if (constructor == null) {
+                return null;
             }
+
+            PhpClass yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\BaseObject");
+            if (yiiObjectClass == null)
+                yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\Object");
+            if (!ClassUtils.isClassInheritsOrEqual(phpClass, yiiObjectClass))
+                return null;
+
+            Parameter[] parameterList = constructor.getParameters();
+            if (parameterList.length > 0 && parameterList[0].getName().equals("config") && ClassUtils.indexForElementInParameterList(element) == 0)
+                return phpClass;
+
         }
         return null;
     }
