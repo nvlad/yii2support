@@ -291,16 +291,14 @@ public class ObjectFactoryUtils {
     @Nullable
     static ArrayCreationExpression getArrayCreationByFieldRef(FieldReference value) {
         ArrayCreationExpression arrayCreation = null;
-        PsiElement arrayDecl = null;
-        arrayDecl = value.resolve();
-        if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1 ) {
+        PsiElement arrayDecl = value.resolve();
+        if (arrayDecl != null && arrayDecl.getParent() != null && arrayDecl.getParent().getChildren().length > 1) {
             PsiElement psiElement = arrayDecl.getLastChild();
-            if (psiElement instanceof ArrayCreationExpression)
-                arrayCreation = (ArrayCreationExpression)psiElement;
-            else
-                return null;
-        } else
-            return null;
+            if (psiElement instanceof ArrayCreationExpression) {
+                arrayCreation = (ArrayCreationExpression) psiElement;
+            }
+        }
+
         return arrayCreation;
     }
 }
