@@ -1,7 +1,7 @@
 package com.nvlad.yii2support.views.references;
 
-import com.google.common.io.Files;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -10,11 +10,11 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.nvlad.yii2support.common.PhpUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
+import com.nvlad.yii2support.views.entities.ViewInfo;
 import com.nvlad.yii2support.views.entities.ViewResolve;
 import com.nvlad.yii2support.views.entities.ViewResolveFrom;
-import com.nvlad.yii2support.views.util.ViewUtil;
 import com.nvlad.yii2support.views.index.ViewFileIndex;
-import com.nvlad.yii2support.views.entities.ViewInfo;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -35,7 +35,7 @@ class PsiReferenceProvider extends com.intellij.psi.PsiReferenceProvider {
             Project project = psiElement.getProject();
 
             String key = resolve.key;
-            if (Files.getFileExtension(key).isEmpty()) {
+            if (FileUtilRt.getExtension(key).isEmpty()) {
                 key = key + '.' + Yii2SupportSettings.getInstance(psiElement.getProject()).defaultViewExtension;
             }
 

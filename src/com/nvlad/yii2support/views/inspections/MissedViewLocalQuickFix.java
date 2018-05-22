@@ -1,6 +1,5 @@
 package com.nvlad.yii2support.views.inspections;
 
-import com.google.common.io.Files;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -9,6 +8,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -92,7 +92,7 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
         }
 
         final PsiFile viewPsiFile = directory.createFile(fileName);
-        FileType fileType = FileTypeManager.getInstance().getFileTypeByExtension(Files.getFileExtension(myPath));
+        FileType fileType = FileTypeManager.getInstance().getFileTypeByExtension(FileUtilRt.getExtension(myPath));
         String templateName = getFileTemplateName(fileType);
         if (templateName == null) {
             System.out.println("Template for \"" + myPath + "\" not detected.");
