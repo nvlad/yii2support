@@ -34,8 +34,8 @@
       - Enhance UI for Go to render call<br/>
       - Set "Alt + R" by default shortcut for Go to View render call<br/>
       - Applied migration count<br/>
-    ]]>
-    </change-notes>
+      - Disable ActiveRecord table inspection for abstract classes<br/>
+    ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="162"/>

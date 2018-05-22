@@ -10,6 +10,7 @@ Waiting for Release
 - Send plugin exceptions from IDE Error Report Dialog
 - Applied migration count
 - Update DB schema after Apply/Undo/Redo migration(s)
+- Disable ActiveRecord table inspection for abstract classes
 
 0.9.50 May 17, 2018
 -------------------
