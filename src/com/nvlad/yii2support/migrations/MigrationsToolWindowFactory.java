@@ -20,10 +20,6 @@ import javax.swing.*;
 public class MigrationsToolWindowFactory implements ToolWindowFactory {
     public static final String TOOL_WINDOW_ID = "Migrations";
 
-    public MigrationsToolWindowFactory() {
-        System.out.println("Hohoho");
-    }
-
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         MigrationPanel migrationPanel = new MigrationPanel(project, toolWindow);
