@@ -47,7 +47,7 @@ public class ObjectFactoryUtils {
     static PhpClass getPhpClassByYiiCreateObject(ArrayCreationExpression arrayCreation) {
         PhpClass phpClass = null;
         PsiElement parent = arrayCreation.getParent().getParent();
-        if (parent != null && parent instanceof MethodReference) {
+        if (parent instanceof MethodReference) {
             MethodReference method = (MethodReference) parent;
             if (method.getName() != null && method.getName().equals("createObject")) {
                 PhpExpression methodClass = method.getClassReference();
@@ -81,18 +81,18 @@ public class ObjectFactoryUtils {
 
     static PhpClass getPhpClassInWidget(ArrayCreationExpression arrayCreation) {
         PsiElement parent = arrayCreation.getParent().getParent();
-        if (parent != null && parent instanceof MethodReference) {
+        if (parent instanceof MethodReference) {
             MethodReference methodRef = (MethodReference) parent;
             if (methodRef.getName() != null && (methodRef.getName().equals("widget") || methodRef.getName().equals("begin"))) {
                 Method method = (Method) methodRef.resolve();
 
                 PhpExpression ref = methodRef.getClassReference();
-                if (ref != null && ref instanceof ClassReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 0) {
+                if (ref instanceof ClassReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 0) {
                     PhpClass callingClass = (PhpClass) ((ClassReference) ref).resolve();
                     PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "\\yii\\base\\Widget");
                     if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass))
                         return callingClass;
-                } else if (method != null && ref != null && ref instanceof MethodReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 1) {
+                } else if (method != null && ref instanceof MethodReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 1) {
                     // This code process
                     // $form->field($model, 'username')->widget(\Class::className())
                     PhpClass callingClass = method.getContainingClass();
@@ -116,7 +116,7 @@ public class ObjectFactoryUtils {
 
     static PhpClass getPhpClassInGridColumns(ArrayCreationExpression arrayCreation) {
         PsiElement parent = arrayCreation.getParent().getParent();
-        if (parent != null && parent instanceof ArrayCreationExpression) {
+        if (parent instanceof ArrayCreationExpression) {
             PsiElement possibleHashElement = arrayCreation.getParent().getParent().getParent().getParent();
 
             if (!(possibleHashElement instanceof ArrayHashElement)) {
@@ -124,7 +124,7 @@ public class ObjectFactoryUtils {
             }
 
             PsiElement key = ((ArrayHashElement) possibleHashElement).getKey();
-            if (key != null &
+            if (key != null &&
                     key.getText() != null &&
                     key.getText().replace("\"", "").replace("\'", "").equals("columns")) {
                 PsiElement methodRef = possibleHashElement.getParent().getParent().getParent();
@@ -220,7 +220,7 @@ public class ObjectFactoryUtils {
     static PhpClass getClassByInstatiation(PhpExpression element) {
 
         PsiElement newElement = element.getParent().getParent();
-        if (newElement != null && newElement instanceof NewExpression) {
+        if (newElement instanceof NewExpression) {
             ClassReference ref = ((NewExpression) newElement).getClassReference();
             if (ref == null)
                 return null;
