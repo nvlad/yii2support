@@ -13,7 +13,7 @@ public class ErrorReportHandler extends ErrorReportSubmitter {
 
     @Override
     public String getReportActionText() {
-        return "Send to Yii2 Support developers";
+        return "Report to Yii2 Support";
     }
 
     @Override
