@@ -40,13 +40,14 @@ public class MigrationHistory extends CommandBase {
             fillParams(params);
 
             ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, "migrate/history", params);
-            if (processHandler == null) {
-                return;
+            Integer exitCode = 1;
+            if (processHandler != null) {
+                exitCode = executeProcess(processHandler);
             }
-            executeProcess(processHandler);
 
+            MigrationStatus status = exitCode == 0 ? MigrationStatus.NotApply : MigrationStatus.Unknown;
             for (Migration migration : migrations) {
-                migration.status = MigrationStatus.NotApply;
+                migration.status = status;
                 migration.upDuration = null;
                 migration.downDuration = null;
                 migration.applyAt = null;

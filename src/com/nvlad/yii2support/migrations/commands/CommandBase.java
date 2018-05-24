@@ -1,6 +1,5 @@
 package com.nvlad.yii2support.migrations.commands;
 
-import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.AnsiEscapeDecoder;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
@@ -58,7 +57,7 @@ public abstract class CommandBase implements Runnable {
 
     abstract DefaultMutableTreeNode findTreeNode(Migration migration);
 
-    void executeProcess(ProcessHandler processHandler) {
+    Integer executeProcess(@NotNull ProcessHandler processHandler) {
         processHandler.addProcessListener(new CommandProcessListener(this));
         processHandler.startNotify();
 
@@ -79,6 +78,7 @@ public abstract class CommandBase implements Runnable {
                 myComponent.setEnabled(true);
             });
         }
+        return processHandler.getExitCode();
     }
 
     void fillParams(List<String> params) {
@@ -91,7 +91,7 @@ public abstract class CommandBase implements Runnable {
         }
     }
 
-    void processExecutionException(ExecutionException e) {
+    void processExecutionException(Throwable e) {
 //        if (PhpCommandSettingsBuilder.INTERPRETER_NOT_FOUND_ERROR.equals(e.getMessage())) {
         if (myConsoleView != null) {
             myConsoleView.print(e.getMessage() + "\n", ConsoleViewContentType.ERROR_OUTPUT);
