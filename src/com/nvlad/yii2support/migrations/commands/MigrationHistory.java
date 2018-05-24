@@ -40,6 +40,9 @@ public class MigrationHistory extends CommandBase {
             fillParams(params);
 
             ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, "migrate/history", params);
+            if (processHandler == null) {
+                return;
+            }
             executeProcess(processHandler);
 
             for (Migration migration : migrations) {
