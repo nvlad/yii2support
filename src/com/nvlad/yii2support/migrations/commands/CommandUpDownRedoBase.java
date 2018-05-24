@@ -87,6 +87,10 @@ abstract class CommandUpDownRedoBase extends CommandBase {
     void executeCommandWithParams(String command, List<String> parameters) {
         try {
             ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, command, parameters);
+            if (processHandler == null) {
+                return;
+            }
+
             executeProcess(processHandler);
 
             setErrorStatusForMigrationInProgress();
