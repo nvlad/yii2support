@@ -28,6 +28,7 @@
       - Send plugin exceptions from IDE Error Report Dialog<br/>
       - Added info notification on plugin update<br/>
       - Update DB schema after Apply/Undo/Redo migration(s)<br/>
+      - Support Remote CLI for Migration tool<br/>
       <br/>
       <b>Fixes</b><br/>
       - Fix UI path map edit popup<br/>

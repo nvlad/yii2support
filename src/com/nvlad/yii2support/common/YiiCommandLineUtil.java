@@ -26,6 +26,7 @@ public class YiiCommandLineUtil {
 
     private static final String[] knownErrors = new String[]{
             "userName must not be null",
+            "Auth cancel",
     };
 
     public static GeneralCommandLine create(Project project, String command) throws ExecutionException {

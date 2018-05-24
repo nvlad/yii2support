@@ -11,6 +11,7 @@ Waiting for Release
 - Applied migration count
 - Update DB schema after Apply/Undo/Redo migration(s)
 - Disable ActiveRecord table inspection for abstract classes
+- Support Remote CLI for Migration tool
 
 0.9.50 May 17, 2018
 -------------------
