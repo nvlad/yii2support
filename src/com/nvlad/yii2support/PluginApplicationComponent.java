@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.rollbar.notifier.config.ConfigBuilder.withAccessToken;
 
 public class PluginApplicationComponent implements ApplicationComponent {
-    private static final PluginId PLUGIN_ID = PluginId.getId("com.nvlad.yii2support");
+    private static final PluginId PLUGIN_ID = PluginId.getId("com.yii2support");
     private static Rollbar rollbar;
 
     @Override
