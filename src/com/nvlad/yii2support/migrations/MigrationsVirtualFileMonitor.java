@@ -2,8 +2,8 @@ package com.nvlad.yii2support.migrations;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
+import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.PhpIndex;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-public class MigrationsVirtualFileMonitor extends VirtualFileAdapter {
+class MigrationsVirtualFileMonitor implements VirtualFileListener {
     private final Project myProject;
     private final JTree myTree;
     private final Yii2SupportSettings mySettings;

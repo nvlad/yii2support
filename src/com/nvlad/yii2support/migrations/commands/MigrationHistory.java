@@ -16,10 +16,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MigrationHistory extends CommandBase {
-    private static Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) (m\\d{6}_\\d{6}_[\\w+_-]+)");
+    private static final Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) (m\\d{6}_\\d{6}_[\\w+_-]+)");
 
     private final Map<String, Collection<Migration>> migrationMap;
-    private Set<Migration> migrations;
+    private final Set<Migration> migrations;
     private Map<String, DefaultMutableTreeNode> treeNodeMap;
 
     public MigrationHistory(Project project) {

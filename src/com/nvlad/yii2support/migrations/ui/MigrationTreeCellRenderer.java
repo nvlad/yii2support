@@ -16,7 +16,7 @@ import java.text.DateFormat;
 import java.time.Duration;
 import java.util.Enumeration;
 
-public class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
+class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
     private static final Icon[] progressIcons = {
             AllIcons.RunConfigurations.TestInProgress1,
             AllIcons.RunConfigurations.TestInProgress2,

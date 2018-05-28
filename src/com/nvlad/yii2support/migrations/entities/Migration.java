@@ -9,8 +9,8 @@ import java.util.Date;
 
 public class Migration implements Comparable<Migration> {
     public PhpClass migrationClass;
-    public String name;
-    public String path;
+    public final String name;
+    public final String path;
     public MigrationStatus status;
     public Date createdAt;
     public Date applyAt;

@@ -3,7 +3,7 @@ package com.nvlad.yii2support.migrations.entities;
 import java.util.Comparator;
 
 public class MigrationComparator implements Comparator<Migration> {
-    private boolean myNewestFirst;
+    private final boolean myNewestFirst;
 
     public MigrationComparator(boolean newestFirst) {
         myNewestFirst = newestFirst;
