@@ -152,7 +152,9 @@
       <!--  <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/> -->
 
         <!-- Migrations -->
-        <toolWindow id="Migrations" anchor="bottom" factoryClass="com.nvlad.yii2support.migrations.MigrationsToolWindowFactory"/>
+        <toolWindow id="Migrations" anchor="bottom"
+                    factoryClass="com.nvlad.yii2support.migrations.MigrationsToolWindowFactory"
+                    icon="/icons/migration_tool_window.png"/>
 
         <errorHandler implementation="com.nvlad.yii2support.ErrorReportHandler"/>
     </extensions>
