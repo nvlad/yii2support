@@ -78,6 +78,7 @@ public abstract class CommandBase implements Runnable {
                 myComponent.setEnabled(true);
             });
         }
+
         return processHandler.getExitCode();
     }
 
@@ -89,18 +90,6 @@ public abstract class CommandBase implements Runnable {
         if (settings.migrationTable != null) {
             params.add("--migrationTable=" + settings.migrationTable);
         }
-    }
-
-    void processExecutionException(Throwable e) {
-//        if (PhpCommandSettingsBuilder.INTERPRETER_NOT_FOUND_ERROR.equals(e.getMessage())) {
-        if (myConsoleView != null) {
-            myConsoleView.print(e.getMessage() + "\n", ConsoleViewContentType.ERROR_OUTPUT);
-        }
-
-        if (myApplication != null) {
-            myApplication.invokeLater(() -> Messages.showErrorDialog(e.getMessage(), "Command Error"));
-        }
-//        }
     }
 
     private void updateComponent() {

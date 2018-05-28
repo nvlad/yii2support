@@ -27,6 +27,8 @@ public class YiiCommandLineUtil {
     private static final String[] knownErrors = new String[]{
             "userName must not be null",
             "Auth cancel",
+            "PHP home is not specified or invalid.",
+            PhpCommandSettingsBuilder.INTERPRETER_NOT_FOUND_ERROR,
     };
 
     public static GeneralCommandLine create(Project project, String command) throws ExecutionException {
@@ -77,22 +79,29 @@ public class YiiCommandLineUtil {
                     return (ProcessHandler) getRemoteProcessHandler
                             .invoke(interpreterManager, project, additionalData, commandLine, pathMappings);
                 }
-            } catch (NoSuchMethodException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                String message = e.getTargetException().getMessage();
-
-                if (!ArrayUtil.contains(message,knownErrors)) {
-                    throw new RuntimeException(e);
-                }
-
-                SwingUtilities.invokeLater(() -> Messages.showErrorDialog(message, "Execution Error"));
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                processError(e);
             }
 
             return null;
         }
 
         return new OSProcessHandler(commandLine);
+    }
+
+    public static void processError(Throwable e) {
+        final String message;
+        if (e instanceof InvocationTargetException) {
+            message = ((InvocationTargetException) e).getTargetException().getMessage();
+        } else {
+            message = e.getMessage();
+        }
+
+        if (e instanceof InvocationTargetException || ArrayUtil.contains(message, knownErrors)) {
+            SwingUtilities.invokeLater(() -> Messages.showErrorDialog(message, "Execution Error"));
+        }
+
+        throw new RuntimeException(e);
     }
 
     private static Method getMethod(PhpRemoteInterpreterManager manager) throws NoSuchMethodException {

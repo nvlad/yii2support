@@ -55,7 +55,7 @@ public class MigrationHistory extends CommandBase {
 
             migrations.clear();
         } catch (ExecutionException e) {
-            processExecutionException(e);
+            YiiCommandLineUtil.processError(e);
         }
     }
 

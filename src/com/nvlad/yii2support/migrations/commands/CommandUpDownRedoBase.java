@@ -95,7 +95,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
 
             setErrorStatusForMigrationInProgress();
         } catch (ExecutionException e) {
-            processExecutionException(e);
+            YiiCommandLineUtil.processError(e);
         }
 
         syncDataSources();
