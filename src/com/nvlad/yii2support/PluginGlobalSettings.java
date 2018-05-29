@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class PluginGlobalSettings implements PersistentStateComponent<PluginGlobalSettings> {
     public String version;
     public String uuid;
+    public String username;
 
     @Nullable
     @Override

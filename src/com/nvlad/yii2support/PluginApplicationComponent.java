@@ -39,6 +39,10 @@ public class PluginApplicationComponent implements ApplicationComponent {
             settings.uuid = UUID.randomUUID().toString();
         }
 
+        if (StringUtil.isEmpty(settings.username)) {
+            settings.username = settings.uuid;
+        }
+
         if (!plugin.getVersion().equals(settings.version)) {
             settings.version = plugin.getVersion();
 
@@ -108,7 +112,7 @@ public class PluginApplicationComponent implements ApplicationComponent {
         environment = environment + " build #" + applicationInfo.getApiVersion();
 
         config
-                .person(() -> new Person.Builder().id(settings.uuid).username(settings.uuid).build())
+                .person(() -> new Person.Builder().id(settings.uuid).username(settings.username).build())
                 .environment(environment)
                 .framework(SystemInfo.JAVA_RUNTIME_VERSION)
                 .platform(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION + " (" + SystemInfo.OS_ARCH + ")");
