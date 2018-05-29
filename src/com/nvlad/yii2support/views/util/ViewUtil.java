@@ -70,9 +70,11 @@ public class ViewUtil {
                         break;
                     }
                 }
+
                 if (viewPath == null) {
                     return null;
                 }
+
                 path = viewPath;
             }
             result.key = path;
@@ -128,9 +130,9 @@ public class ViewUtil {
 
     @NotNull
     public static Collection<String> getPhpViewVariables(PsiFile psiFile) {
-        final ArrayList<String> result = new ArrayList<>();
-        final HashSet<String> allVariables = new HashSet<>();
-        final HashSet<String> declaredVariables = new HashSet<>();
+        final Set<String> result = new HashSet<>();
+        final Set<String> allVariables = new HashSet<>();
+        final Set<String> declaredVariables = new HashSet<>();
         final Collection<Variable> viewVariables = PsiTreeUtil.findChildrenOfType(psiFile, Variable.class);
 
         for (FunctionReference reference : PsiTreeUtil.findChildrenOfType(psiFile, FunctionReference.class)) {
@@ -146,7 +148,7 @@ public class ViewUtil {
         }
 
         final SearchScope fileScope = psiFile.getUseScope();
-        final HashSet<String> usedBeforeDeclaration = new HashSet<>();
+        final Set<String> usedBeforeDeclaration = new HashSet<>();
         for (Variable variable : viewVariables) {
             String variableName = variable.getName();
             if (variable.isDeclaration()

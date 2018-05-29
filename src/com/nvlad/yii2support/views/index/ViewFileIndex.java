@@ -97,10 +97,12 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                 map.put("@app/views/modules" + resolve.key.substring(12), viewInfo);
                 System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/modules" + resolve.key.substring(12));
             }
+
             if (resolve.key.startsWith("@app/widgets/") && !resolve.relativePath.startsWith("/widgets/")) {
                 map.put("@app/views/widgets" + resolve.key.substring(12), viewInfo);
                 System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/widgets" + resolve.key.substring(12));
             }
+
             return map;
         }
     }
@@ -126,8 +128,9 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             viewInfo.fileUrl = readString(dataInput);
             viewInfo.application = readString(dataInput);
             viewInfo.theme = readString(dataInput);
+
             final int parameterCount = dataInput.readInt();
-            viewInfo.parameters = new ArrayList<>(parameterCount);
+            viewInfo.parameters = new HashSet<>(parameterCount);
             for (int i = 0; i < parameterCount; i++) {
                 viewInfo.parameters.add(readString(dataInput));
             }
@@ -164,8 +167,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
         ViewFileInputFilter() {
             try {
-                Class.forName("com.jetbrains.twig.TwigFileType");
-                twigSupported = true;
+                twigSupported = Class.forName("com.jetbrains.twig.TwigFileType") != null;
             } catch (ClassNotFoundException e) {
                 twigSupported = false;
             }
