@@ -16,12 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by NVlad on 02.02.2017.
  */
 public class RenameViewProcessor extends RenamePsiElementProcessor {
-    private final HashSet<PsiElement> renders = new HashSet<>();
+    private final Set<PsiElement> renders = new HashSet<>();
 
     @Override
     public boolean canProcessElement(@NotNull PsiElement psiElement) {
@@ -31,6 +32,7 @@ public class RenameViewProcessor extends RenamePsiElementProcessor {
     @Override
     public void prepareRenaming(PsiElement psiElement, String s, Map<PsiElement, String> map) {
         renders.clear();
+
         for (PsiReference reference : findReferences(psiElement)) {
             final PsiElement element = reference.getElement();
             if (element instanceof StringLiteralExpression) {
@@ -43,13 +45,11 @@ public class RenameViewProcessor extends RenamePsiElementProcessor {
     @Override
     public Runnable getPostRenameCallback(PsiElement psiElement, String s, RefactoringElementListener refactoringElementListener) {
         return () -> {
-            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
             Yii2SupportSettings settings = Yii2SupportSettings.getInstance(psiElement.getProject());
 
             for (PsiElement render : renders) {
                 final StringLiteralExpression element = (StringLiteralExpression) ((ParameterList) render).getParameters()[0];
                 String fileName = element.getContents();
-
                 if (fileName.endsWith("." + settings.defaultViewExtension)) {
                     fileName = fileName.substring(0, fileName.length() - settings.defaultViewExtension.length() - 1);
                 }
@@ -60,6 +60,8 @@ public class RenameViewProcessor extends RenamePsiElementProcessor {
                     element.replace(newValue);
                 }
             }
+
+            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
         };
     }
 }
