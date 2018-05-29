@@ -49,6 +49,10 @@ public class MigrationService {
 
         Map<String, Collection<Migration>> migrationMap = new HashMap<>();
         for (PhpClass migration : migrations) {
+            if (migration.isAbstract()) {
+                continue;
+            }
+
             VirtualFile virtualFile = FileUtil.getVirtualFile(migration.getContainingFile());
             if (virtualFile.getUrl().length() < baseUrlLength) {
                 continue;
