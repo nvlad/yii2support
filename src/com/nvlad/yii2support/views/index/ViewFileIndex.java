@@ -17,10 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     public static final ID<String, ViewInfo> identity = ID.create("Yii2Support.ViewFileIndex");
@@ -60,7 +57,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 29;
+        return 30;
     }
 
     @NotNull
@@ -140,9 +137,11 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
         }
 
         private void writeString(@NotNull DataOutput dataOutput, @NotNull String data) throws IOException {
-            dataOutput.writeInt(data.length());
-            if (data.length() > 0) {
-                dataOutput.writeChars(data);
+            byte[] bytes = data.getBytes();
+            dataOutput.writeInt(bytes.length);
+
+            if (bytes.length > 0) {
+                dataOutput.write(bytes);
             }
         }
 
@@ -152,11 +151,11 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             if (length == 0) {
                 return "";
             }
-            char[] chars = new char[length];
-            for (int i = 0; i < length; i++) {
-                chars[i] = dataInput.readChar();
-            }
-            return new String(chars);
+
+            byte[] bytes = new byte[length];
+            dataInput.readFully(bytes, 0, length);
+
+            return new String(bytes);
         }
     }
 
