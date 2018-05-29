@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 @State(name = "Yii2 Support", storages = @Storage(file = "$APP_CONFIG$/yii2support.xml"))
 public class PluginGlobalSettings implements PersistentStateComponent<PluginGlobalSettings> {
     public String version;
+    public String uuid;
 
     @Nullable
     @Override

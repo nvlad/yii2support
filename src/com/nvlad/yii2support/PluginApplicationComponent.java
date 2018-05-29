@@ -9,13 +9,17 @@ import com.intellij.openapi.application.impl.ApplicationInfoImpl;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.rollbar.api.payload.Payload;
+import com.rollbar.api.payload.data.Person;
 import com.rollbar.notifier.Rollbar;
 import com.rollbar.notifier.config.Config;
 import com.rollbar.notifier.config.ConfigBuilder;
 import com.rollbar.notifier.sender.listener.SenderListener;
 import com.rollbar.notifier.sender.result.Response;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 import static com.rollbar.notifier.config.ConfigBuilder.withAccessToken;
 
@@ -31,6 +35,10 @@ public class PluginApplicationComponent implements ApplicationComponent {
         }
 
         final PluginGlobalSettings settings = PluginGlobalSettings.getInstance();
+        if (StringUtil.isEmpty(settings.uuid)) {
+            settings.uuid = UUID.randomUUID().toString();
+        }
+
         if (!plugin.getVersion().equals(settings.version)) {
             settings.version = plugin.getVersion();
 
@@ -55,7 +63,6 @@ public class PluginApplicationComponent implements ApplicationComponent {
 
 
     public Rollbar getRollbar() {
-
         if (rollbar == null) {
             Config config = rollbarConfig();
             config.sender().addListener(new SenderListener() {
@@ -95,20 +102,23 @@ public class PluginApplicationComponent implements ApplicationComponent {
 
     private Config rollbarConfig() {
         final ConfigBuilder config = withAccessToken("7b5e3f2f1e3d4084869f7fff29f87688");
+        final PluginGlobalSettings settings = PluginGlobalSettings.getInstance();
+        final ApplicationInfoImpl applicationInfo = (ApplicationInfoImpl) ApplicationInfo.getInstance();
+        String environment = applicationInfo.getFullApplicationName();
+        environment = environment + " build #" + applicationInfo.getApiVersion();
+
+        config
+                .person(() -> new Person.Builder().id(settings.uuid).username(settings.uuid).build())
+                .environment(environment)
+                .framework(SystemInfo.JAVA_RUNTIME_VERSION)
+                .platform(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION + " (" + SystemInfo.OS_ARCH + ")");
+
         final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PLUGIN_ID);
         if (plugin == null) {
             return config.build();
         }
 
-        ApplicationInfoImpl applicationInfo = (ApplicationInfoImpl) ApplicationInfo.getInstance();
-        String environment = applicationInfo.getFullApplicationName();
-        environment = environment + " build #" + applicationInfo.getApiVersion();
-
-        config
-                .codeVersion(plugin.getVersion())
-                .environment(environment)
-                .framework(SystemInfo.JAVA_RUNTIME_VERSION)
-                .platform(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION + " (" + SystemInfo.OS_ARCH + ")" );
+        config.codeVersion(plugin.getVersion());
 
         return config.build();
     }
