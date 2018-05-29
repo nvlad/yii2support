@@ -63,7 +63,10 @@ public class ViewUtil {
                     Matcher matcher = entry.getKey().matcher(path);
                     if (matcher.find()) {
                         viewPath = entry.getValue() + path.substring(matcher.end(1));
-                        result.theme = matcher.group(2);
+                        if (matcher.groupCount() == 2) {
+                            result.theme = matcher.group(2);
+                        }
+
                         break;
                     }
                 }
