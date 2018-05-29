@@ -12,8 +12,6 @@ import javax.swing.tree.TreeNode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class MigrationUtil {
@@ -160,23 +158,6 @@ public class MigrationUtil {
         treeModel.nodesWereInserted(root, new int[]{index});
 
         return result;
-    }
-
-    private static final Pattern dateFromName = Pattern.compile("m(\\d{6}_\\d{6})_.+");
-    private static final SimpleDateFormat migrationCreateDateFormat = new SimpleDateFormat("yyMMdd_HHmmss");
-
-    @Nullable
-    public static Date createDateFromName(String name) {
-        Matcher matcher = dateFromName.matcher(name);
-        if (!matcher.find()) {
-            return null;
-        }
-
-        try {
-            return migrationCreateDateFormat.parse(matcher.group(1));
-        } catch (ParseException e) {
-            return null;
-        }
     }
 
     private static final SimpleDateFormat migrationApplyDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
