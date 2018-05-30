@@ -1,9 +1,7 @@
 package com.nvlad.yii2support.migrations;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileEvent;
-import com.intellij.openapi.vfs.VirtualFileListener;
+import com.intellij.openapi.vfs.*;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.PhpIndex;
@@ -30,6 +28,16 @@ class MigrationsVirtualFileMonitor implements VirtualFileListener {
     }
 
     @Override
+    public void propertyChanged(@NotNull VirtualFilePropertyEvent virtualFilePropertyEvent) {
+
+    }
+
+    @Override
+    public void contentsChanged(@NotNull VirtualFileEvent virtualFileEvent) {
+
+    }
+
+    @Override
     public void fileCreated(@NotNull VirtualFileEvent event) {
         if (isMigrationFile(event.getFile())) {
             MigrationService manager = MigrationService.getInstance(myProject);
@@ -43,6 +51,36 @@ class MigrationsVirtualFileMonitor implements VirtualFileListener {
         MigrationService service = MigrationService.getInstance(myProject);
         service.refresh();
         MigrationUtil.updateTree(myTree, service.getMigrations(), mySettings.newestFirst);
+    }
+
+    @Override
+    public void fileMoved(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
+
+    }
+
+    @Override
+    public void fileCopied(@NotNull VirtualFileCopyEvent virtualFileCopyEvent) {
+
+    }
+
+    @Override
+    public void beforePropertyChange(@NotNull VirtualFilePropertyEvent virtualFilePropertyEvent) {
+
+    }
+
+    @Override
+    public void beforeContentsChange(@NotNull VirtualFileEvent virtualFileEvent) {
+
+    }
+
+    @Override
+    public void beforeFileDeletion(@NotNull VirtualFileEvent virtualFileEvent) {
+
+    }
+
+    @Override
+    public void beforeFileMovement(@NotNull VirtualFileMoveEvent virtualFileMoveEvent) {
+
     }
 
     private boolean isMigrationFile(VirtualFile virtualFile) {
