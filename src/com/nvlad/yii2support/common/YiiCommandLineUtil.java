@@ -28,7 +28,6 @@ public class YiiCommandLineUtil {
             "userName must not be null",
             "Auth cancel",
             "PHP home is not specified or invalid.",
-            "Interpreter is not specified or invalid.",
             PhpCommandSettingsBuilder.INTERPRETER_NOT_FOUND_ERROR,
     };
 
@@ -100,6 +99,8 @@ public class YiiCommandLineUtil {
 
         if (e instanceof InvocationTargetException || ArrayUtil.contains(message, knownErrors)) {
             SwingUtilities.invokeLater(() -> Messages.showErrorDialog(message, "Execution Error"));
+
+            return;
         }
 
         throw new RuntimeException(e);
