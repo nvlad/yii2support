@@ -47,7 +47,7 @@ public class Migration implements Comparable<Migration> {
     private static Date dateFromName(String name) {
         Matcher matcher = dateFromName.matcher(name);
         if (!matcher.find()) {
-            throw new InvalidParameterException("Migration name <" + name + "> not contain creation date.");
+            throw new InvalidParameterException("Migration name <" + name + "> not contain or invalid creation date.");
         }
 
         try {
