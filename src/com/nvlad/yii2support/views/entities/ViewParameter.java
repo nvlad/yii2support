@@ -1,10 +1,8 @@
 package com.nvlad.yii2support.views.entities;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.Variable;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.DataInput;
 
 public class ViewParameter {
     public ViewParameter(Variable variable) {
@@ -25,4 +23,21 @@ public class ViewParameter {
     public String name;
     public String type;
     public Boolean required;
+
+    @Override
+    public int hashCode() {
+        return name.hashCode() + type.hashCode() + required.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ViewParameter) {
+            ViewParameter parameter = (ViewParameter) obj;
+            return parameter.required == this.required
+                    && StringUtil.equals(parameter.name, this.name)
+                    && StringUtil.equals(parameter.type, this.type);
+        }
+
+        return false;
+    }
 }
