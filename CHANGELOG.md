@@ -1,7 +1,11 @@
 Yii2 Support Change Log
 =======================
 
-0.9.54.5 May 29, 2018
+Waiting for Release
+-------------------
+
+
+0.9.54.9 May 31, 2018
 ---------------------
 - Fix "Index deserialization violates equals / hashCode contract for Value parameter" exception
 - Fix support PhpStorm 2016.2
