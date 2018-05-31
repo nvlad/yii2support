@@ -24,7 +24,7 @@ class Util {
             Collections.addAll(categories, directory.getFiles());
         }
 
-        return categories.toArray(new PsiElement[categories.size()]);
+        return categories.toArray(new PsiElement[0]);
     }
 
     @NotNull
@@ -39,7 +39,7 @@ class Util {
             }
         }
 
-        return messages.toArray(new ArrayHashElement[messages.size()]);
+        return messages.toArray(new ArrayHashElement[0]);
     }
 //
 //    public String[] getMessagePointers(String category, String message) {

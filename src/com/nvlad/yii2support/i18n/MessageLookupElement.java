@@ -79,20 +79,20 @@ class MessageLookupElement extends LookupElement {
                 ParameterList parameterList = (ParameterList) myElement.getParent();
                 if (parameterList.getParameters().length == 2) {
 
-                    String params = "";
+                    StringBuilder params = new StringBuilder();
                     if (matches.size() == 1 && matches.get(0).equals("0")) {
-                        params = ", []";
+                        params = new StringBuilder(", []");
                     } else {
                         for (String match : matches) {
                             if (params.length() > 0) {
-                                params = params + ", ";
+                                params.append(", ");
                             }
-                            params = params.concat("'" + match + "' => ");
+                            params = new StringBuilder(params.toString().concat("'" + match + "' => "));
                         }
-                        params = ", [" + params + "]";
+                        params = new StringBuilder(", [" + params + "]");
                     }
 
-                    context.getDocument().insertString(context.getSelectionEndOffset() + 1, params);
+                    context.getDocument().insertString(context.getSelectionEndOffset() + 1, params.toString());
                 }
             } else {
                 cleanParams(context);

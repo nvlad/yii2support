@@ -28,8 +28,7 @@ public class ObjectFactoryReference extends PsiReferenceBase<PsiElement> {
             PhpClass phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
 
             if (phpClass != null) {
-                PsiElement field = ClassUtils.findWritableField(phpClass, myElement.getText());
-                return field;
+                return ClassUtils.findWritableField(phpClass, myElement.getText());
             }
 
         }

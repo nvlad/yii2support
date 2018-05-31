@@ -1,9 +1,9 @@
 package com.nvlad.yii2support.views.inspections;
 
-import com.google.common.io.Files;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -65,7 +65,7 @@ public class RequireParameterInspection extends PhpInspection {
                 }
 
                 String key = resolve.key;
-                if (Files.getFileExtension(key).isEmpty()) {
+                if (FileUtilRt.getExtension(key).isEmpty()) {
                     key = key + '.' + Yii2SupportSettings.getInstance(reference.getProject()).defaultViewExtension;
                 }
 

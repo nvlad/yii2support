@@ -1,8 +1,8 @@
 package com.nvlad.yii2support.views.inspections;
 
-import com.google.common.io.Files;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -55,7 +55,7 @@ final public class MissedViewInspection extends PhpInspection {
                         }
 
                         String key = resolve.key;
-                        if (Files.getFileExtension(key).isEmpty()) {
+                        if (FileUtilRt.getExtension(key).isEmpty()) {
                             key = key + '.' + Yii2SupportSettings.getInstance(reference.getProject()).defaultViewExtension;
                         }
 
@@ -94,7 +94,14 @@ final public class MissedViewInspection extends PhpInspection {
                                 return;
                             }
 
-                            String path = yiiRoot.getUrl().substring(project.getBaseDir().getUrl().length()) + paths.iterator().next();
+                            int projectUrlLength = project.getBaseDir().getUrl().length();
+                            String yiiRootUrl = yiiRoot.getUrl();
+                            String path;
+                            if (projectUrlLength > yiiRootUrl.length()) {
+                                path = paths.iterator().next();
+                            } else {
+                                path = yiiRootUrl.substring(projectUrlLength) + paths.iterator().next();
+                            }
                             final String viewNotFoundMessage = "View file for \"" + value + "\" not found in \"" + path + "\".";
                             final MissedViewLocalQuickFix quickFix = new MissedViewLocalQuickFix(value, path, RenderUtil.getViewArguments(reference));
                             final PsiElement stringPart = pathParameter.findElementAt(1);

@@ -16,7 +16,10 @@ public class SettingsForm implements Configurable {
     private JPanel mainPanel;
     private JTextField tablePrefixTextbox;
     private JCheckBox insertTableNamesWithCheckBox;
-    private JPanel panel;
+    private JPanel tablePanel;
+    private JTextField migrationTable;
+    private JPanel migrationPanel;
+    private JTextField dbConnection;
     private Yii2SupportSettings settings;
 
     public SettingsForm(Project project) {
@@ -30,7 +33,8 @@ public class SettingsForm implements Configurable {
             }
         });
 
-        UIUtil.addBorder(panel, IdeBorderFactory.createTitledBorder("Table Prefix Support", false));
+        UIUtil.addBorder(tablePanel, IdeBorderFactory.createTitledBorder("Table Prefix Support", false));
+        UIUtil.addBorder(migrationPanel, IdeBorderFactory.createTitledBorder("Migrations", false));
     }
 
     private void adjustInputs() {
@@ -59,13 +63,22 @@ public class SettingsForm implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !tablePrefixTextbox.getText().equals(settings.tablePrefix) || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected();
+        boolean migrationTableChanged = !settings.migrationTable.equals(migrationTable.getText());
+        boolean dbConnectionChanged = !settings.dbConnection.equals(dbConnection.getText());
+
+        return !tablePrefixTextbox.getText().equals(settings.tablePrefix)
+                || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected()
+                || migrationTableChanged
+                || dbConnectionChanged;
     }
 
     @Override
     public void apply() {
         settings.tablePrefix = tablePrefixTextbox.getText();
         settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
+
+        settings.migrationTable = migrationTable.getText();
+        settings.dbConnection = dbConnection.getText();
     }
 
     private void createUIComponents() {
@@ -76,6 +89,8 @@ public class SettingsForm implements Configurable {
     public void reset() {
         tablePrefixTextbox.setText(settings.tablePrefix);
         insertTableNamesWithCheckBox.setSelected(settings.insertWithTablePrefix);
+        migrationTable.setText(settings.migrationTable);
+        dbConnection.setText(settings.dbConnection);
         adjustInputs();
     }
 

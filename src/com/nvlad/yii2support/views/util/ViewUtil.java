@@ -1,7 +1,7 @@
 package com.nvlad.yii2support.views.util;
 
-import com.google.common.io.Files;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -64,13 +64,18 @@ public class ViewUtil {
                     Matcher matcher = entry.getKey().matcher(path);
                     if (matcher.find()) {
                         viewPath = entry.getValue() + path.substring(matcher.end(1));
-                        result.theme = matcher.group(2);
+                        if (matcher.groupCount() == 2) {
+                            result.theme = matcher.group(2);
+                        }
+
                         break;
                     }
                 }
+
                 if (viewPath == null) {
                     return null;
                 }
+
                 path = viewPath;
             }
             result.key = path;
@@ -203,7 +208,7 @@ public class ViewUtil {
         Set<String> result = new HashSet<>();
 
         String path = resolve.key;
-        if (Files.getFileExtension(path).isEmpty()) {
+        if (FileUtilRt.getExtension(path).isEmpty()) {
             path = path + '.' + Yii2SupportSettings.getInstance(project).defaultViewExtension;
         }
         if (path.startsWith("@app/")) {

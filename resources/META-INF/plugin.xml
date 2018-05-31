@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.8.42.3</version>
+    <version>0.9.54.9</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,7 @@
        <li>Autocomplete in model's rules method</li>
        <li>Calculates return type for Yii::createObject call and one/all method calls of ActiveRecord</li>
        <li>Url autocomplete</li>
+       <li>Migration tool</li>
        </ul>
        <br/>
        Detailed information can be found in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a><br/>
@@ -22,23 +23,17 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      <p><b>Features</b></p>
-      <ul>
-        <li>Change plugin settings structure</li>
-        <li>Add setup Yii Root Path in project</li>
-        <li>Add settings page for Views (Theme paths, View file extension, Default View class)</li>
-        <li>Action for go to render method call this View (by default Ctrl + Alt + R / Cmd + Alt + R, or Navigate -> Goto View render call)</li>
-        <li>Inspection for missed variable declaration in View + QuickFix</li>
-        <li>Support relative path to Yii root</li>
-        <li>Path to missed View file in error message</li>
-      </ul>
-      <p>&nbsp;</p>
-      <p><b>Fixes</b></p>
-      <ul>
-        <li>Fix View path resolving</li>
-      </ul>
-    ]]>
-    </change-notes>
+
+      <b>Enhances</b><br/>
+      Error reporting tool<br/>
+      <br/>
+      <b>Fixes</b><br/>
+      - Fix "Index deserialization violates equals / hashCode contract for Value parameter" exception<br/>
+      - Fix support PhpStorm 2016.2<br/>
+      ...other fixes<br/>
+      <br/>
+      Full <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG</a><br/>
+    ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="162"/>
@@ -49,9 +44,11 @@
     <depends>com.intellij.modules.lang</depends>
     -->
     <depends>com.jetbrains.php</depends>
-    <depends optional="true">com.jetbrains.twig</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
+    <depends optional="true">com.jetbrains.twig</depends>
+    <depends optional="true">org.jetbrains.plugins.terminal</depends>
+    <depends optional="true">org.jetbrains.plugins.phpstorm-remote-interpreter</depends>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
@@ -61,6 +58,7 @@
     <extensions defaultExtensionNs="com.intellij">
 
         <projectService serviceImplementation="com.nvlad.yii2support.utils.Yii2SupportSettings"/>
+        <applicationService serviceImplementation="com.nvlad.yii2support.PluginGlobalSettings"/>
 
         <projectConfigurable instance="com.nvlad.yii2support.ui.settings.SettingsForm"
                              displayName="Yii2 Support"
@@ -88,7 +86,7 @@
         <localInspection language="PHP" shortName="ViewMissedPhpDocInspection"
                          displayName="Missed PhpDoc variable declaration"
                          groupName="Views" groupPath="PHP,Framework,Yii2"
-                         enabledByDefault="true" level="WARNING"
+                         enabledByDefault="false" level="WARNING"
                          implementationClass="com.nvlad.yii2support.views.inspections.ViewMissedPhpDocInspection"/>
 
         <fileBasedIndex implementation="com.nvlad.yii2support.views.index.ViewFileIndex" id="view-index"/>
@@ -149,6 +147,13 @@
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
       <!--  <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/> -->
+
+        <!-- Migrations -->
+        <toolWindow id="Migrations" anchor="bottom"
+                    factoryClass="com.nvlad.yii2support.migrations.MigrationsToolWindowFactory"
+                    icon="/icons/migration_tool_window.png"/>
+
+        <errorHandler implementation="com.nvlad.yii2support.ErrorReportHandler"/>
     </extensions>
 
     <actions>
@@ -156,9 +161,16 @@
         <action id="yii2support.GotoViewCalls" class="com.nvlad.yii2support.views.actions.OpenViewCalls"
                 text="Goto View render call">
             <add-to-group group-id="GoToMenu" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt R"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="alt R"/>
         </action>
     </actions>
+
+    <application-components>
+        <component>
+            <implementation-class>com.nvlad.yii2support.PluginApplicationComponent</implementation-class>
+        </component>
+    </application-components>
 
     <!--
     <project-components>

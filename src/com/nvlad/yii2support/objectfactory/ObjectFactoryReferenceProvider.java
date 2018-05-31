@@ -22,6 +22,6 @@ public class ObjectFactoryReferenceProvider extends com.intellij.psi.PsiReferenc
         references.add(reference);
 
 
-        return references.toArray(new ObjectFactoryReference[references.size()]);
+        return references.toArray(new ObjectFactoryReference[0]);
     }
 }

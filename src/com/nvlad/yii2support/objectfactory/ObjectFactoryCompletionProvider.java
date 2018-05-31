@@ -5,6 +5,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -80,10 +81,18 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
 
     @Nullable
     private ArrayCreationExpression getArrayCreation(@NotNull CompletionParameters completionParameters) {
-        if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) {
-            return (ArrayCreationExpression) completionParameters.getPosition().getParent().getParent().getParent();
+        PsiElement element = completionParameters.getPosition();
+        int level = 0;
+        while (element != null && level < 3) {
+            element = element.getParent();
+            level++;
         }
-        else return null;
+
+        if (element instanceof ArrayCreationExpression) {
+            return (ArrayCreationExpression) element;
+        }
+
+        return null;
     }
 
     @NotNull

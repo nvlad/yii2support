@@ -3,7 +3,6 @@ package com.nvlad.yii2support.database;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.inspections.PhpInspection;
@@ -23,6 +22,10 @@ public class UndetectableTableInspection extends PhpInspection {
         return new PhpElementVisitor() {
             @Override
             public void visitPhpClass(PhpClass clazz) {
+                if (clazz.isAbstract()) {
+                    return;
+                }
+
                 PhpIndex index = PhpIndex.getInstance(problemsHolder.getProject());
                 if (DatabaseUtils.HasConnections(problemsHolder.getProject()) &&
                         ClassUtils.isClassInheritsOrEqual(clazz, ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord"))) {
@@ -31,9 +34,9 @@ public class UndetectableTableInspection extends PhpInspection {
                         problemsHolder.registerProblem(clazz.getFirstChild(), "Can not detect database table for class " + clazz.getFQN(), ProblemHighlightType.WEAK_WARNING);
                     } else if (! DatabaseUtils.isTableExists(table, problemsHolder.getProject())) {
                         problemsHolder.registerProblem(clazz.getFirstChild(), "Table '" + table + "' not found in database connections", ProblemHighlightType.WEAK_WARNING);
-
                     }
                 }
+
                 super.visitPhpClass(clazz);
             }
         };

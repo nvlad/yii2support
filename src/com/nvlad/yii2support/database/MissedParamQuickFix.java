@@ -22,7 +22,7 @@ public class MissedParamQuickFix  implements LocalQuickFix {
     MethodReference methodReference;
 
 
-    public MissedParamQuickFix(MethodReference methodRef ) {
+    public MissedParamQuickFix(MethodReference methodRef) {
         methodReference = methodRef;
     }
 
@@ -44,7 +44,7 @@ public class MissedParamQuickFix  implements LocalQuickFix {
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
         Method method = (Method)methodReference.resolve();
         if (method != null) {
-          Parameter[] parameters = method.getParameters();
+//          Parameter[] parameters = method.getParameters();
           int paramParameterIndex = ClassUtils.getParamIndex(method, "params");
           int conditionParameterIndex = ClassUtils.getParamIndex(method, new String[]{ "condition", "expression", "sql"});
 
@@ -80,23 +80,27 @@ public class MissedParamQuickFix  implements LocalQuickFix {
 
     }
 
-    private Template buildParamArray(Template template, String[] conditionParams, ArrayCreationExpression array, int conditionParameterIndex) {
+    private void buildParamArray(Template template, String[] conditionParams, ArrayCreationExpression array, int conditionParameterIndex) {
         if (methodReference.getParameterList() != null
                 && (methodReference.getParameterList().getParameters()[conditionParameterIndex].getNextSibling() == null ||
-                ! methodReference.getParameterList().getParameters()[conditionParameterIndex].getNextSibling().getText().equals(",")))
+                ! methodReference.getParameterList().getParameters()[conditionParameterIndex].getNextSibling().getText().equals(","))) {
             template.addTextSegment(", ");
+        }
 
         template.addTextSegment("[");
         String separator = " ";
-        if (conditionParams.length > 1)
+        if (conditionParams.length > 1) {
             separator = "\n";
-        Boolean addComma = false;
+        }
+
+        boolean addComma = false;
         for (String variable : conditionParams) {
             if (addComma) {
                 template.addTextSegment(",");
             }
+
             template.addTextSegment(separator);
-            String templateVariable = "$" + variable.toUpperCase() + "$";
+//            String templateVariable = "$" + variable.toUpperCase() + "$";
           //  template.addVariable(templateVariable, "", "'variable'", true);
             String value = getArrayValueByHash(variable, array);
             //if (value != null)
@@ -106,13 +110,15 @@ public class MissedParamQuickFix  implements LocalQuickFix {
           //  template.addVariableSegment(templateVariable);
             addComma = true;
         }
+
         template.addTextSegment(separator + "]");
-        return template;
     }
 
     private String getArrayValueByHash(String hash, ArrayCreationExpression array) {
-        if (array == null)
+        if (array == null) {
             return null;
+        }
+
         for (ArrayHashElement el: array.getHashElements()) {
             PsiElement key = el.getKey();
             PsiElement value = el.getValue();
@@ -121,6 +127,7 @@ public class MissedParamQuickFix  implements LocalQuickFix {
                 return value.getText();
             }
         }
+
         return null;
     }
 

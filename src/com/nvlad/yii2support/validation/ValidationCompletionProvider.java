@@ -72,7 +72,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                                 String value = validatorIdentifier.getText();
                                 if (value != null) {
                                     PhpPsiElement validatorElement = validators.get(ClassUtils.removeQuotes(value));
-                                    if (validatorElement != null && validatorElement instanceof PhpClass ) {
+                                    if (validatorElement instanceof PhpClass) {
                                         validator = (PhpClass)validatorElement;
                                     }
                                 }

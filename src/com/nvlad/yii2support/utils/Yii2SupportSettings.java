@@ -32,6 +32,11 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     @MapAnnotation(sortBeforeSave = false)
     public Map<String, String> viewPathMap;
 
+    // Migrations
+    public boolean newestFirst = false;
+    public String dbConnection = "db";
+    public String migrationTable = "{{%migration}}";
+
     public Yii2SupportSettings() {
         viewPathMap = new LinkedHashMap<>();
         viewPathMap.put("@app/themes/*/modules", "@app/modules");
@@ -47,9 +52,9 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
 
     @Override
     public void loadState(Yii2SupportSettings applicationService) {
-        if (this.viewPathMap.hashCode() != applicationService.viewPathMap.hashCode()) {
-            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
-        }
+//        if (this.viewPathMap.hashCode() != applicationService.viewPathMap.hashCode()) {
+//            FileBasedIndex.getInstance().requestRebuild(ViewFileIndex.identity);
+//        }
         XmlSerializerUtil.copyBean(applicationService, this);
     }
 
