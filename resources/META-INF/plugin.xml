@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.9.54.5</version>
+    <version>0.9.54.9</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -23,19 +23,16 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      <b>Features</b><br/>
-      - Migration tool<br/>
-      - Send plugin exceptions from IDE Error Report Dialog<br/>
-      - Added info notification on plugin update<br/>
-      - Update DB schema after Apply/Undo/Redo migration(s)<br/>
-      - Support Remote CLI for Migration tool<br/>
-      <br/>
+
+      <b>Enhances</b><br/>
+      Error reporting tool<br/>
+
       <b>Fixes</b><br/>
-      - Fix UI path map edit popup<br/>
-      - Enhance UI for Go to render call<br/>
-      - Set "Alt + R" by default shortcut for Go to View render call<br/>
-      - Applied migration count<br/>
-      - Disable ActiveRecord table inspection for abstract classes<br/>
+      - Fix "Index deserialization violates equals / hashCode contract for Value parameter" exception<br/>
+      - Fix support PhpStorm 2016.2<br/>
+      ...other fixes<br/>
+      <br/>
+      Full <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG</a><br/>
     ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->

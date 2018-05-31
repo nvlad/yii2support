@@ -1,8 +1,19 @@
 Yii2 Support Change Log
 =======================
 
-Waiting for Release
--------------------
+0.9.54.5 May 29, 2018
+---------------------
+- Fix "Index deserialization violates equals / hashCode contract for Value parameter" exception
+- Fix support PhpStorm 2016.2
+- Send code version in Report for Rollbar code assignment
+- Not process migrations with invalid name (InvalidParameterException)
+- Skip abstract migration classes
+- Fix #150: throw NullPointerException
+- Enhance read&write data from index
+- Enhance error reports
+
+0.9.54.5 May 29, 2018
+---------------------
 - Added info notification on plugin update
 - Fix UI path map edit popup
 - Enhance UI for Go to render call
