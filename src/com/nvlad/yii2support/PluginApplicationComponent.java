@@ -108,8 +108,8 @@ public class PluginApplicationComponent implements ApplicationComponent {
         final ConfigBuilder config = withAccessToken("7b5e3f2f1e3d4084869f7fff29f87688");
         final PluginGlobalSettings settings = PluginGlobalSettings.getInstance();
         final ApplicationInfoImpl applicationInfo = (ApplicationInfoImpl) ApplicationInfo.getInstance();
-        String environment = applicationInfo.getFullApplicationName();
-        environment = environment + " build #" + applicationInfo.getApiVersion();
+        String environment = applicationInfo.getApiVersion();
+        environment = environment + " (" + applicationInfo.getFullApplicationName() + ")";
 
         config
                 .person(() -> new Person.Builder().id(settings.uuid).username(settings.username).build())
