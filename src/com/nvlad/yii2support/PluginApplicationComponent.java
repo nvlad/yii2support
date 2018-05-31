@@ -122,7 +122,7 @@ public class PluginApplicationComponent implements ApplicationComponent {
             return config.build();
         }
 
-        config.codeVersion(plugin.getVersion());
+        config.context(plugin::getVersion);
 
         return config.build();
     }
