@@ -3,6 +3,7 @@ package com.nvlad.yii2support.migrations.commands;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.entities.Migration;
@@ -16,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MigrationHistory extends CommandBase {
-    private static final Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) (m\\d{6}_\\d{6}_[\\w+_-]+)");
+    private static final Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) ([\\w\\\\-]*?\\\\)?([mM]\\d{6}_?\\d{6}\\D.+)");
 
     private final Map<String, Collection<Migration>> migrationMap;
     private final Set<Migration> migrations;
@@ -63,16 +64,17 @@ public class MigrationHistory extends CommandBase {
     void processOutput(String text) {
         Matcher matcher = historyEntryPattern.matcher(text);
         if (matcher.find()) {
-            String migrationName = matcher.group(2);
+            String migrationNamespace = "\\" + StringUtil.defaultIfEmpty(matcher.group(2), "");
+            String migrationName = matcher.group(3);
             Date date = MigrationUtil.applyDate(matcher.group(1));
-            updateMigration(migrationName, date);
+            updateMigration(migrationNamespace, migrationName, date);
         }
     }
 
-    private void updateMigration(String name, Date date) {
+    private void updateMigration(String namespace, String name, Date date) {
         for (Collection<Migration> migrationCollection : migrationMap.values()) {
             for (Migration migration : migrationCollection) {
-                if (migration.name.equals(name)) {
+                if (StringUtil.equals(name, migration.name) && StringUtil.equals(namespace, migration.namespace)) {
                     migration.status = MigrationStatus.Success;
                     migration.applyAt = date;
                     migration.upDuration = null;
