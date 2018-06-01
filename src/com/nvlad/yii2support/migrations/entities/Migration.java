@@ -16,6 +16,7 @@ public class Migration implements Comparable<Migration> {
     public PhpClass migrationClass;
     public final String name;
     public final String path;
+    public final String namespace;
     public MigrationStatus status;
     public Date createdAt;
     public Date applyAt;
@@ -26,6 +27,7 @@ public class Migration implements Comparable<Migration> {
         this.migrationClass = clazz;
         this.name = clazz.getName();
         this.path = path;
+        this.namespace = clazz.getNamespaceName();
         this.status = MigrationStatus.Unknown;
         this.createdAt = dateFromName(this.name);
     }
@@ -40,8 +42,9 @@ public class Migration implements Comparable<Migration> {
         return createdAt.compareTo(migration.createdAt);
     }
 
-    private static final Pattern dateFromName = Pattern.compile("m(\\d{6}_\\d{6})_.*");
-    private static final SimpleDateFormat migrationCreateDateFormat = new SimpleDateFormat("yyMMdd_HHmmss");
+    private static final Pattern dateFromName = Pattern.compile("([mM])(\\d{6}_?\\d{6})\\D.+");
+    private static final SimpleDateFormat migrationPathDateFormat = new SimpleDateFormat("yyMMdd_HHmmss");
+    private static final SimpleDateFormat migrationNamespaceDateFormat = new SimpleDateFormat("yyMMddHHmmss");
 
     @Nullable
     private static Date dateFromName(String name) {
@@ -51,7 +54,11 @@ public class Migration implements Comparable<Migration> {
         }
 
         try {
-            return migrationCreateDateFormat.parse(matcher.group(1));
+            if (matcher.group(1).equals("M")) {
+                return migrationNamespaceDateFormat.parse(matcher.group(2));
+            }
+
+            return migrationPathDateFormat.parse(matcher.group(2));
         } catch (ParseException e) {
             throw new InvalidParameterException("Migration name <" + name + "> contain invalid creation date.");
         }

@@ -54,21 +54,22 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
 
         if (object instanceof Migration) {
             Migration migration = (Migration) object;
+            String name = migration.namespace.equals("\\") ? migration.name : migration.namespace + migration.name;
             switch (migration.status) {
                 case Progress:
                     renderer.setIcon(getProgressIcon());
-                    renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+                    renderer.append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     if (migration.downDuration != null) {
                         renderer.append("  down time " + formatDuration(migration.downDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
                     }
                     break;
                 case Unknown:
                     renderer.setIcon(AllIcons.RunConfigurations.Unknown);
-                    renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+                    renderer.append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     break;
                 case NotApply:
                     renderer.setIcon(AllIcons.General.Bullet);
-                    renderer.append(migration.name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+                    renderer.append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     if (migration.downDuration != null) {
                         renderer.append("  down time " + formatDuration(migration.downDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
                     }
@@ -76,7 +77,7 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
                 case Success:
                     renderer.setIcon(AllIcons.RunConfigurations.TestPassed);
                     SimpleTextAttributes successAttributes = new SimpleTextAttributes(0, JBColor.green);
-                    renderer.append(migration.name, successAttributes, true);
+                    renderer.append(name, successAttributes, true);
 
                     if (migration.applyAt != null) {
                         String applyDate = DateFormat.getDateTimeInstance().format(migration.applyAt);
@@ -94,7 +95,7 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
                 case RollbackError:
                     renderer.setIcon(AllIcons.RunConfigurations.TestError);
                     SimpleTextAttributes errorAttributes = new SimpleTextAttributes(0, JBColor.red);
-                    renderer.append(migration.name, errorAttributes, true);
+                    renderer.append(name, errorAttributes, true);
                     break;
             }
         }
