@@ -2,8 +2,9 @@ package com.nvlad.yii2support.views.refactor;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.refactoring.RefactoringSettings;
 import com.intellij.refactoring.listeners.RefactoringElementListener;
-import com.intellij.refactoring.rename.RenamePsiElementProcessor;
+import com.intellij.refactoring.rename.RenamePsiFileProcessor;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
@@ -21,7 +22,7 @@ import java.util.Set;
 /**
  * Created by NVlad on 02.02.2017.
  */
-public class RenameViewProcessor extends RenamePsiElementProcessor {
+public class RenameViewProcessor extends RenamePsiFileProcessor {
     private final Set<PsiElement> renders = new HashSet<>();
 
     @Override
@@ -32,6 +33,10 @@ public class RenameViewProcessor extends RenamePsiElementProcessor {
     @Override
     public void prepareRenaming(PsiElement psiElement, String s, Map<PsiElement, String> map) {
         renders.clear();
+
+        if (!RefactoringSettings.getInstance().RENAME_SEARCH_FOR_REFERENCES_FOR_FILE) {
+            return;
+        }
 
         for (PsiReference reference : findReferences(psiElement)) {
             final PsiElement element = reference.getElement();
@@ -45,7 +50,7 @@ public class RenameViewProcessor extends RenamePsiElementProcessor {
     @Override
     public Runnable getPostRenameCallback(PsiElement psiElement, String s, RefactoringElementListener refactoringElementListener) {
         return () -> {
-            Yii2SupportSettings settings = Yii2SupportSettings.getInstance(psiElement.getProject());
+            final Yii2SupportSettings settings = Yii2SupportSettings.getInstance(psiElement.getProject());
 
             for (PsiElement render : renders) {
                 final StringLiteralExpression element = (StringLiteralExpression) ((ParameterList) render).getParameters()[0];

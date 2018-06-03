@@ -3,7 +3,7 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
-
+- Fix showing "Search for references" checkbox on php file rename dialog
 
 0.9.54.9 May 31, 2018
 ---------------------
