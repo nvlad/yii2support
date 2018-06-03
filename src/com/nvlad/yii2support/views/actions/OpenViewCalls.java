@@ -18,6 +18,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.ListCellRendererWithRightAlignedComponent;
 import com.intellij.ui.popup.list.ListPopupImpl;
 import com.jetbrains.php.PhpIcons;
+import com.jetbrains.php.lang.psi.elements.Include;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.nvlad.yii2support.common.FileUtil;
 
@@ -37,6 +38,8 @@ public class OpenViewCalls extends AnAction {
         }
 
         Collection<PsiReference> references = ReferencesSearch.search(psiFile).findAll();
+        references.removeIf(psiReference -> psiReference.getElement() instanceof Include);
+
         if (references.size() == 0) {
             return;
         }
