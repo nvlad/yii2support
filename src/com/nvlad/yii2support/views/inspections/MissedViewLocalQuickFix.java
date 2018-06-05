@@ -4,11 +4,10 @@ import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -17,11 +16,13 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import com.jetbrains.php.templates.PhpFileTemplateUtil;
 import com.jetbrains.smarty.SmartyFileType;
 import com.jetbrains.twig.TwigFileType;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
@@ -33,6 +34,7 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
     final private String myName;
     final private String myPath;
     final private Map<String, PhpType> myParameters;
+    final private Logger LOGGER = Logger.getInstance(MissedViewLocalQuickFix.class);
 
     MissedViewLocalQuickFix(String name, String path, Map<String, PhpType> parameters) {
         myName = name;
@@ -92,25 +94,8 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
         }
 
         final PsiFile viewPsiFile = directory.createFile(fileName);
-        FileType fileType = FileTypeManager.getInstance().getFileTypeByExtension(FileUtilRt.getExtension(myPath));
-        String templateName = getFileTemplateName(fileType);
-        if (templateName == null) {
-            System.out.println("Template for \"" + myPath + "\" not detected.");
-            return;
-        }
-        templateName = templateName.toLowerCase();
-
+        final FileTemplate template = getFileTemplate(project, viewPsiFile);
         FileEditorManager.getInstance(project).openFile(viewPsiFile.getVirtualFile(), true);
-
-        final FileTemplate[] templates = FileTemplateManager.getDefaultInstance().getTemplates(FileTemplateManager.DEFAULT_TEMPLATES_CATEGORY);
-        FileTemplate template = null;
-        for (FileTemplate fileTemplate : templates) {
-            if (fileTemplate.isTemplateOfType(fileType) && fileTemplate.getName().toLowerCase().equals(templateName)) {
-                template = fileTemplate;
-                break;
-            }
-        }
-
         if (template != null && viewPsiFile.getViewProvider().getDocument() != null) {
             final Properties properties = FileTemplateManager.getDefaultInstance().getDefaultProperties();
             if (myParameters != null) {
@@ -132,7 +117,32 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
         }
     }
 
-    private String getFileTemplateName(FileType fileType) {
+    @Nullable
+    private FileTemplate getFileTemplate(Project project, PsiFile psiFile) {
+        final FileType fileType = psiFile.getFileType();
+        final FileTemplateManager templateManager = FileTemplateManager.getInstance(project);
+        String templateName = getViewFileTemplateName(fileType);
+        if (templateName != null) {
+            FileTemplate template = templateManager.getTemplate(templateName);
+            if (template != null) {
+                return template;
+            }
+        }
+
+        LOGGER.warn("Yii2Support View template for <" + myPath + "> not found.");
+
+        templateName = getDefaultFileTemplateName(fileType);
+        if (templateName == null) {
+            System.out.println("Default IDE template for <" + myPath + "> not found.");
+
+            return null;
+        }
+
+        return templateManager.getTemplate(templateName);
+    }
+
+    @Nullable
+    private String getViewFileTemplateName(FileType fileType) {
         if (fileType == PhpFileType.INSTANCE) {
             return "Yii2 PHP View File";
         } else if (fileType == SmartyFileType.INSTANCE) {
@@ -147,6 +157,16 @@ class MissedViewLocalQuickFix implements LocalQuickFix {
                 return null;
             }
         }
+
+        return null;
+    }
+
+    @Nullable
+    private String getDefaultFileTemplateName(FileType fileType) {
+        if (fileType == PhpFileType.INSTANCE) {
+            return PhpFileTemplateUtil.INTERNAL_PHP_FILE_TEMPLATE_NAME;
+        }
+
         return null;
     }
 }
