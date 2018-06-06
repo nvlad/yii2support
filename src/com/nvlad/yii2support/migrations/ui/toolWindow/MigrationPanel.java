@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.migrations.ui;
+package com.nvlad.yii2support.migrations.ui.toolWindow;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;

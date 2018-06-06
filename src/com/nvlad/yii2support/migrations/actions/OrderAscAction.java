@@ -7,7 +7,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
-import com.nvlad.yii2support.migrations.ui.MigrationPanel;
+import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationPanel;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 

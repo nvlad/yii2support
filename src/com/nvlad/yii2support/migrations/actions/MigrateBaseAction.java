@@ -11,8 +11,8 @@ import com.nvlad.yii2support.migrations.MigrationsToolWindowFactory;
 import com.nvlad.yii2support.migrations.commands.CommandBase;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
-import com.nvlad.yii2support.migrations.ui.ConsolePanel;
-import com.nvlad.yii2support.migrations.ui.MigrationPanel;
+import com.nvlad.yii2support.migrations.ui.toolWindow.ConsolePanel;
+import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
