@@ -40,7 +40,7 @@ public class Migration implements Comparable<Migration> {
         return createdAt.compareTo(migration.createdAt);
     }
 
-    private static final Pattern dateFromName = Pattern.compile("m(\\d{6}_\\d{6})_.*");
+    private static final Pattern dateFromName = Pattern.compile("m(\\d{6}_\\d{6})_.*", Pattern.CASE_INSENSITIVE);
     private static final SimpleDateFormat migrationCreateDateFormat = new SimpleDateFormat("yyMMdd_HHmmss");
 
     @Nullable
