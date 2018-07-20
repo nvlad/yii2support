@@ -83,12 +83,12 @@ public abstract class CommandBase implements Runnable {
 
     void fillParams(List<String> params) {
         Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-        if (settings.dbConnection != null) {
-            params.add("--db=" + settings.dbConnection);
-        }
-        if (settings.migrationTable != null) {
-            params.add("--migrationTable=" + settings.migrationTable);
-        }
+//        if (settings.dbConnection != null) {
+//            params.add("--db=" + settings.dbConnection);
+//        }
+//        if (settings.migrationTable != null) {
+//            params.add("--migrationTable=" + settings.migrationTable);
+//        }
     }
 
     private void updateComponent() {

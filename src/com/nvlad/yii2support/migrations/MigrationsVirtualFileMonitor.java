@@ -34,7 +34,8 @@ class MigrationsVirtualFileMonitor implements VirtualFileListener {
 
     @Override
     public void contentsChanged(@NotNull VirtualFileEvent virtualFileEvent) {
-
+        MigrationService service = MigrationService.getInstance(myProject);
+        service.findMigrationByFile(virtualFileEvent.getFile());
     }
 
     @Override

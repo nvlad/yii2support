@@ -8,7 +8,10 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.FileUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class MigrationService {
     private static final Map<Project, MigrationService> migrationManagerMap = new HashMap<>();
@@ -48,7 +51,7 @@ public class MigrationService {
         }
 
         Map<String, Collection<Migration>> migrationMap = new HashMap<>();
-        for (PhpClass migration : migrations) {
+        for (PhpClass migration: migrations) {
             if (migration.isAbstract()) {
                 continue;
             }
@@ -73,21 +76,21 @@ public class MigrationService {
             myMigrationMap = migrationMap;
         }
 
-        for (String path : myMigrationMap.keySet()) {
+        for (String path: myMigrationMap.keySet()) {
             if (!migrationMap.containsKey(path)) {
                 myMigrationMap.remove(path);
                 continue;
             }
 
             Collection<Migration> migrationCollection = migrationMap.get(path);
-            for (Migration migration : myMigrationMap.get(path)) {
+            for (Migration migration: myMigrationMap.get(path)) {
                 if (isNotContains(migrationCollection, migration)) {
                     myMigrationMap.get(path).remove(migration);
                 }
             }
 
             migrationCollection = myMigrationMap.get(path);
-            for (Migration migration : migrationMap.get(path)) {
+            for (Migration migration: migrationMap.get(path)) {
                 Migration founded = findMigration(migrationCollection, migration);
                 if (founded == null) {
                     migrationCollection.add(migration);
@@ -97,7 +100,7 @@ public class MigrationService {
             }
         }
 
-        for (String path : migrationMap.keySet()) {
+        for (String path: migrationMap.keySet()) {
             if (!myMigrationMap.containsKey(path)) {
                 myMigrationMap.put(path, migrationMap.get(path));
             }
@@ -113,5 +116,9 @@ public class MigrationService {
 
     private boolean isNotContains(Collection<Migration> migrations, Migration required) {
         return migrations.stream().noneMatch(migration -> migration.name.equals(required.name));
+    }
+
+    public Migration findMigrationByFile(VirtualFile file) {
+        return null;
     }
 }

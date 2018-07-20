@@ -8,6 +8,7 @@ import com.intellij.database.util.DbImplUtil;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
@@ -24,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 abstract class CommandUpDownRedoBase extends CommandBase {
-    private static final Pattern migratePattern = Pattern.compile("\\*\\*\\* (applying|applied|reverting|reverted|failed to apply|failed to revert) (m\\d{6}_\\d{6}_.+?)\\s+(\\(time: ([\\d.]+)s\\))?");
+    private static final Pattern migratePattern = Pattern.compile("\\*\\*\\* (applying|applied|reverting|reverted|failed to apply|failed to revert) ([\\w\\\\-]*?\\\\)?([mM]\\d{6}_?\\d{6}\\D.+?)\\s+(\\(time: ([\\d.]+)s\\))?");
 
     final String myPath;
     final List<Migration> myMigrations;
@@ -43,7 +44,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         Matcher matcher = migratePattern.matcher(text);
 
         if (matcher.find()) {
-            Migration migration = findMigration(matcher.group(2));
+            Migration migration = findMigration("\\" + StringUtil.defaultIfEmpty(matcher.group(2), ""), matcher.group(3));
             if (migration == null) {
                 return;
             }
@@ -58,7 +59,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                     break;
                 case "applied":
                     migration.status = MigrationStatus.Success;
-                    migration.upDuration = Duration.parse("PT" + matcher.group(4) + "S");
+                    migration.upDuration = Duration.parse("PT" + matcher.group(5) + "S");
                     break;
                 case "failed to apply":
                     migration.status = MigrationStatus.ApplyError;
@@ -73,7 +74,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                     break;
                 case "reverted":
                     migration.status = MigrationStatus.NotApply;
-                    migration.downDuration = Duration.parse("PT" + matcher.group(4) + "S");
+                    migration.downDuration = Duration.parse("PT" + matcher.group(5) + "S");
                     break;
                 case "failed to revert":
                     migration.status = MigrationStatus.RollbackError;
@@ -154,9 +155,9 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
     }
 
-    private Migration findMigration(String name) {
+    private Migration findMigration(String namespace, String name) {
         for (Migration migration : myMigrations) {
-            if (migration.name.equals(name)) {
+            if (StringUtil.equals(name, migration.name) && StringUtil.equals(namespace, migration.namespace)) {
                 return migration;
             }
         }
