@@ -3,6 +3,7 @@ package com.nvlad.yii2support.database.settings;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.util.SmartList;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.migrations.entities.MigrateCommandOptions;
 import com.nvlad.yii2support.migrations.ui.settings.MigrationPanel;
@@ -79,7 +80,12 @@ public class SettingsForm implements Configurable {
     public void apply() {
         settings.tablePrefix = tablePrefixTextbox.getText();
         settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
-        settings.migrateCommandOptions = ((MigrationPanel) migrationPanel).getData();
+
+        List<MigrateCommandOptions> newList = new SmartList<>();
+        for (MigrateCommandOptions option : ((MigrationPanel) migrationPanel).getData()) {
+            newList.add(option.clone());
+        }
+        settings.migrateCommandOptions = newList;
     }
 
     private void createUIComponents() {

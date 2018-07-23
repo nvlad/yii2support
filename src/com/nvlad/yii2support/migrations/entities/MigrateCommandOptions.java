@@ -4,7 +4,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.SmartList;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 
 public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>, Cloneable {
@@ -32,6 +31,10 @@ public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>,
     public boolean equals(Object obj) {
         if (!(obj instanceof MigrateCommandOptions)) {
             return false;
+        }
+
+        if (obj == this) {
+            return true;
         }
 
         MigrateCommandOptions options = (MigrateCommandOptions) obj;
