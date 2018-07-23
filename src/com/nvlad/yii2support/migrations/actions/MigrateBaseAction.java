@@ -7,7 +7,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.content.Content;
-import com.nvlad.yii2support.migrations.MigrationsToolWindowFactory;
+import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationsToolWindowFactory;
 import com.nvlad.yii2support.migrations.commands.CommandBase;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;

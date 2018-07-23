@@ -16,12 +16,12 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-class MigrationsVirtualFileMonitor implements VirtualFileListener {
+public class MigrationsVirtualFileMonitor implements VirtualFileListener {
     private final Project myProject;
     private final JTree myTree;
     private final Yii2SupportSettings mySettings;
 
-    MigrationsVirtualFileMonitor(Project project, JTree tree) {
+    public MigrationsVirtualFileMonitor(Project project, JTree tree) {
         myProject = project;
         myTree = tree;
         mySettings = Yii2SupportSettings.getInstance(project);

@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.panels.VerticalLayout;
 import com.nvlad.yii2support.migrations.MigrationService;
-import com.nvlad.yii2support.migrations.entities.MigrateCommandOptions;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.ui.settings.entities.TableModelStringEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,9 +18,9 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class MigrationCommandOptionsDialog extends DialogWrapper {
+public class MigrationCommandDialog extends DialogWrapper {
     private final Project myProject;
-    private MigrateCommandOptions myEntry;
+    private MigrateCommand myEntry;
     private JPanel myPanel;
     private JBTextField myCommandField;
     private JBTextField myTableField;
@@ -31,7 +31,7 @@ public class MigrationCommandOptionsDialog extends DialogWrapper {
     private JBCheckBox myIsDefaultCheckBox;
     private Set<MigrationCommandDialogValidator> validators;
 
-    MigrationCommandOptionsDialog(@Nullable Project project) {
+    MigrationCommandDialog(@Nullable Project project) {
         super(project);
 
         myProject = project;
@@ -47,23 +47,23 @@ public class MigrationCommandOptionsDialog extends DialogWrapper {
         this.initValidation();
     }
 
-    void setEntry(MigrateCommandOptions options) {
-        myEntry = options;
+    void setEntry(MigrateCommand command) {
+        myEntry = command;
         if (myEntry == null) {
             return;
         }
 
-        myCommandField.setText(options.command);
-        myTableField.setText(options.migrationTable);
-        myDbField.setText(options.db);
-        myMigrationPathPanel.setStringData(options.migrationPath);
-        myMigrationNamespacesPanel.setStringData(options.migrationNamespaces);
-        myUseTablePrefixCheckBox.setSelected(options.useTablePrefix);
-        myIsDefaultCheckBox.setSelected(options.isDefault);
+        myCommandField.setText(command.command);
+        myTableField.setText(command.migrationTable);
+        myDbField.setText(command.db);
+        myMigrationPathPanel.setStringData(command.migrationPath);
+        myMigrationNamespacesPanel.setStringData(command.migrationNamespaces);
+        myUseTablePrefixCheckBox.setSelected(command.useTablePrefix);
+        myIsDefaultCheckBox.setSelected(command.isDefault);
     }
 
-    MigrateCommandOptions getEntry() {
-        MigrateCommandOptions entry = new MigrateCommandOptions();
+    MigrateCommand getEntry() {
+        MigrateCommand entry = new MigrateCommand();
         entry.command = myCommandField.getText();
         entry.migrationTable = myTableField.getText();
         entry.db = myDbField.getText();

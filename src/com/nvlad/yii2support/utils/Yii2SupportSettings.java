@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.SmartList;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
-import com.nvlad.yii2support.migrations.entities.MigrateCommandOptions;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -35,7 +35,7 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     public boolean newestFirst = false;
 //    public String dbConnection = "db";
 //    public String migrationTable = "{{%migration}}";
-    public List<MigrateCommandOptions> migrateCommandOptions;
+    public List<MigrateCommand> migrateCommands;
 
     public Yii2SupportSettings() {
         viewPathMap = new LinkedHashMap<>();
@@ -43,15 +43,15 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
         viewPathMap.put("@app/themes/*/widgets", "@app/widgets");
         viewPathMap.put("@app/themes/*", "@app/views");
 
-        migrateCommandOptions =  new SmartList<>();
-        MigrateCommandOptions options = new MigrateCommandOptions();
-        options.command = "migrate";
-        options.migrationPath.add("app/migrations");
-        options.migrationTable = "{{%migration}}";
-        options.db = "db";
-        options.isDefault = true;
-        options.useTablePrefix = false;
-        migrateCommandOptions.add(options);
+        migrateCommands =  new SmartList<>();
+        MigrateCommand command = new MigrateCommand();
+        command.command = "migrate";
+        command.migrationPath.add("app/migrations");
+        command.migrationTable = "{{%migration}}";
+        command.db = "db";
+        command.isDefault = true;
+        command.useTablePrefix = false;
+        migrateCommands.add(command);
     }
 
     @Nullable

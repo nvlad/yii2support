@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.migrations;
+package com.nvlad.yii2support.migrations.ui.toolWindow;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileSystem;
@@ -9,8 +9,8 @@ import com.intellij.openapi.wm.ex.ToolWindowManagerEx;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.nvlad.yii2support.migrations.ui.toolWindow.ConsolePanel;
-import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationPanel;
+import com.nvlad.yii2support.migrations.MigrationService;
+import com.nvlad.yii2support.migrations.MigrationsVirtualFileMonitor;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;

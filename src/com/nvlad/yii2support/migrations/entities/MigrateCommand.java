@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>, Cloneable {
+public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {
     public boolean isDefault;
     public String command;
     public String migrationTable;
@@ -15,7 +15,7 @@ public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>,
     public List<String> migrationNamespaces;
     public boolean useTablePrefix;
 
-    public MigrateCommandOptions() {
+    public MigrateCommand() {
         isDefault = false;
         migrationPath = new SmartList<>();
         migrationNamespaces = new SmartList<>();
@@ -23,13 +23,13 @@ public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>,
     }
 
     @Override
-    public int compareTo(@NotNull MigrateCommandOptions o) {
+    public int compareTo(@NotNull MigrateCommand o) {
         return 0;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof MigrateCommandOptions)) {
+        if (!(obj instanceof MigrateCommand)) {
             return false;
         }
 
@@ -37,7 +37,7 @@ public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>,
             return true;
         }
 
-        MigrateCommandOptions options = (MigrateCommandOptions) obj;
+        MigrateCommand options = (MigrateCommand) obj;
 
         return options.isDefault == isDefault
                 && options.useTablePrefix == useTablePrefix
@@ -60,8 +60,8 @@ public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>,
     }
 
     @Override
-    public MigrateCommandOptions clone() {
-        MigrateCommandOptions clone = new MigrateCommandOptions();
+    public MigrateCommand clone() {
+        MigrateCommand clone = new MigrateCommand();
         clone.isDefault = isDefault;
         clone.command = command;
         clone.migrationTable = migrationTable;
@@ -71,6 +71,13 @@ public class MigrateCommandOptions implements Comparable<MigrateCommandOptions>,
         clone.useTablePrefix = useTablePrefix;
 
         return clone;
+    }
 
+    public boolean containsMigration(Migration migration) {
+        if (migrationPath.contains(migration.path)) {
+            return true;
+        }
+
+        return migrationNamespaces.contains(migration.namespace);
     }
 }

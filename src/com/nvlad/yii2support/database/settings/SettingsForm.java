@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.SmartList;
 import com.intellij.util.ui.UIUtil;
-import com.nvlad.yii2support.migrations.entities.MigrateCommandOptions;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.ui.settings.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nls;
@@ -73,7 +73,7 @@ public class SettingsForm implements Configurable {
     public boolean isModified() {
         return !tablePrefixTextbox.getText().equals(settings.tablePrefix)
                 || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected()
-                || !getOptionsList().equals(((MigrationPanel) migrationPanel).getData());
+                || !getCommandList().equals(((MigrationPanel) migrationPanel).getData());
     }
 
     @Override
@@ -81,20 +81,20 @@ public class SettingsForm implements Configurable {
         settings.tablePrefix = tablePrefixTextbox.getText();
         settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
 
-        List<MigrateCommandOptions> newList = new SmartList<>();
-        for (MigrateCommandOptions option : ((MigrationPanel) migrationPanel).getData()) {
-            newList.add(option.clone());
+        List<MigrateCommand> newCommandList = new SmartList<>();
+        for (MigrateCommand command : ((MigrationPanel) migrationPanel).getData()) {
+            newCommandList.add(command.clone());
         }
-        settings.migrateCommandOptions = newList;
+        settings.migrateCommands = newCommandList;
     }
 
     private void createUIComponents() {
-        List<MigrateCommandOptions> optionsList = new ArrayList<>(getSettings().migrateCommandOptions.size());
-        for (MigrateCommandOptions migrateCommandOption : getSettings().migrateCommandOptions) {
-            optionsList.add(migrateCommandOption.clone());
+        List<MigrateCommand> commandList = new ArrayList<>(getSettings().migrateCommands.size());
+        for (MigrateCommand migrateCommand : getSettings().migrateCommands) {
+            commandList.add(migrateCommand.clone());
         }
 
-        migrationPanel = new MigrationPanel(myProject, optionsList);
+        migrationPanel = new MigrationPanel(myProject, commandList);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class SettingsForm implements Configurable {
         return settings;
     }
 
-    private List<MigrateCommandOptions> getOptionsList() {
-        return getSettings().migrateCommandOptions;
+    private List<MigrateCommand> getCommandList() {
+        return getSettings().migrateCommands;
     }
 }

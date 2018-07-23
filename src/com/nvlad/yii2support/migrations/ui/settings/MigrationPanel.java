@@ -3,7 +3,7 @@ package com.nvlad.yii2support.migrations.ui.settings;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.AddEditRemovePanel;
-import com.nvlad.yii2support.migrations.entities.MigrateCommandOptions;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -13,11 +13,11 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.List;
 
-public class MigrationPanel extends AddEditRemovePanel<MigrateCommandOptions> {
+public class MigrationPanel extends AddEditRemovePanel<MigrateCommand> {
     final private Project myProject;
 
-    public MigrationPanel(Project project, List<MigrateCommandOptions> optionsList) {
-        super(new MigrateCommandOptionsTableModel(), optionsList);
+    public MigrationPanel(Project project, List<MigrateCommand> commandList) {
+        super(new MigrateCommandTableModel(), commandList);
 
         myProject = project;
         getTable().setTableHeader(new JTableHeader(getTable().getColumnModel()));
@@ -40,13 +40,13 @@ public class MigrationPanel extends AddEditRemovePanel<MigrateCommandOptions> {
 
     @Nullable
     @Override
-    protected MigrateCommandOptions addItem() {
+    protected MigrateCommand addItem() {
         return showEditor(myProject, null);
     }
 
     @Override
-    protected boolean removeItem(MigrateCommandOptions migrateCommandOptions) {
-        if (migrateCommandOptions.isDefault) {
+    protected boolean removeItem(MigrateCommand command) {
+        if (command.isDefault) {
             Messages.showErrorDialog("Do not remove default migrate command.", "Error");
 
             return false;
@@ -57,32 +57,32 @@ public class MigrationPanel extends AddEditRemovePanel<MigrateCommandOptions> {
 
     @Nullable
     @Override
-    protected MigrateCommandOptions editItem(MigrateCommandOptions migrateCommandOptions) {
-        return showEditor(myProject, migrateCommandOptions);
+    protected MigrateCommand editItem(MigrateCommand command) {
+        return showEditor(myProject, command);
     }
 
     @Nullable
-    private MigrateCommandOptions showEditor(Project project, MigrateCommandOptions migrateCommandOptions) {
-        MigrationCommandOptionsDialog dialog = new MigrationCommandOptionsDialog(project);
+    private MigrateCommand showEditor(Project project, MigrateCommand command) {
+        MigrationCommandDialog dialog = new MigrationCommandDialog(project);
 
         dialog.addValidator(optionsDialog -> {
             if (optionsDialog.isNewEntry()) {
                 final String commandName = optionsDialog.getCommandName();
-                return getData().stream().noneMatch(options -> commandName.equals(options.command));
+                return getData().stream().noneMatch(c -> commandName.equals(c.command));
             }
 
             return true;
         });
 
-        dialog.setEntry(migrateCommandOptions);
+        dialog.setEntry(command);
         dialog.show();
 
         if (dialog.isOK()) {
-            MigrateCommandOptions entry = dialog.getEntry();
+            MigrateCommand entry = dialog.getEntry();
             if (entry.isDefault) {
-                for (MigrateCommandOptions option : getData()) {
-                    if (option.isDefault) {
-                        option.isDefault = false;
+                for (MigrateCommand migrateCommand : getData()) {
+                    if (migrateCommand.isDefault) {
+                        migrateCommand.isDefault = false;
                         break;
                     }
                 }
