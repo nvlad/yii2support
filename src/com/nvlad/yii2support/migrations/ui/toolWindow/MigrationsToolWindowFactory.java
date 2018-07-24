@@ -9,9 +9,8 @@ import com.intellij.openapi.wm.ex.ToolWindowManagerEx;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.MigrationsVirtualFileMonitor;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.migrations.services.MigrationService;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,9 +66,9 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
                     fileSystem.removeVirtualFileListener(fileMonitor);
                 } else {
                     MigrationService service = MigrationService.getInstance(myProject);
-                    service.refresh();
+                    service.sync();
                     Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-                    MigrationUtil.updateTree(myTree, service.getMigrations(), settings.newestFirst);
+                    TreeUtil.updateTree(myTree, service.getMigrations(), settings.newestFirst);
 
                     fileSystem.addVirtualFileListener(fileMonitor);
                 }

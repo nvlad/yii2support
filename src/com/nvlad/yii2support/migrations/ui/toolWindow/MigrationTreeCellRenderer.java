@@ -6,6 +6,8 @@ import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import icons.DatabaseIcons;
@@ -54,7 +56,13 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
 
         if (object instanceof Migration) {
             Migration migration = (Migration) object;
-            String name = migration.namespace.equals("\\") ? migration.name : migration.namespace + migration.name;
+            DefaultMutableTreeNode nodeParent = (DefaultMutableTreeNode) treeNode.getParent();
+            final String name;
+            if (nodeParent != null && nodeParent.getUserObject() instanceof MigrateCommand) {
+                name = (migration.namespace.equals("\\") ? migration.path + "/" : migration.namespace) + migration.name;
+            } else {
+                name = migration.namespace.equals("\\") ? migration.path : migration.namespace + migration.name;
+            }
             switch (migration.status) {
                 case Progress:
                     renderer.setIcon(getProgressIcon());
@@ -98,6 +106,16 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
                     renderer.append(name, errorAttributes, true);
                     break;
             }
+        }
+
+        if (object instanceof MigrateCommand) {
+            MigrateCommand command = (MigrateCommand) object;
+            renderer.setIcon(AllIcons.Debugger.CommandLine);
+            renderer.append(command.command, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+        }
+
+        if (object instanceof DefaultMigrateCommand) {
+            renderer.append("  applied with default migration command", SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
         }
     }
 

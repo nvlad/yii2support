@@ -10,7 +10,7 @@ import com.jetbrains.php.codeInsight.controlFlow.instructions.PhpInstruction;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.ClassUtils;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.migrations.util._MigrationUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +43,7 @@ public class MigrationsVirtualFileMonitor implements VirtualFileListener {
         if (isMigrationFile(event.getFile())) {
             MigrationService manager = MigrationService.getInstance(myProject);
             manager.refresh();
-            MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
+            _MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
         }
     }
 
@@ -51,7 +51,7 @@ public class MigrationsVirtualFileMonitor implements VirtualFileListener {
     public void fileDeleted(@NotNull VirtualFileEvent event) {
         MigrationService service = MigrationService.getInstance(myProject);
         service.refresh();
-        MigrationUtil.updateTree(myTree, service.getMigrations(), mySettings.newestFirst);
+        _MigrationUtil.updateTree(myTree, service.getMigrations(), mySettings.newestFirst);
     }
 
     @Override

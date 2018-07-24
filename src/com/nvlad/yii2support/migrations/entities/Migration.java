@@ -23,6 +23,10 @@ public class Migration implements Comparable<Migration> {
     public Duration downDuration;
     public Duration upDuration;
 
+    private static final Pattern dateFromName = Pattern.compile("([mM])(\\d{6}_?\\d{6})\\D.+");
+    private static final SimpleDateFormat migrationPathDateFormat = new SimpleDateFormat("yyMMdd_HHmmss");
+    private static final SimpleDateFormat migrationNamespaceDateFormat = new SimpleDateFormat("yyMMddHHmmss");
+
     public Migration(PhpClass clazz, String path) {
         this.migrationClass = clazz;
         this.name = clazz.getName();
@@ -42,9 +46,9 @@ public class Migration implements Comparable<Migration> {
         return createdAt.compareTo(migration.createdAt);
     }
 
-    private static final Pattern dateFromName = Pattern.compile("([mM])(\\d{6}_?\\d{6})\\D.+");
-    private static final SimpleDateFormat migrationPathDateFormat = new SimpleDateFormat("yyMMdd_HHmmss");
-    private static final SimpleDateFormat migrationNamespaceDateFormat = new SimpleDateFormat("yyMMddHHmmss");
+    public static boolean isValidMigrationClass(PhpClass phpClass) {
+        return dateFromName.matcher(phpClass.getName()).find();
+    }
 
     @Nullable
     private static Date dateFromName(String name) {

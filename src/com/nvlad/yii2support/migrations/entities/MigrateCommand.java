@@ -23,8 +23,16 @@ public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {
     }
 
     @Override
-    public int compareTo(@NotNull MigrateCommand o) {
-        return 0;
+    public int compareTo(@NotNull MigrateCommand command) {
+        if (this.isDefault) {
+            return 1;
+        }
+
+        if (command.isDefault) {
+            return -1;
+        }
+
+        return this.command.compareTo(command.command);
     }
 
     @Override

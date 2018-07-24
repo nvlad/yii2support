@@ -1,15 +1,19 @@
 package com.nvlad.yii2support.migrations.services;
 
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.SmartList;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.nvlad.yii2support.common.FileUtil;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
+import com.nvlad.yii2support.migrations.entities.MigrateCommandComparator;
 import com.nvlad.yii2support.migrations.entities.Migration;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MigrationService {
     private static final Map<Project, MigrationService> migrationManagerMap = new HashMap<>();
@@ -25,7 +29,7 @@ public class MigrationService {
     private final Project myProject;
     private final PhpIndex myPhpIndex;
     private final int baseUrlLength;
-    private Map<String, Collection<Migration>> myMigrationMap;
+    private Map<MigrateCommand, Collection<Migration>> myMigrationMap;
 
     private MigrationService(Project project) {
         myProject = project;
@@ -33,7 +37,58 @@ public class MigrationService {
         baseUrlLength = project.getBaseDir().getUrl().length();
     }
 
-    public void update() {
-        List<MigrateCommand> commands = Yii2SupportSettings.getInstance(myProject).migrateCommands;
+
+    public Map<MigrateCommand, Collection<Migration>> getMigrations() {
+        if (myMigrationMap == null) {
+            myMigrationMap = new HashMap<>();
+            sync();
+        }
+
+        return myMigrationMap;
+    }
+
+    public void sync() {
+        Collection<PhpClass> migrations;
+        try {
+            migrations = myPhpIndex.getAllSubclasses("\\yii\\db\\Migration");
+        } catch (IndexNotReadyException e) {
+            return;
+        }
+
+        List<MigrateCommand> commands = new SmartList<>(Yii2SupportSettings.getInstance(myProject).migrateCommands);
+        commands.add(new DefaultMigrateCommand(commands));
+        commands.sort(new MigrateCommandComparator());
+
+        Map<MigrateCommand, Collection<Migration>> migrationMap = new HashMap<>();
+        for (MigrateCommand command : commands) {
+            migrationMap.put(command, new SmartList<>());
+        }
+
+        for (PhpClass migrationClass: migrations) {
+            if (migrationClass.isAbstract() || !Migration.isValidMigrationClass(migrationClass)) {
+                continue;
+            }
+
+            VirtualFile virtualFile = FileUtil.getVirtualFile(migrationClass.getContainingFile());
+            if (virtualFile.getUrl().length() < baseUrlLength) {
+                continue;
+            }
+
+            String path = virtualFile.getUrl().substring(baseUrlLength + 1);
+            int pathLength = path.length();
+            path = path.substring(0, pathLength - virtualFile.getName().length() - 1);
+            Migration migration = new Migration(migrationClass, path);
+            for (MigrateCommand command : commands) {
+                if (command.containsMigration(migration)) {
+                    migrationMap.get(command).add(migration);
+
+                    break;
+                }
+            }
+
+            if (!migrationMap.equals(myMigrationMap)) {
+                myMigrationMap = migrationMap;
+            }
+        }
     }
 }

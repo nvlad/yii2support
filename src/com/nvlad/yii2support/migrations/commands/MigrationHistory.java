@@ -8,7 +8,7 @@ import com.nvlad.yii2support.common.YiiCommandLineUtil;
 import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.migrations.util._MigrationUtil;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -66,7 +66,7 @@ public class MigrationHistory extends CommandBase {
         if (matcher.find()) {
             String migrationNamespace = "\\" + StringUtil.defaultIfEmpty(matcher.group(2), "");
             String migrationName = matcher.group(3);
-            Date date = MigrationUtil.applyDate(matcher.group(1));
+            Date date = _MigrationUtil.applyDate(matcher.group(1));
             updateMigration(migrationNamespace, migrationName, date);
         }
     }
