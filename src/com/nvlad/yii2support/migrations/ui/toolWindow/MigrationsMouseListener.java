@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.migrations;
+package com.nvlad.yii2support.migrations.ui.toolWindow;
 
 import com.nvlad.yii2support.migrations.entities.Migration;
 

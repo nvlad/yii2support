@@ -13,7 +13,6 @@ import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.migrations.MigrationService;
-import com.nvlad.yii2support.migrations.MigrationsMouseListener;
 import com.nvlad.yii2support.migrations.actions.*;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
