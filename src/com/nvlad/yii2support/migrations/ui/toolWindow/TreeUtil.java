@@ -54,65 +54,20 @@ class TreeUtil {
             }
 
             final DefaultMutableTreeNode node = getCommandNode(treeModel, root, command, commandIndex++);
+            final List<Migration> migrations = new LinkedList<>(migrationMap.get(command));
             if (node.getUserObject() instanceof DefaultMigrateCommand) {
+                Map<String, List<Migration>> migrationTree = buildMigrationPathTree(migrations);
 
-            }
-
-            List<Migration> migrations = new LinkedList<>(migrationMap.get(command));
-            migrations.sort(new MigrationComparator(newestFirst));
-
-            nodes.clear();
-            Enumeration nodeEnumeration = node.children();
-            while (nodeEnumeration.hasMoreElements()) {
-                DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) nodeEnumeration.nextElement();
-                Migration treeNodeMigration = (Migration) treeNode.getUserObject();
-
-                if (migrations.stream().noneMatch((migration) -> migration.name.equals(treeNodeMigration.name))) {
-                    nodes.add(treeNode);
-                }
-            }
-
-            if (nodes.size() > 0) {
-                IntStream nodeIndices = nodes.stream().mapToInt(n -> {
-                    int nodeIndex = node.getIndex(n);
-                    node.remove(nodeIndex);
-                    return nodeIndex;
-                });
-                treeModel.nodesWereRemoved(node, nodeIndices.toArray(), nodes.toArray());
-            }
-
-            Vector<Integer> insertIndices = new Vector<>();
-            Vector<Integer> changeIndices = new Vector<>();
-            int migrationIndex = 0;
-            for (Migration migration : migrations) {
-                MutableTreeNode treeNode = findMigrationTreeNode(migration, node);
-
-                if (treeNode == null) {
-                    treeNode = new DefaultMutableTreeNode(migration);
-                    insertIndices.add(migrationIndex);
-                    node.insert(treeNode, migrationIndex);
-                } else {
-                    int treeNodeIndex = node.getIndex(treeNode);
-                    if (treeNodeIndex != migrationIndex) {
-//                        insertIndices.add(treeNodeIndex);
-//                        insertIndices.add(migrationIndex);
-//                        treeModel.nodeChanged(treeNode);
-                        node.insert(treeNode, migrationIndex);
-                    }
-                    changeIndices.add(migrationIndex);
+                int pathIndex = 0;
+                for (String path : migrationTree.keySet()) {
+                    DefaultMutableTreeNode pathNode = getPathNode(treeModel, node, path, pathIndex);
+                    addMigrationsToNode(treeModel, pathNode, migrationTree.get(path), newestFirst);
                 }
 
-                migrationIndex++;
+                continue;
             }
 
-            if (insertIndices.size() > 0) {
-                int[] childIndices = insertIndices.stream().distinct().sorted().mapToInt(v -> v).toArray();
-                treeModel.nodesWereInserted(node, childIndices);
-            }
-
-            if (changeIndices.size() > 0) {
-                treeModel.nodesChanged(node, changeIndices.stream().distinct().sorted().mapToInt(v -> v).toArray());
-            }
+            addMigrationsToNode(treeModel, node, migrations, newestFirst);
         }
 
         if (first) {
@@ -120,8 +75,61 @@ class TreeUtil {
         }
     }
 
-    private static void addMigrationsToNode(DefaultMutableTreeNode node, List<Migration> migrations) {
+    private static void addMigrationsToNode(DefaultTreeModel treeModel,
+                                            DefaultMutableTreeNode node,
+                                            List<Migration> migrations,
+                                            boolean newestFirst) {
+        migrations.sort(new MigrationComparator(newestFirst));
+        Vector<DefaultMutableTreeNode> nodes = new Vector<>();
+        Enumeration nodeEnumeration = node.children();
+        while (nodeEnumeration.hasMoreElements()) {
+            DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) nodeEnumeration.nextElement();
+            Migration treeNodeMigration = (Migration) treeNode.getUserObject();
 
+            if (migrations.stream().noneMatch((migration) -> migration.name.equals(treeNodeMigration.name))) {
+                nodes.add(treeNode);
+            }
+        }
+
+        if (nodes.size() > 0) {
+            IntStream nodeIndices = nodes.stream().mapToInt(n -> {
+                int nodeIndex = node.getIndex(n);
+                node.remove(nodeIndex);
+                return nodeIndex;
+            });
+            treeModel.nodesWereRemoved(node, nodeIndices.toArray(), nodes.toArray());
+        }
+
+
+        Vector<Integer> insertIndices = new Vector<>();
+        Vector<Integer> changeIndices = new Vector<>();
+        int migrationIndex = 0;
+        for (Migration migration : migrations) {
+            MutableTreeNode treeNode = findMigrationTreeNode(migration, node);
+
+            if (treeNode == null) {
+                treeNode = new DefaultMutableTreeNode(migration);
+                insertIndices.add(migrationIndex);
+                node.insert(treeNode, migrationIndex);
+            } else {
+                int treeNodeIndex = node.getIndex(treeNode);
+                if (treeNodeIndex != migrationIndex) {
+                    node.insert(treeNode, migrationIndex);
+                }
+                changeIndices.add(migrationIndex);
+            }
+
+            migrationIndex++;
+        }
+
+        if (insertIndices.size() > 0) {
+            int[] childIndices = insertIndices.stream().distinct().sorted().mapToInt(v -> v).toArray();
+            treeModel.nodesWereInserted(node, childIndices);
+        }
+
+        if (changeIndices.size() > 0) {
+            treeModel.nodesChanged(node, changeIndices.stream().distinct().sorted().mapToInt(v -> v).toArray());
+        }
     }
 
     private static MutableTreeNode findMigrationTreeNode(Migration migration, TreeNode node) {
@@ -162,7 +170,7 @@ class TreeUtil {
         return result;
     }
 
-    private static MutableTreeNode getPathNode(DefaultTreeModel treeModel, MutableTreeNode root, String path, int index) {
+    private static DefaultMutableTreeNode getPathNode(DefaultTreeModel treeModel, MutableTreeNode root, String path, int index) {
         Enumeration enumeration = root.children();
         while (enumeration.hasMoreElements()) {
             DefaultMutableTreeNode nextElement = (DefaultMutableTreeNode) enumeration.nextElement();
@@ -172,7 +180,7 @@ class TreeUtil {
             }
         }
 
-        MutableTreeNode result = new DefaultMutableTreeNode(path);
+        DefaultMutableTreeNode result = new DefaultMutableTreeNode(path);
         root.insert(result, index);
         treeModel.nodesWereInserted(root, new int[]{index});
 
@@ -190,4 +198,16 @@ class TreeUtil {
         }
     }
 
+    private static Map<String, List<Migration>> buildMigrationPathTree(List<Migration> migrations) {
+        Map<String, List<Migration>> result = new HashMap<>();
+        for (Migration migration : migrations) {
+            if (!result.containsKey(migration.path)) {
+                result.put(migration.path, new LinkedList<>());
+            }
+
+            result.get(migration.path).add(migration);
+        }
+
+        return result;
+    }
 }
