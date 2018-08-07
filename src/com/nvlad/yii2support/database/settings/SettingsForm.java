@@ -6,6 +6,7 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.util.SmartList;
 import com.intellij.util.ui.UIUtil;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
+import com.nvlad.yii2support.migrations.services.MigrationService;
 import com.nvlad.yii2support.migrations.ui.settings.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nls;
@@ -46,8 +47,10 @@ public class SettingsForm implements Configurable {
     }
 
     private void adjustInputs() {
-        if (tablePrefixTextbox.getText().length() > 0)
+        if (tablePrefixTextbox.getText().length() > 0) {
             insertTableNamesWithCheckBox.setSelected(true);
+        }
+
         insertTableNamesWithCheckBox.setEnabled(tablePrefixTextbox.getText().length() == 0);
     }
 
@@ -85,7 +88,12 @@ public class SettingsForm implements Configurable {
         for (MigrateCommand command : ((MigrationPanel) migrationPanel).getData()) {
             newCommandList.add(command.clone());
         }
-        settings.migrateCommands = newCommandList;
+
+        if (!settings.migrateCommands.equals(newCommandList)) {
+            settings.migrateCommands = newCommandList;
+
+            MigrationService.getInstance(myProject).sync();
+        }
     }
 
     private void createUIComponents() {

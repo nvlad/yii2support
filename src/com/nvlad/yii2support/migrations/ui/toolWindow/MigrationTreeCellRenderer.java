@@ -59,9 +59,10 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
             DefaultMutableTreeNode nodeParent = (DefaultMutableTreeNode) treeNode.getParent();
             final String name;
             if (nodeParent != null && nodeParent.getUserObject() instanceof MigrateCommand) {
-                name = (migration.namespace.equals("\\") ? migration.path + "/" : migration.namespace) + migration.name;
+                renderer.append((migration.namespace.equals("\\") ? migration.path + "/" : migration.namespace), SimpleTextAttributes.GRAY_ATTRIBUTES, true);
+                name =  migration.name;
             } else {
-                name = migration.namespace.equals("\\") ? migration.path : migration.namespace + migration.name;
+                name = migration.namespace.equals("\\") ? migration.name : migration.namespace + migration.name;
             }
             switch (migration.status) {
                 case Progress:

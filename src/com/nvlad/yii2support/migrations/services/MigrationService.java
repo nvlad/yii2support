@@ -30,15 +30,18 @@ public class MigrationService {
     private final PhpIndex myPhpIndex;
     private final int baseUrlLength;
     private Map<MigrateCommand, Collection<Migration>> myMigrationMap;
+    private List<Migration> myMigrations;
+    private Set<MigrationServiceListener> listeners;
 
     private MigrationService(Project project) {
         myProject = project;
         myPhpIndex = PhpIndex.getInstance(project);
         baseUrlLength = project.getBaseDir().getUrl().length();
+        listeners = new HashSet<>();
     }
 
 
-    public Map<MigrateCommand, Collection<Migration>> getMigrations() {
+    public Map<MigrateCommand, Collection<Migration>> getMigrationCommandMap() {
         if (myMigrationMap == null) {
             myMigrationMap = new HashMap<>();
             sync();
@@ -60,11 +63,12 @@ public class MigrationService {
         commands.sort(new MigrateCommandComparator());
 
         Map<MigrateCommand, Collection<Migration>> migrationMap = new HashMap<>();
+        List<Migration> migrationList = new SmartList<>();
         for (MigrateCommand command : commands) {
             migrationMap.put(command, new SmartList<>());
         }
 
-        for (PhpClass migrationClass: migrations) {
+        for (PhpClass migrationClass : migrations) {
             if (migrationClass.isAbstract() || !Migration.isValidMigrationClass(migrationClass)) {
                 continue;
             }
@@ -77,18 +81,47 @@ public class MigrationService {
             String path = virtualFile.getUrl().substring(baseUrlLength + 1);
             int pathLength = path.length();
             path = path.substring(0, pathLength - virtualFile.getName().length() - 1);
-            Migration migration = new Migration(migrationClass, path);
+            Migration migration = getMigrationForClass(migrationClass, path);
             for (MigrateCommand command : commands) {
                 if (command.containsMigration(migration)) {
                     migrationMap.get(command).add(migration);
-
+                    migrationList.add(migration);
                     break;
                 }
             }
+        }
 
-            if (!migrationMap.equals(myMigrationMap)) {
-                myMigrationMap = migrationMap;
+        if (!migrationMap.equals(myMigrationMap)) {
+            myMigrationMap = migrationMap;
+            myMigrations = migrationList;
+
+            for (MigrationServiceListener listener : listeners) {
+                listener.treeChanged();
             }
         }
+    }
+
+    public List<Migration> getMigrations() {
+        return myMigrations;
+    }
+
+    public void addListener(MigrationServiceListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(MigrationServiceListener listener) {
+        listeners.remove(listener);
+    }
+
+    private Migration getMigrationForClass(PhpClass phpClass, String path) {
+        if (myMigrations != null) {
+            for (Migration migration : myMigrations) {
+                if (migration.migrationClass.equals(phpClass)) {
+                    return migration;
+                }
+            }
+        }
+
+        return new Migration(phpClass, path);
     }
 }

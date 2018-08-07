@@ -23,7 +23,7 @@ import java.util.List;
 
 public abstract class CommandBase implements Runnable {
     final Project myProject;
-    JComponent myComponent;
+    protected JComponent myComponent;
     private ConsoleView myConsoleView;
     private Alarm myAlarm;
     private Application myApplication;

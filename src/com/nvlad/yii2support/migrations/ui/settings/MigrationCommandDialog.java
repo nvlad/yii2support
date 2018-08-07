@@ -7,9 +7,10 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.panels.VerticalLayout;
-import com.nvlad.yii2support.migrations.MigrationService;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
+import com.nvlad.yii2support.migrations.services.MigrationService;
 import com.nvlad.yii2support.migrations.ui.settings.entities.TableModelStringEntity;
+import com.nvlad.yii2support.migrations.util.MigrationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,14 +151,16 @@ public class MigrationCommandDialog extends DialogWrapper {
         myPanel.add(myDbField);
 
         MigrationService service = MigrationService.getInstance(myProject);
-        List<String> migrationPaths = new Vector<>(service.getMigrations().keySet());
+        List<String> migrationPaths = MigrationUtil.migrationPaths(service.getMigrations());
         Collections.sort(migrationPaths);
         myMigrationPathPanel = new StringListEditPanel("Migration Path", migrationPaths);
         myMigrationPathPanel.setPreferredSize(new Dimension(-1, 140));
         myMigrationPathPanel.getData().add(new TableModelStringEntity("app/migrations"));
         myPanel.add(myMigrationPathPanel);
 
-        myMigrationNamespacesPanel = new StringListEditPanel("Migration Namespaces", Arrays.asList("item_1", "item_2", "item_3", "item_4"));
+        List<String> namespaces = MigrationUtil.migrationPaths(service.getMigrations());
+        Collections.sort(namespaces);
+        myMigrationNamespacesPanel = new StringListEditPanel("Migration Namespaces", namespaces);
         myMigrationNamespacesPanel.setPreferredSize(new Dimension(-1, 140));
         myPanel.add(myMigrationNamespacesPanel);
 

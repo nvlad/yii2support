@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.migrations.ui.toolWindow;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.openapi.wm.ToolWindow;
@@ -9,8 +10,10 @@ import com.intellij.openapi.wm.ex.ToolWindowManagerEx;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.nvlad.yii2support.migrations.MigrationsVirtualFileMonitor;
 import com.nvlad.yii2support.migrations.services.MigrationService;
+import com.nvlad.yii2support.migrations.services.MigrationServiceListener;
+import com.nvlad.yii2support.migrations.services.MigrationsVirtualFileMonitor;
+import com.nvlad.yii2support.migrations.util.TreeUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,16 +39,18 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 
     class MigrationToolWindowManagerListener implements ToolWindowManagerListener {
         private final Project myProject;
-        private final JTree myTree;
         private final MigrationsVirtualFileMonitor fileMonitor;
+        private final VirtualFileSystem fileSystem;
+        private final MigrationService service;
+        private final MigrationServiceListener serviceListener;
         private boolean myToolWindowVisible = true;
 
         MigrationToolWindowManagerListener(Project project, JTree tree) {
             myProject = project;
-            myTree = tree;
-            fileMonitor = new MigrationsVirtualFileMonitor(project, myTree);
-
-            project.getBaseDir().getFileSystem().addVirtualFileListener(fileMonitor);
+            fileMonitor = new MigrationsVirtualFileMonitor(project);
+            fileSystem = myProject.getBaseDir().getFileSystem();
+            service = MigrationService.getInstance(project);
+            serviceListener = new ServiceListener(tree, project);
         }
 
         @Override
@@ -54,27 +59,45 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
 
         @Override
         public void stateChanged() {
-            ToolWindow window = ToolWindowManager.getInstance(myProject).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
+            ToolWindow window = ToolWindowManager
+                    .getInstance(myProject)
+                    .getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
             if (window == null) {
                 return;
             }
 
             boolean toolWindowVisible = window.isVisible();
             if (myToolWindowVisible != toolWindowVisible) {
-                VirtualFileSystem fileSystem = myProject.getBaseDir().getFileSystem();
                 if (myToolWindowVisible) {
                     fileSystem.removeVirtualFileListener(fileMonitor);
+                    service.removeListener(serviceListener);
                 } else {
-                    MigrationService service = MigrationService.getInstance(myProject);
-                    service.sync();
-                    Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-                    TreeUtil.updateTree(myTree, service.getMigrations(), settings.newestFirst);
-
+                    service.addListener(serviceListener);
                     fileSystem.addVirtualFileListener(fileMonitor);
+
+                    ApplicationManager.getApplication().invokeLater(service::sync);
                 }
 
                 myToolWindowVisible = toolWindowVisible;
             }
+        }
+    }
+
+    class ServiceListener implements MigrationServiceListener {
+        private final JTree myTree;
+        private final MigrationService service;
+        private final Yii2SupportSettings settings;
+
+        ServiceListener(JTree tree, Project project) {
+            myTree = tree;
+
+            service = MigrationService.getInstance(project);
+            settings = Yii2SupportSettings.getInstance(project);
+        }
+
+        @Override
+        public void treeChanged() {
+            TreeUtil.updateTree(myTree, service.getMigrationCommandMap(), settings.newestFirst);
         }
     }
 }
