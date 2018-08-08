@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.nvlad.yii2support.migrations.commands.MigrationRedo;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
@@ -37,6 +38,19 @@ public class MigrateRedoAction extends MigrateBaseAction {
 
         Object userObject = treeNode.getUserObject();
         if (userObject instanceof String) {
+            Enumeration migrationEnumeration = treeNode.children();
+            while (migrationEnumeration.hasMoreElements()) {
+                Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (migration.status == MigrationStatus.Success || migration.status == MigrationStatus.RollbackError) {
+                    migrationsToRedo.add(migration);
+                }
+            }
+
+            migrationPath = getMigrationPath(project, treeNode);
+            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
+        }
+
+        if (userObject instanceof MigrateCommand) {
             Enumeration migrationEnumeration = treeNode.children();
             while (migrationEnumeration.hasMoreElements()) {
                 Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();

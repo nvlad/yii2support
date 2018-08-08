@@ -10,6 +10,7 @@ import com.intellij.ui.AnActionButton;
 import com.intellij.ui.content.Content;
 import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.migrations.commands.CommandBase;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
@@ -85,7 +86,11 @@ abstract class MigrateBaseAction extends AnActionButton {
             return status == MigrationStatus.Success || status == MigrationStatus.RollbackError;
         }
 
-        if (userObject instanceof String) {
+        if (userObject instanceof DefaultMigrateCommand) {
+            return false;
+        }
+
+        if (userObject instanceof String || userObject instanceof MigrateCommand) {
             Enumeration migrationEnumeration = treeNode.children();
             while (migrationEnumeration.hasMoreElements()) {
                 Object migration = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
@@ -108,7 +113,11 @@ abstract class MigrateBaseAction extends AnActionButton {
             return ((Migration) userObject).status != MigrationStatus.Success && status != MigrationStatus.RollbackError;
         }
 
-        if (userObject instanceof String) {
+        if (userObject instanceof DefaultMigrateCommand) {
+            return false;
+        }
+
+        if (userObject instanceof String || userObject instanceof MigrateCommand) {
             Enumeration migrationEnumeration = treeNode.children();
             while (migrationEnumeration.hasMoreElements()) {
                 Object migration = ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
