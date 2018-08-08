@@ -45,7 +45,7 @@ public class MigrateRedoAction extends MigrateBaseAction {
                 }
             }
 
-            migrationPath = (String) userObject;
+            migrationPath = getMigrationPath(project, treeNode);
             migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
         }
 
@@ -78,7 +78,7 @@ public class MigrateRedoAction extends MigrateBaseAction {
                 return;
             }
 
-            migrationPath = (String) ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
+            migrationPath = getMigrationPath(project, treeNode.getParent());
             migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
         }
 

@@ -45,7 +45,7 @@ public class MigrateDownAction extends MigrateBaseAction {
                 }
             }
 
-            migrationPath = (String) userObject;
+            migrationPath = getMigrationPath(project, treeNode);
             migrationDown = new MigrationDown(project, migrationPath, migrationsToDown);
         }
 
@@ -78,7 +78,7 @@ public class MigrateDownAction extends MigrateBaseAction {
                 return;
             }
 
-            migrationPath = (String) ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
+            migrationPath = getMigrationPath(project, treeNode.getParent());
             migrationDown = new MigrationDown(project, migrationPath, migrationsToDown);
         }
 

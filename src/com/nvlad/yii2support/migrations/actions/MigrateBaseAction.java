@@ -3,23 +3,29 @@ package com.nvlad.yii2support.migrations.actions;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.content.Content;
-import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationsToolWindowFactory;
+import com.nvlad.yii2support.common.YiiApplicationUtils;
 import com.nvlad.yii2support.migrations.commands.CommandBase;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.ui.toolWindow.ConsolePanel;
 import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationPanel;
+import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationsToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 abstract class MigrateBaseAction extends AnActionButton {
     MigrateBaseAction(String name, Icon icon) {
@@ -116,5 +122,34 @@ abstract class MigrateBaseAction extends AnActionButton {
         }
 
         return false;
+    }
+
+    @Nullable
+    String getMigrationPath(Project project, TreeNode node) {
+        String projectRoot = YiiApplicationUtils.getYiiRootPath(project) + "/";
+        Object userObject = ((DefaultMutableTreeNode) node).getUserObject();
+        if (userObject instanceof MigrateCommand) {
+            List<String> paths = new ArrayList<>();
+            for (String s : ((MigrateCommand) userObject).migrationPath) {
+                String preparePath = preparePath(s, projectRoot);
+                paths.add(preparePath);
+            }
+
+            return StringUtil.join(paths, ",");
+        }
+
+        if (userObject instanceof String) {
+            return preparePath((String) userObject, projectRoot);
+        }
+
+        return null;
+    }
+
+    private String preparePath(String path, String projectRoot) {
+        if (path.startsWith("@") || path.startsWith("/")) {
+            return path;
+        }
+
+        return projectRoot + path;
     }
 }
