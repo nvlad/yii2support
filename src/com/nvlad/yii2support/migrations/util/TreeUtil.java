@@ -166,6 +166,7 @@ public class TreeUtil {
             DefaultMutableTreeNode nextElement = (DefaultMutableTreeNode) enumeration.nextElement();
             MigrateCommand migrationCommand = (MigrateCommand) nextElement.getUserObject();
             if (migrationCommand.isDefault == command.isDefault && migrationCommand.command.equals(command.command)) {
+                nextElement.setUserObject(command);
                 return nextElement;
             }
         }
