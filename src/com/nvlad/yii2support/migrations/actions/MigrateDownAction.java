@@ -97,7 +97,6 @@ public class MigrateDownAction extends MigrateBaseAction {
             migrationDown = new MigrationDown(project, migrationPath, migrationsToDown);
         }
 
-
         if (migrationDown != null) {
             executeCommand(project, migrationDown);
         }

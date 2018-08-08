@@ -29,8 +29,9 @@ abstract class CommandUpDownRedoBase extends CommandBase {
 
     final String myPath;
     final List<Migration> myMigrations;
+    String direction = null;
     private Map<String, DefaultMutableTreeNode> treeNodeMap;
-    private String direction = null;
+    private Map<Migration, MigrationStatus> migrationStatusMap;
 
     CommandUpDownRedoBase(Project project, String path, @NotNull List<Migration> migrations) {
         super(project);
@@ -92,6 +93,11 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                 return;
             }
 
+            migrationStatusMap = new HashMap<>();
+            for (Migration migration : myMigrations) {
+                migrationStatusMap.put(migration, migration.status);
+            }
+
             executeProcess(processHandler);
 
             setErrorStatusForMigrationInProgress();
@@ -132,7 +138,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
     private void setErrorStatusForMigrationInProgress() {
         if (myMigrations.size() > 0) {
             for (Migration migration : myMigrations) {
-                if (migration.status == MigrationStatus.Progress) {
+                if (migration.status == MigrationStatus.Progress || migration.status == migrationStatusMap.get(migration)) {
                     if (direction.equals("reverting")) {
                         migration.status = MigrationStatus.RollbackError;
                     } else {

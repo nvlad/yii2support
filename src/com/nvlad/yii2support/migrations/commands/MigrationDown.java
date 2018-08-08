@@ -10,6 +10,7 @@ import java.util.List;
 public class MigrationDown extends CommandUpDownRedoBase {
     public MigrationDown(Project project, String path, @NotNull List<Migration> migrations) {
         super(project, path, migrations);
+        direction = "reverting";
     }
 
     @Override
