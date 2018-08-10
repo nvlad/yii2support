@@ -10,6 +10,7 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import org.jetbrains.annotations.NotNull;
@@ -30,11 +31,11 @@ abstract class CommandUpDownRedoBase extends CommandBase {
     final String myPath;
     final List<Migration> myMigrations;
     String direction = null;
-    private Map<String, DefaultMutableTreeNode> treeNodeMap;
-    private Map<Migration, MigrationStatus> migrationStatusMap;
+    private Map<String, DefaultMutableTreeNode> myMigrationNodeMap;
+    private Map<Migration, MigrationStatus> myMigrationStatusMap;
 
-    CommandUpDownRedoBase(Project project, String path, @NotNull List<Migration> migrations) {
-        super(project);
+    CommandUpDownRedoBase(@NotNull Project project, @NotNull List<Migration> migrations, @NotNull MigrateCommand command, String path) {
+        super(project, command);
 
         myPath = path;
         myMigrations = migrations;
@@ -86,16 +87,17 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
     }
 
-    void executeCommandWithParams(String command, List<String> parameters) {
+    void executeActionWithParams(String action, List<String> parameters) {
         try {
+            String command = myCommand.command + "/" + action;
             ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, command, parameters);
             if (processHandler == null) {
                 return;
             }
 
-            migrationStatusMap = new HashMap<>();
+            myMigrationStatusMap = new HashMap<>();
             for (Migration migration : myMigrations) {
-                migrationStatusMap.put(migration, migration.status);
+                myMigrationStatusMap.put(migration, migration.status);
             }
 
             executeProcess(processHandler);
@@ -110,35 +112,35 @@ abstract class CommandUpDownRedoBase extends CommandBase {
 
     DefaultMutableTreeNode findTreeNode(Migration migration) {
         if (myComponent instanceof JTree) {
-            if (treeNodeMap == null) {
-                JTree tree = (JTree) myComponent;
-                DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-                Enumeration pathEnumeration = root.children();
-                while (pathEnumeration.hasMoreElements()) {
-                    DefaultMutableTreeNode pathNode = ((DefaultMutableTreeNode) pathEnumeration.nextElement());
-                    String path = (String) pathNode.getUserObject();
-                    if (path.equals(myPath)) {
-                        treeNodeMap = new HashMap<>();
-                        Enumeration migrationEnumeration = pathNode.children();
-                        while (migrationEnumeration.hasMoreElements()) {
-                            DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) migrationEnumeration.nextElement();
-                            treeNodeMap.put(((Migration) treeNode.getUserObject()).name, treeNode);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            return treeNodeMap.get(migration.name);
+            return getMigrationNodeMap().get(migration.name);
         }
 
         return null;
     }
 
+    private Map<String, DefaultMutableTreeNode> getMigrationNodeMap() {
+        if (myMigrationNodeMap == null) {
+            myMigrationNodeMap = new HashMap<>();
+            buildMigrationNodeMap((DefaultMutableTreeNode) ((JTree) myComponent).getModel().getRoot());
+        }
+
+        return myMigrationNodeMap;
+    }
+
+    private void buildMigrationNodeMap(DefaultMutableTreeNode parentNode) {
+        Enumeration pathEnumeration = parentNode.children();
+        while (pathEnumeration.hasMoreElements()) {
+            DefaultMutableTreeNode node = ((DefaultMutableTreeNode) pathEnumeration.nextElement());
+            if (node.getUserObject() instanceof Migration) {
+                myMigrationNodeMap.put(((Migration) node.getUserObject()).name, node);
+            }
+        }
+    }
+
     private void setErrorStatusForMigrationInProgress() {
         if (myMigrations.size() > 0) {
             for (Migration migration : myMigrations) {
-                if (migration.status == MigrationStatus.Progress || migration.status == migrationStatusMap.get(migration)) {
+                if (migration.status == MigrationStatus.Progress || migration.status == myMigrationStatusMap.get(migration)) {
                     if (direction.equals("reverting")) {
                         migration.status = MigrationStatus.RollbackError;
                     } else {

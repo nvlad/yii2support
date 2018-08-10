@@ -1,6 +1,7 @@
 package com.nvlad.yii2support.migrations.commands;
 
 import com.intellij.openapi.project.Project;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MigrationRedo extends CommandUpDownRedoBase {
-    public MigrationRedo(Project project, String path, @NotNull List<Migration> migrations) {
-        super(project, path, migrations);
+    public MigrationRedo(@NotNull Project project, @NotNull List<Migration> migrations, @NotNull MigrateCommand command, String path) {
+        super(project, migrations, command, path);
         direction = "reverting";
     }
 
@@ -21,6 +22,6 @@ public class MigrationRedo extends CommandUpDownRedoBase {
         params.add("--migrationPath=" + myPath);
         params.add("--interactive=0");
 
-        executeCommandWithParams("migrate/redo", params);
+        executeActionWithParams("redo", params);
     }
 }

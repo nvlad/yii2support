@@ -48,7 +48,7 @@ public class MigrateUpAction extends MigrateBaseAction {
             }
 
             migrationPath = getMigrationPath(project, treeNode);
-            migrationUp = new MigrationUp(project, migrationPath, migrationsToUp);
+            migrationUp = new MigrationUp(project, migrationsToUp, getCommand(treeNode), migrationPath);
         }
 
         if (userObject instanceof MigrateCommand && !(userObject instanceof DefaultMigrateCommand)) {
@@ -61,7 +61,7 @@ public class MigrateUpAction extends MigrateBaseAction {
             }
 
             migrationPath = getMigrationPath(project, treeNode);
-            migrationUp = new MigrationUp(project, migrationPath, migrationsToUp);
+            migrationUp = new MigrationUp(project, migrationsToUp, getCommand(treeNode), migrationPath);
         }
 
         if (userObject instanceof Migration) {
@@ -94,7 +94,7 @@ public class MigrateUpAction extends MigrateBaseAction {
             }
 
             migrationPath = getMigrationPath(project, treeNode.getParent());
-            migrationUp = new MigrationUp(project, migrationPath, migrationsToUp);
+            migrationUp = new MigrationUp(project, migrationsToUp, getCommand(treeNode), migrationPath);
         }
 
 

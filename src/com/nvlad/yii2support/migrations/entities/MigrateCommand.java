@@ -95,8 +95,8 @@ public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {
     }
 
     private List<String> getPathCache(Project project) {
-        YiiAlias yiiAlias = YiiAlias.getInstance(project);
         if (myPathCache == null) {
+            YiiAlias yiiAlias = YiiAlias.getInstance(project);
             myPathCache = new SmartList<>();
             for (String path : migrationPath) {
                 myPathCache.add(yiiAlias.resolveAlias(path));

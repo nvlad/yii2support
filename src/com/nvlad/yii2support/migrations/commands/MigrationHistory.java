@@ -6,9 +6,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
-import com.nvlad.yii2support.migrations.services.MigrationService;
 import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationPanel;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 
@@ -21,11 +21,11 @@ import java.util.regex.Pattern;
 public class MigrationHistory extends CommandBase {
     private static final Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) ([\\w\\\\-]*?\\\\)?([mM]\\d{6}_?\\d{6}\\D.+)");
     private Map<Migration, DefaultMutableTreeNode> treeNodeMap;
-    private final List<Migration> migrations;
+    private final List<Migration> myMigrations;
 
-    public MigrationHistory(Project project) {
-        super(project);
-        migrations = new LinkedList<>(MigrationService.getInstance(myProject).getMigrations());
+    public MigrationHistory(Project project, MigrateCommand command, List<Migration> migrations) {
+        super(project, command);
+        myMigrations = migrations;
     }
 
     @Override
@@ -35,14 +35,14 @@ public class MigrationHistory extends CommandBase {
             params.add("all");
             fillParams(params);
 
-            ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, "migrate/history", params);
+            ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, myCommand.command + "/history", params);
             Integer exitCode = 1;
             if (processHandler != null) {
                 exitCode = executeProcess(processHandler);
             }
 
             MigrationStatus status = exitCode == 0 ? MigrationStatus.NotApply : MigrationStatus.Unknown;
-            for (Migration migration : migrations) {
+            for (Migration migration : myMigrations) {
                 migration.status = status;
                 migration.upDuration = null;
                 migration.downDuration = null;
@@ -71,21 +71,21 @@ public class MigrationHistory extends CommandBase {
 
         if (text.contains("No migration has been done before.")) {
             if (treeNodeMap == null) {
-                findTreeNode(migrations.get(0));
+                findTreeNode(myMigrations.get(0));
 
             }
         }
     }
 
     private void updateMigration(String namespace, String name, Date date) {
-        for (Migration migration : MigrationService.getInstance(myProject).getMigrations()) {
+        for (Migration migration : myMigrations) {
             if (StringUtil.equals(name, migration.name) && StringUtil.equals(namespace, migration.namespace)) {
                 migration.status = MigrationStatus.Success;
                 migration.applyAt = date;
                 migration.upDuration = null;
                 migration.downDuration = null;
 
-                migrations.remove(migration);
+                myMigrations.remove(migration);
 
                 repaintMigrationNode(migration);
                 return;
@@ -98,17 +98,6 @@ public class MigrationHistory extends CommandBase {
             if (treeNodeMap == null) {
                 JTree tree = (JTree) myComponent;
                 DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-//                Enumeration pathEnumeration = root.children();
-//
-//                treeNodeMap = new HashMap<>();
-//                while (pathEnumeration.hasMoreElements()) {
-//                    DefaultMutableTreeNode pathNode = ((DefaultMutableTreeNode) pathEnumeration.nextElement());
-//                    Enumeration migrationEnumeration = pathNode.children();
-//                    while (migrationEnumeration.hasMoreElements()) {
-//                        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) migrationEnumeration.nextElement();
-//                        treeNodeMap.put((Migration) treeNode.getUserObject(), treeNode);
-//                    }
-//                }
                 treeNodeMap = buildTreeNodeMap(root);
             }
 

@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Alarm;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
@@ -23,13 +24,15 @@ import java.util.List;
 
 public abstract class CommandBase implements Runnable {
     final Project myProject;
+    final MigrateCommand myCommand;
     protected JComponent myComponent;
     private ConsoleView myConsoleView;
     private Alarm myAlarm;
     private Application myApplication;
 
-    CommandBase(Project project) {
+    CommandBase(Project project, MigrateCommand command) {
         myProject = project;
+        myCommand = command;
     }
 
     public ConsoleView getConsoleView() {

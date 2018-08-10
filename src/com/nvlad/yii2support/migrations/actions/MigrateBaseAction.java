@@ -17,6 +17,7 @@ import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.migrations.ui.toolWindow.ConsolePanel;
 import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationPanel;
 import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationsToolWindowFactory;
+import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -59,7 +61,11 @@ abstract class MigrateBaseAction extends AnActionButton {
         return null;
     }
 
-    void executeCommand(Project project, CommandBase command) {
+    void executeCommand(Project project, CommandBase ...command) {
+        executeCommand(project, Arrays.asList(command));
+    }
+
+    void executeCommand(Project project, List<CommandBase> commands) {
         ToolWindow window = ToolWindowManager
                 .getInstance(project).getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
 
@@ -67,16 +73,23 @@ abstract class MigrateBaseAction extends AnActionButton {
             Content content = window.getContentManager().getContent(1);
             if (content != null) {
                 ConsolePanel consolePanel = (ConsolePanel) content.getComponent();
-                command.setConsoleView(consolePanel.getConsoleView());
+                for (CommandBase command : commands) {
+                    command.setConsoleView(consolePanel.getConsoleView());
+                }
             }
         }
 
-        command.repaintComponent(getTree());
-
         Application application = ApplicationManager.getApplication();
-        command.setApplication(application);
+        for (CommandBase command : commands) {
+            command.repaintComponent(getTree());
+            command.setApplication(application);
+        }
 
-        application.executeOnPooledThread(command);
+        application.executeOnPooledThread(() -> {
+            for (CommandBase command : commands) {
+                command.run();
+            }
+        });
     }
 
     boolean enableDownButtons(DefaultMutableTreeNode treeNode) {
@@ -133,6 +146,15 @@ abstract class MigrateBaseAction extends AnActionButton {
         return false;
     }
 
+    @NotNull
+    MigrateCommand getCommand(@NotNull DefaultMutableTreeNode node) {
+        if (node.getUserObject() instanceof MigrateCommand) {
+            return (MigrateCommand) node.getUserObject();
+        }
+
+        return getCommand((DefaultMutableTreeNode) node.getParent());
+    }
+
     @Nullable
     String getMigrationPath(Project project, TreeNode node) {
         String projectRoot = YiiApplicationUtils.getYiiRootPath(project) + "/";
@@ -156,6 +178,10 @@ abstract class MigrateBaseAction extends AnActionButton {
 
     private String preparePath(String path, String projectRoot) {
         if (path.startsWith("@") || path.startsWith("/")) {
+            return path;
+        }
+
+        if (path.charAt(1) == ':') {
             return path;
         }
 

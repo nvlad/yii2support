@@ -47,7 +47,7 @@ public class MigrateRedoAction extends MigrateBaseAction {
             }
 
             migrationPath = getMigrationPath(project, treeNode);
-            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
+            migrationRedo = new MigrationRedo(project, migrationsToRedo, getCommand(treeNode), migrationPath);
         }
 
         if (userObject instanceof MigrateCommand) {
@@ -60,7 +60,7 @@ public class MigrateRedoAction extends MigrateBaseAction {
             }
 
             migrationPath = getMigrationPath(project, treeNode);
-            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
+            migrationRedo = new MigrationRedo(project, migrationsToRedo, (MigrateCommand) userObject, migrationPath);
         }
 
         if (userObject instanceof Migration) {
@@ -93,7 +93,7 @@ public class MigrateRedoAction extends MigrateBaseAction {
             }
 
             migrationPath = getMigrationPath(project, treeNode.getParent());
-            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
+            migrationRedo = new MigrationRedo(project, migrationsToRedo, getCommand(treeNode), migrationPath);
         }
 
 
