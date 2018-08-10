@@ -120,7 +120,11 @@ public class YiiCommandLineUtil {
         String yiiRootPath = YiiApplicationUtils.getYiiRootPath(project);
 
         PhpCommandSettings commandSettings = PhpCommandSettingsBuilder.create(project, false);
-        commandSettings.setScript(yiiRootPath + "/yii");
+        if (YiiApplicationUtils.getAppTemplate(project) == YiiApplicationTemplate.StarterKit) {
+            commandSettings.setScript(yiiRootPath + "/console/yii");
+        } else {
+            commandSettings.setScript(yiiRootPath + "/yii");
+        }
         commandSettings.addArgument(command);
         commandSettings.addArguments(parameters);
 
