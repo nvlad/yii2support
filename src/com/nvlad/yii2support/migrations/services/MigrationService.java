@@ -53,7 +53,7 @@ public class MigrationService {
     public void sync() {
         Collection<PhpClass> migrations;
         try {
-            migrations = myPhpIndex.getAllSubclasses("\\yii\\db\\Migration");
+            migrations = myPhpIndex.getAllSubclasses("\\yii\\db\\MigrationInterface");
         } catch (IndexNotReadyException e) {
             return;
         }
