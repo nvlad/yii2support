@@ -151,6 +151,8 @@ public class MigrationCommandDialog extends DialogWrapper {
         myPanel.add(myDbField);
 
         MigrationService service = MigrationService.getInstance(myProject);
+        service.sync();
+
         List<String> migrationPaths = MigrationUtil.migrationPaths(service.getMigrations());
         Collections.sort(migrationPaths);
         myMigrationPathPanel = new StringListEditPanel("Migration Path", migrationPaths);
