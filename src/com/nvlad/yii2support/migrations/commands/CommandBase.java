@@ -60,6 +60,10 @@ public abstract class CommandBase implements Runnable {
     abstract DefaultMutableTreeNode findTreeNode(Migration migration);
 
     Integer executeProcess(@NotNull ProcessHandler processHandler) {
+        if (myConsoleView != null && myConsoleView.getContentSize() > 0) {
+            myConsoleView.print("\n*************************************\n\n", ConsoleViewContentType.NORMAL_OUTPUT);
+        }
+
         processHandler.addProcessListener(new CommandProcessListener(this));
         processHandler.startNotify();
 
