@@ -33,7 +33,7 @@ public class MigrationHistory extends CommandBase {
         try {
             LinkedList<String> params = new LinkedList<>();
             params.add("all");
-            fillParams(params);
+            prepareCommandParams(params, null);
 
             ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, myCommand.command + "/history", params);
             Integer exitCode = 1;

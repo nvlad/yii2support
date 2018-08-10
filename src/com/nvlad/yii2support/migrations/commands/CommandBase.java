@@ -10,10 +10,10 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Alarm;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -88,14 +88,20 @@ public abstract class CommandBase implements Runnable {
         return processHandler.getExitCode();
     }
 
-    void fillParams(List<String> params) {
-        Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-//        if (settings.dbConnection != null) {
-//            params.add("--db=" + settings.dbConnection);
-//        }
-//        if (settings.migrationTable != null) {
-//            params.add("--migrationTable=" + settings.migrationTable);
-//        }
+    void prepareCommandParams(List<String> params, String path) {
+        if (!StringUtil.isEmpty(path)) {
+            params.add("--migrationPath=" + path);
+        }
+
+        if (!StringUtil.isEmpty(myCommand.db)) {
+            params.add("--db=" + myCommand.db);
+        }
+
+        if (myCommand.migrationTable != null) {
+            params.add("--migrationTable=" + myCommand.migrationTable);
+        }
+//        params.add("--useTablePrefix=" + (myCommand.useTablePrefix ? "1" : "0")); // only for "create" action
+        params.add("--interactive=0");
     }
 
     private void updateComponent() {

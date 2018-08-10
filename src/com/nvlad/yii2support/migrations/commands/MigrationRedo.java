@@ -18,10 +18,7 @@ public class MigrationRedo extends CommandUpDownRedoBase {
     public void run() {
         LinkedList<String> params = new LinkedList<>();
         params.add(String.valueOf(myMigrations.size()));
-        fillParams(params);
-        params.add("--migrationPath=" + myPath);
-        params.add("--interactive=0");
-
+        prepareCommandParams(params, myPath);
         executeActionWithParams("redo", params);
     }
 }
