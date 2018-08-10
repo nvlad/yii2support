@@ -83,7 +83,7 @@ public class MigrationService {
             path = path.substring(0, pathLength - virtualFile.getName().length() - 1);
             Migration migration = getMigrationForClass(migrationClass, path);
             for (MigrateCommand command : commands) {
-                if (command.containsMigration(migration)) {
+                if (command.containsMigration(myProject, migration)) {
                     migrationMap.get(command).add(migration);
                     migrationList.add(migration);
                     break;

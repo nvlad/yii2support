@@ -1,9 +1,12 @@
 package com.nvlad.yii2support.migrations.entities;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.SmartList;
+import com.nvlad.yii2support.common.YiiAlias;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {
@@ -14,6 +17,8 @@ public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {
     public List<String> migrationPath;
     public List<String> migrationNamespaces;
     public boolean useTablePrefix;
+
+    private List<String> myPathCache;
 
     public MigrateCommand() {
         isDefault = false;
@@ -81,11 +86,23 @@ public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {
         return clone;
     }
 
-    public boolean containsMigration(Migration migration) {
-        if (migrationPath.contains(migration.path)) {
+    public boolean containsMigration(Project project, Migration migration) {
+        if (getPathCache(project).contains(migration.path)) {
             return true;
         }
 
         return migrationNamespaces.contains(migration.namespace);
+    }
+
+    private List<String> getPathCache(Project project) {
+        YiiAlias yiiAlias = YiiAlias.getInstance(project);
+        if (myPathCache == null) {
+            myPathCache = new SmartList<>();
+            for (String path : migrationPath) {
+                myPathCache.add(yiiAlias.resolveAlias(path));
+            }
+        }
+
+        return myPathCache;
     }
 }
