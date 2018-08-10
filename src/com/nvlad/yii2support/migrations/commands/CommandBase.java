@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public abstract class CommandBase implements Runnable {
@@ -142,12 +142,9 @@ public abstract class CommandBase implements Runnable {
             final boolean toUtf8 = SystemInfo.isWindows && key.toString().equals("stdout");
             decoder.escapeText(processEvent.getText(), key, (text, processOutputType) -> {
                 if (toUtf8) {
-                    try {
-                        text = new String(text.getBytes(), "utf-8");
-                    } catch (UnsupportedEncodingException ignored) {
-
-                    }
+                    text = new String(text.getBytes(), StandardCharsets.UTF_8);
                 }
+
                 builder.append(text);
 
                 if (myConsoleView != null) {
