@@ -10,6 +10,7 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
@@ -18,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.time.Duration;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -171,5 +169,20 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
 
         return null;
+    }
+
+    void prepareCommandParams(List<String> params, MigrateCommand command, String path) {
+        boolean useNamespaces = myMigrations.stream().anyMatch(migration -> !migration.namespace.equals("\\"));
+        super.prepareCommandParams(params, useNamespaces ? "@vendor" : path);
+        if (command instanceof DefaultMigrateCommand && useNamespaces) {
+            Set<String> namespaces = new HashSet<>();
+            for (Migration migration : myMigrations) {
+                if (!migration.namespace.equals("\\")) {
+                    namespaces.add(migration.namespace);
+                }
+            }
+
+            params.add("--migrationNamespaces=" + StringUtil.join(namespaces, ","));
+        }
     }
 }
