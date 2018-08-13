@@ -4,7 +4,7 @@ Yii2 Support Change Log
 Waiting for Release
 -------------------
 
-0.10.56.13 August 13, 2018
+0.10.56.15 August 13, 2018
 --------------------------
 - Migrations v2 (support namespaced migration, multiple commands, sync freezes)
 - Fix showing "Search for references" checkbox on php file rename dialog

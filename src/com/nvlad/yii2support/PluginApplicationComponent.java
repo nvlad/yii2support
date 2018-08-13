@@ -114,7 +114,7 @@ public class PluginApplicationComponent implements ApplicationComponent {
         config
                 .person(() -> new Person.Builder().id(settings.uuid).username(settings.username).build())
                 .environment(environment)
-                .codeVersion("f073c1f169a7ba02293346b50b6b42fd78302126")
+                .codeVersion("bac332aa5cd5e9242d61bb543b977743fa7fe679")
                 .framework(SystemInfo.JAVA_RUNTIME_VERSION)
                 .platform(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION + " (" + SystemInfo.OS_ARCH + ")");
 
