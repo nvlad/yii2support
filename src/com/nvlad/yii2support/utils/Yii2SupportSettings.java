@@ -88,16 +88,16 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
                 case Basic:
                     aliasMap.put("@yii2support-console-command-app-root", "");
                     break;
+                case StarterKit:
+                    aliasMap.put("@base", "");
+                    aliasMap.put("@api", "api");
+                    aliasMap.put("@storage", "storage");
                 case Advanced:
                     aliasMap.put("@yii2support-console-command-app-root", "@console");
                     aliasMap.put("@common", "common");
                     aliasMap.put("@frontend", "frontend");
                     aliasMap.put("@backend", "backend");
                     aliasMap.put("@console", "console");
-                case StarterKit:
-                    aliasMap.put("@base", "");
-                    aliasMap.put("@api", "api");
-                    aliasMap.put("@storage", "storage");
                     break;
             }
         }
