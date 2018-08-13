@@ -5,6 +5,7 @@ Waiting for Release
 -------------------
 - Fix showing "Search for references" checkbox on php file rename dialog
 - Skip include for "Goto View render call"
+- Code completion for inherited GridView [Issue #202]
 
 0.9.54.9 May 31, 2018
 ---------------------

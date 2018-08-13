@@ -110,7 +110,6 @@ public class ObjectFactoryUtils {
         PsiElement parent = arrayCreation.getParent().getParent();
         if (parent instanceof ArrayCreationExpression) {
             PsiElement possibleHashElement = arrayCreation.getParent().getParent().getParent().getParent();
-
             if (!(possibleHashElement instanceof ArrayHashElement)) {
                 return null;
             }
@@ -124,11 +123,14 @@ public class ObjectFactoryUtils {
                     MethodReference method = (MethodReference) methodRef;
                     if (method.getClassReference() != null) {
                         PhpExpression methodClass = method.getClassReference();
-                        if (! (methodClass instanceof ClassReference) )
+                        if (!(methodClass instanceof ClassReference)) {
                             return null;
+                        }
+
+                        PhpIndex phpIndex = PhpIndex.getInstance(methodClass.getProject());
                         PhpClass callingClass = (PhpClass) ((ClassReference) methodClass).resolve();
-                        if (callingClass != null && callingClass.getFQN().equals("\\yii\\grid\\GridView")) {
-                            return ClassUtils.getClass(PhpIndex.getInstance(methodClass.getProject()), "\\yii\\grid\\DataColumn");
+                        if (callingClass != null && ClassUtils.isClassInheritsOrEqual(callingClass, "\\yii\\grid\\GridView", phpIndex)) {
+                            return ClassUtils.getClass(phpIndex, "\\yii\\grid\\DataColumn");
                         }
                     }
                 }
