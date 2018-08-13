@@ -3,10 +3,15 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+
+0.10.56.13 August 13, 2018
+--------------------------
 - Migrations v2 (support namespaced migration, multiple commands, sync freezes)
 - Fix showing "Search for references" checkbox on php file rename dialog
 - Skip include for "Goto View render call"
+- Use fixed font for "Goto View render call"
 - Code completion for inherited GridView [Issue #202]
+- NullPointerException fix
 
 0.9.54.9 May 31, 2018
 ---------------------
