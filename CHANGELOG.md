@@ -3,6 +3,7 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+- Migrations v2 (support namespaced migration, multiple commands, sync freezes)
 
 
 0.9.54.9 May 31, 2018
