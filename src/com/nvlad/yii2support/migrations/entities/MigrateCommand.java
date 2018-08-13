@@ -99,7 +99,12 @@ public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {
             YiiAlias yiiAlias = YiiAlias.getInstance(project);
             myPathCache = new SmartList<>();
             for (String path : migrationPath) {
-                myPathCache.add(yiiAlias.resolveAlias(path));
+                String resolvedAlias = yiiAlias.resolveAlias(path, true);
+                if (resolvedAlias == null) {
+                    continue;
+                }
+
+                myPathCache.add(yiiAlias.resolveAlias(resolvedAlias, true));
             }
         }
 

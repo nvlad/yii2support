@@ -78,6 +78,7 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     }
 
     public void initProjectConfiguration(Project project) {
+        YiiApplicationUtils.resetYiiRootPath(project);
         YiiApplicationTemplate template = YiiApplicationUtils.getAppTemplate(project, yiiRootPath);
         if (aliasMap.isEmpty()) {
             aliasMap.put("@vendor", "vendor");

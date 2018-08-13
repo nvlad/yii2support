@@ -7,10 +7,11 @@ import com.intellij.util.SmartList;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.FileUtil;
+import com.nvlad.yii2support.common.YiiApplicationUtils;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.MigrateCommandComparator;
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import java.util.*;
@@ -36,8 +37,10 @@ public class MigrationService {
     private MigrationService(Project project) {
         myProject = project;
         myPhpIndex = PhpIndex.getInstance(project);
-        baseUrlLength = project.getBaseDir().getUrl().length();
         listeners = new HashSet<>();
+
+        String projectRootUrl = YiiApplicationUtils.getYiiRootUrl(project);
+        baseUrlLength = projectRootUrl != null ? projectRootUrl.length() : 0;
     }
 
 
