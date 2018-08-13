@@ -100,7 +100,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
 
             executeProcess(processHandler);
 
-            setErrorStatusForMigrationInProgress();
+            setErrorStatusForMigrationInProgress(action);
         } catch (ExecutionException e) {
             YiiCommandLineUtil.processError(e);
         }
@@ -135,10 +135,10 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
     }
 
-    private void setErrorStatusForMigrationInProgress() {
+    private void setErrorStatusForMigrationInProgress(String action) {
         if (myMigrations.size() > 0) {
             for (Migration migration : myMigrations) {
-                if (migration.status == MigrationStatus.Progress || migration.status == myMigrationStatusMap.get(migration)) {
+                if (isInvalidMigrationStatus(migration, action)) {
                     if (direction.equals("reverting")) {
                         migration.status = MigrationStatus.RollbackError;
                     } else {
@@ -147,6 +147,19 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                 }
             }
         }
+    }
+
+    private boolean isInvalidMigrationStatus(Migration migration, String action) {
+        if (migration.status == MigrationStatus.Progress) {
+            return true;
+        }
+
+        if (action.equals("redo") && migration.status != myMigrationStatusMap.get(migration)) {
+            return true;
+        }
+
+        return !action.equals("redo") && migration.status == myMigrationStatusMap.get(migration);
+
     }
 
     private void syncDataSources() {
