@@ -10,11 +10,8 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
-import com.nvlad.yii2support.common.DatabaseUtils;
-import com.nvlad.yii2support.objectfactory.ObjectFactoryUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**

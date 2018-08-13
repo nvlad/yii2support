@@ -21,48 +21,46 @@ import java.util.Hashtable;
 public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-
         if (getArrayCreation(completionParameters) == null &&
-                !(completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression) &&
-                ! (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayAccessExpression)) {
+                !(walkParents(completionParameters, 4) instanceof ArrayCreationExpression) &&
+                !(walkParents(completionParameters, 3) instanceof ArrayAccessExpression)) {
             return;
         }
-        ArrayCreationExpression arrayCreation = null;
 
+        ArrayCreationExpression arrayCreation = null;
         // access to key of variable declared elsewhere
         if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayAccessExpression) {
-            ArrayAccessExpression arrayAccess = (ArrayAccessExpression)completionParameters.getPosition().getParent().getParent().getParent();
+            ArrayAccessExpression arrayAccess = (ArrayAccessExpression) completionParameters.getPosition().getParent().getParent().getParent();
             PhpPsiElement value = arrayAccess.getValue();
-
-            if (value instanceof Variable)
+            if (value instanceof Variable) {
                 arrayCreation = ObjectFactoryUtils.getArrayCreationByVarRef((Variable) value);
+            }
 
-            if (value instanceof FieldReference)
+            if (value instanceof FieldReference) {
                 arrayCreation = ObjectFactoryUtils.getArrayCreationByFieldRef((FieldReference) value);
+            }
 
-            if (arrayCreation == null)
+            if (arrayCreation == null) {
                 return;
-         // get parent array creation from inside of array
+            }
+
+            // get parent array creation from inside of array
         } else if (getArrayCreation(completionParameters) != null) {
             arrayCreation = getArrayCreation(completionParameters);
-
-        } else if (completionParameters.getPosition().getParent().getParent().getParent().getParent() instanceof ArrayCreationExpression &&
-                completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayHashElement &&
-                completionParameters.getPosition().getParent().getParent().toString() != "Array value") {
-            arrayCreation = (ArrayCreationExpression) completionParameters.getPosition().getParent().getParent().getParent().getParent();
+        } else if (walkParents(completionParameters, 4) instanceof ArrayCreationExpression &&
+                walkParents(completionParameters, 3) instanceof ArrayHashElement &&
+                !walkParents(completionParameters, 2).toString().equals("Array value")) {
+            arrayCreation = (ArrayCreationExpression) walkParents(completionParameters, 4);
         } else {
             return;
         }
 
-        PhpClass phpClass = null;
-        PhpFile file = (PhpFile) completionParameters.getOriginalFile();
-        PsiDirectory dir = file.getContainingDirectory();
+        final PhpFile file = (PhpFile) completionParameters.getOriginalFile();
+        final PsiDirectory dir = file.getContainingDirectory();
+        final PhpClass phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
 
-        phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
-
-        Hashtable<String, Object> uniqTracker = new Hashtable<>();
-
-        PhpExpression position = (PhpExpression) completionParameters.getPosition().getParent();
+        final Hashtable<String, Object> uniqTracker = new Hashtable<>();
+        final PhpExpression position = (PhpExpression) completionParameters.getPosition().getParent();
         if (phpClass != null) {
             for (Field field : ClassUtils.getWritableClassFields(phpClass)) {
                 uniqTracker.put(field.getName(), field);
@@ -95,10 +93,24 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
         return null;
     }
 
+    @Nullable
+    private PsiElement walkParents(CompletionParameters parameters, int level) {
+        PsiElement element = parameters.getPosition();
+        for (int i = 0; i < level; i++) {
+            if (element == null) {
+                return null;
+            }
+
+            element = element.getParent();
+        }
+
+        return element;
+    }
+
     @NotNull
     private LookupElementBuilder buildLookup(PhpClassMember field, PhpExpression position) {
         String lookupString = field instanceof Method ? ClassUtils.getAsPropertyName((Method) field) : field.getName();
-        LookupElementBuilder builder =  LookupElementBuilder.create(field, lookupString).withIcon(field.getIcon())
+        LookupElementBuilder builder = LookupElementBuilder.create(field, lookupString).withIcon(field.getIcon())
                 .withInsertHandler((insertionContext, lookupElement) -> {
 
                     Document document = insertionContext.getDocument();
