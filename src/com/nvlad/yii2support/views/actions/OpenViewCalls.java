@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
@@ -23,6 +24,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.nvlad.yii2support.common.FileUtil;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,9 +91,15 @@ public class OpenViewCalls extends AnAction {
                         } else {
                             setLeftText(methodElement.getText() + " ");
                         }
-                        setRightText(fileName + " ");
+                        setRightText("..." + fileName + " ");
                         setRightForeground(JBColor.GRAY);
                         setIcon(PhpIcons.METHOD);
+                    }
+
+                    @Override
+                    public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
+                        jList.setFont(EditorUtil.getEditorFont());
+                        return super.getListCellRendererComponent(jList, o, i, b, b1);
                     }
                 };
             }
