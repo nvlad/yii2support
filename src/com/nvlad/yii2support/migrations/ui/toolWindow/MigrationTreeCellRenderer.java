@@ -14,6 +14,7 @@ import icons.DatabaseIcons;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import java.text.DateFormat;
 import java.time.Duration;
 import java.util.Enumeration;
@@ -39,18 +40,7 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
             renderer.setIcon(DatabaseIcons.Catalog);
             renderer.append(treeNode.toString(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES, true);
 
-            Enumeration enumeration = treeNode.children();
-            int appliedCount = 0;
-            while (enumeration.hasMoreElements()) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumeration.nextElement();
-                Migration migration = (Migration) node.getUserObject();
-                if (migration.status == MigrationStatus.Success) {
-                    appliedCount++;
-                }
-            }
-
-            String count = appliedCount + "/" + treeNode.getChildCount() + StringUtil.pluralize(" migration", treeNode.getChildCount());
-            renderer.append("  " + count, SimpleTextAttributes.GRAY_ATTRIBUTES, true);
+            appliedCount(treeNode, renderer);
             return;
         }
 
@@ -113,6 +103,10 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
             MigrateCommand command = (MigrateCommand) object;
             renderer.setIcon(AllIcons.Debugger.CommandLine);
             renderer.append(command.command, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+
+            if (!(object instanceof DefaultMigrateCommand)) {
+                appliedCount(treeNode, renderer);
+            }
         }
 
         if (object instanceof DefaultMigrateCommand) {
@@ -132,5 +126,20 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
     private Icon getProgressIcon() {
         int frameIndex = (int) ((System.currentTimeMillis() % 1000) / 125);
         return progressIcons[frameIndex];
+    }
+
+    private void appliedCount(TreeNode treeNode, ColoredTreeCellRenderer renderer) {
+        Enumeration enumeration = treeNode.children();
+        int appliedCount = 0;
+        while (enumeration.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumeration.nextElement();
+            Migration migration = (Migration) node.getUserObject();
+            if (migration.status == MigrationStatus.Success) {
+                appliedCount++;
+            }
+        }
+
+        String count = appliedCount + "/" + treeNode.getChildCount() + StringUtil.pluralize(" migration", treeNode.getChildCount());
+        renderer.append("  " + count, SimpleTextAttributes.GRAY_ATTRIBUTES, true);
     }
 }
