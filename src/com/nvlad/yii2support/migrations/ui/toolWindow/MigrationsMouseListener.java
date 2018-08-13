@@ -1,5 +1,6 @@
-package com.nvlad.yii2support.migrations;
+package com.nvlad.yii2support.migrations.ui.toolWindow;
 
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 
 import javax.swing.*;
@@ -19,7 +20,7 @@ public class MigrationsMouseListener implements MouseListener {
             }
 
             DefaultMutableTreeNode object = (DefaultMutableTreeNode) leadSelectionPath.getLastPathComponent();
-            if (object.getUserObject() instanceof String) {
+            if (object.getUserObject() instanceof String || object.getUserObject() instanceof MigrateCommand) {
                 if (migrationsTree.isExpanded(leadSelectionPath)) {
                     migrationsTree.collapsePath(leadSelectionPath);
                 } else {

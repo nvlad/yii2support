@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.migrations.ui;
+package com.nvlad.yii2support.migrations.ui.toolWindow;
 
 import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.execution.ui.ConsoleView;

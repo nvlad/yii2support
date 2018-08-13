@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.migrations.ui;
+package com.nvlad.yii2support.migrations.ui.toolWindow;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -12,24 +12,20 @@ import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
-import com.nvlad.yii2support.migrations.MigrationService;
-import com.nvlad.yii2support.migrations.MigrationsMouseListener;
 import com.nvlad.yii2support.migrations.actions.*;
-import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
+import com.nvlad.yii2support.migrations.services.MigrationService;
+import com.nvlad.yii2support.migrations.util.TreeUtil;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
-import java.util.Collection;
-import java.util.Map;
 
 public class MigrationPanel extends SimpleToolWindowPanel {
     private final Project myProject;
     private CheckboxTree myTree;
-    private final Map<String, Collection<Migration>> myMigrationMap;
+//    private final Map<MigrateCommand, Collection<Migration>> myMigrationMap;
 
     public MigrationPanel(Project project, ToolWindow toolWindow) {
         super(false);
@@ -38,16 +34,16 @@ public class MigrationPanel extends SimpleToolWindowPanel {
 
         initContent();
         initToolBar();
-        initActivationListener(toolWindow);
+//        initActivationListener(toolWindow);
 
-        myMigrationMap = MigrationService.getInstance(myProject).getMigrations();
+//        myMigrationMap = MigrationService.getInstance(myProject).getMigrationCommandMap();
 
 //        DumbService.getInstance(project).runWhenSmart(() -> {
 //            boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
 //            MigrationService service = MigrationService.getInstance(myProject);
 //
 //            service.refresh();
-//            MigrationUtil.updateTree(myTree, service.getMigrations(), newestFirst);
+//            MigrationUtil.updateTree(myTree, service.getMigrationCommandMap(), newestFirst);
 //        });
 //
         toolWindow.hide(() -> {
@@ -58,17 +54,23 @@ public class MigrationPanel extends SimpleToolWindowPanel {
         return myTree;
     }
 
-    public Map<String, Collection<Migration>> getMigrationMap() {
-        return myMigrationMap;
+    public void updateTree() {
+        boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
+        MigrationService service = MigrationService.getInstance(myProject);
+        TreeUtil.updateTree(myTree, service.getMigrationCommandMap(), newestFirst);
     }
+
+    //    public Map<MigrateCommand, Collection<Migration>> getMigrationMap() {
+//        return myMigrationMap;
+//    }
 
     private void initActivationListener(ToolWindow toolWindow) {
         toolWindow.getActivation().doWhenDone(() -> {
-            boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
+//            boolean newestFirst = Yii2SupportSettings.getInstance(myProject).newestFirst;
             MigrationService service = MigrationService.getInstance(myProject);
 
-            service.refresh();
-            MigrationUtil.updateTree(myTree, service.getMigrations(), newestFirst);
+            service.sync();
+            updateTree();
 
             DefaultTreeModel treeModel = ((DefaultTreeModel) myTree.getModel());
             treeModel.nodeStructureChanged((TreeNode) treeModel.getRoot());

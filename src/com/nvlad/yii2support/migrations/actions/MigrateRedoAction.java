@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.nvlad.yii2support.migrations.commands.MigrationRedo;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
@@ -45,8 +46,21 @@ public class MigrateRedoAction extends MigrateBaseAction {
                 }
             }
 
-            migrationPath = (String) userObject;
-            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
+            migrationPath = getMigrationPath(project, treeNode);
+            migrationRedo = new MigrationRedo(project, migrationsToRedo, getCommand(treeNode), migrationPath);
+        }
+
+        if (userObject instanceof MigrateCommand) {
+            Enumeration migrationEnumeration = treeNode.children();
+            while (migrationEnumeration.hasMoreElements()) {
+                Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (migration.status == MigrationStatus.Success || migration.status == MigrationStatus.RollbackError) {
+                    migrationsToRedo.add(migration);
+                }
+            }
+
+            migrationPath = getMigrationPath(project, treeNode);
+            migrationRedo = new MigrationRedo(project, migrationsToRedo, (MigrateCommand) userObject, migrationPath);
         }
 
         if (userObject instanceof Migration) {
@@ -78,8 +92,8 @@ public class MigrateRedoAction extends MigrateBaseAction {
                 return;
             }
 
-            migrationPath = (String) ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
-            migrationRedo = new MigrationRedo(project, migrationPath, migrationsToRedo);
+            migrationPath = getMigrationPath(project, treeNode.getParent());
+            migrationRedo = new MigrationRedo(project, migrationsToRedo, getCommand(treeNode), migrationPath);
         }
 
 

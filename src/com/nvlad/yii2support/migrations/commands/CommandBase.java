@@ -10,26 +10,29 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Alarm;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
-import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public abstract class CommandBase implements Runnable {
     final Project myProject;
-    JComponent myComponent;
+    final MigrateCommand myCommand;
+    protected JComponent myComponent;
     private ConsoleView myConsoleView;
     private Alarm myAlarm;
     private Application myApplication;
 
-    CommandBase(Project project) {
+    CommandBase(Project project, MigrateCommand command) {
         myProject = project;
+        myCommand = command;
     }
 
     public ConsoleView getConsoleView() {
@@ -57,6 +60,10 @@ public abstract class CommandBase implements Runnable {
     abstract DefaultMutableTreeNode findTreeNode(Migration migration);
 
     Integer executeProcess(@NotNull ProcessHandler processHandler) {
+        if (myConsoleView != null && myConsoleView.getContentSize() > 0) {
+            myConsoleView.print("\n*************************************\n\n", ConsoleViewContentType.NORMAL_OUTPUT);
+        }
+
         processHandler.addProcessListener(new CommandProcessListener(this));
         processHandler.startNotify();
 
@@ -81,14 +88,20 @@ public abstract class CommandBase implements Runnable {
         return processHandler.getExitCode();
     }
 
-    void fillParams(List<String> params) {
-        Yii2SupportSettings settings = Yii2SupportSettings.getInstance(myProject);
-        if (settings.dbConnection != null) {
-            params.add("--db=" + settings.dbConnection);
+    void prepareCommandParams(List<String> params, String path) {
+        if (!StringUtil.isEmpty(path)) {
+            params.add("--migrationPath=" + path);
         }
-        if (settings.migrationTable != null) {
-            params.add("--migrationTable=" + settings.migrationTable);
+
+        if (!StringUtil.isEmpty(myCommand.db)) {
+            params.add("--db=" + myCommand.db);
         }
+
+        if (myCommand.migrationTable != null) {
+            params.add("--migrationTable=" + myCommand.migrationTable);
+        }
+//        params.add("--useTablePrefix=" + (myCommand.useTablePrefix ? "1" : "0")); // only for "create" action
+        params.add("--interactive=0");
     }
 
     private void updateComponent() {
@@ -129,12 +142,9 @@ public abstract class CommandBase implements Runnable {
             final boolean toUtf8 = SystemInfo.isWindows && key.toString().equals("stdout");
             decoder.escapeText(processEvent.getText(), key, (text, processOutputType) -> {
                 if (toUtf8) {
-                    try {
-                        text = new String(text.getBytes(), "utf-8");
-                    } catch (UnsupportedEncodingException ignored) {
-
-                    }
+                    text = new String(text.getBytes(), StandardCharsets.UTF_8);
                 }
+
                 builder.append(text);
 
                 if (myConsoleView != null) {

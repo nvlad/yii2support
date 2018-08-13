@@ -2,11 +2,14 @@ package com.nvlad.yii2support.migrations.commands;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
-import com.nvlad.yii2support.migrations.MigrationService;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
+import com.nvlad.yii2support.migrations.ui.toolWindow.MigrationPanel;
 import com.nvlad.yii2support.migrations.util.MigrationUtil;
 
 import javax.swing.*;
@@ -16,44 +19,41 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MigrationHistory extends CommandBase {
-    private static final Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) (m\\d{6}_\\d{6}_[\\w+_-]+)");
+    private static final Pattern historyEntryPattern = Pattern.compile("\\((\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\) ([\\w\\\\-]*?\\\\)?([mM]\\d{6}_?\\d{6}\\D.+)");
+    private Map<Migration, DefaultMutableTreeNode> treeNodeMap;
+    private final List<Migration> myMigrations;
 
-    private final Map<String, Collection<Migration>> migrationMap;
-    private final Set<Migration> migrations;
-    private Map<String, DefaultMutableTreeNode> treeNodeMap;
-
-    public MigrationHistory(Project project) {
-        super(project);
-        migrationMap = MigrationService.getInstance(myProject).getMigrations();
-        migrations = new HashSet<>();
+    public MigrationHistory(Project project, MigrateCommand command, List<Migration> migrations) {
+        super(project, command);
+        myMigrations = migrations;
     }
 
     @Override
     public void run() {
-        for (Collection<Migration> migrationCollection : migrationMap.values()) {
-            migrations.addAll(migrationCollection);
-        }
-
         try {
             LinkedList<String> params = new LinkedList<>();
             params.add("all");
-            fillParams(params);
+            prepareCommandParams(params, null);
 
-            ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, "migrate/history", params);
+            ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, myCommand.command + "/history", params);
             Integer exitCode = 1;
             if (processHandler != null) {
                 exitCode = executeProcess(processHandler);
             }
 
             MigrationStatus status = exitCode == 0 ? MigrationStatus.NotApply : MigrationStatus.Unknown;
-            for (Migration migration : migrations) {
+            for (Migration migration : myMigrations) {
                 migration.status = status;
                 migration.upDuration = null;
                 migration.downDuration = null;
                 migration.applyAt = null;
             }
 
-            migrations.clear();
+            MigrationPanel component = (MigrationPanel) myComponent.getParent().getParent().getParent();
+            ApplicationManager.getApplication().invokeLater(() -> {
+                component.updateTree();
+                component.updateUI();
+            });
         } catch (ExecutionException e) {
             YiiCommandLineUtil.processError(e);
         }
@@ -63,26 +63,32 @@ public class MigrationHistory extends CommandBase {
     void processOutput(String text) {
         Matcher matcher = historyEntryPattern.matcher(text);
         if (matcher.find()) {
-            String migrationName = matcher.group(2);
-            Date date = MigrationUtil.applyDate(matcher.group(1));
-            updateMigration(migrationName, date);
+            String migrationNamespace = "\\" + StringUtil.defaultIfEmpty(matcher.group(2), "");
+            String migrationName = matcher.group(3);
+            Date date = MigrationUtil.parseApplyDate(matcher.group(1));
+            updateMigration(migrationNamespace, migrationName, date);
+        }
+
+        if (text.contains("No migration has been done before.")) {
+            if (treeNodeMap == null) {
+                findTreeNode(myMigrations.get(0));
+
+            }
         }
     }
 
-    private void updateMigration(String name, Date date) {
-        for (Collection<Migration> migrationCollection : migrationMap.values()) {
-            for (Migration migration : migrationCollection) {
-                if (migration.name.equals(name)) {
-                    migration.status = MigrationStatus.Success;
-                    migration.applyAt = date;
-                    migration.upDuration = null;
-                    migration.downDuration = null;
+    private void updateMigration(String namespace, String name, Date date) {
+        for (Migration migration : myMigrations) {
+            if (StringUtil.equals(name, migration.name) && StringUtil.equals(namespace, migration.namespace)) {
+                migration.status = MigrationStatus.Success;
+                migration.applyAt = date;
+                migration.upDuration = null;
+                migration.downDuration = null;
 
-                    migrations.remove(migration);
+                myMigrations.remove(migration);
 
-                    repaintMigrationNode(migration);
-                    return;
-                }
+                repaintMigrationNode(migration);
+                return;
             }
         }
     }
@@ -92,22 +98,30 @@ public class MigrationHistory extends CommandBase {
             if (treeNodeMap == null) {
                 JTree tree = (JTree) myComponent;
                 DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-                Enumeration pathEnumeration = root.children();
-
-                treeNodeMap = new HashMap<>();
-                while (pathEnumeration.hasMoreElements()) {
-                    DefaultMutableTreeNode pathNode = ((DefaultMutableTreeNode) pathEnumeration.nextElement());
-                    Enumeration migrationEnumeration = pathNode.children();
-                    while (migrationEnumeration.hasMoreElements()) {
-                        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) migrationEnumeration.nextElement();
-                        treeNodeMap.put(((Migration) treeNode.getUserObject()).name, treeNode);
-                    }
-                }
+                treeNodeMap = buildTreeNodeMap(root);
             }
 
-            return treeNodeMap.get(migration.name);
+            return treeNodeMap.get(migration);
         }
 
         return null;
+    }
+
+    private Map<Migration, DefaultMutableTreeNode> buildTreeNodeMap(DefaultMutableTreeNode node) {
+        Map<Migration, DefaultMutableTreeNode> result = new HashMap<>();
+
+        Enumeration enumeration = node.children();
+        while (enumeration.hasMoreElements()) {
+            DefaultMutableTreeNode item = (DefaultMutableTreeNode) enumeration.nextElement();
+            if (item.getUserObject() instanceof Migration) {
+                result.put((Migration) item.getUserObject(), item);
+
+                if (node.getChildCount() > 0) {
+                    result.putAll(buildTreeNodeMap(item));
+                }
+            }
+        }
+
+        return result;
     }
 }

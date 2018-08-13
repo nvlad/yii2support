@@ -3,7 +3,11 @@ package com.nvlad.yii2support.database.settings;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.util.SmartList;
 import com.intellij.util.ui.UIUtil;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
+import com.nvlad.yii2support.migrations.services.MigrationService;
+import com.nvlad.yii2support.migrations.ui.settings.MigrationPanel;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -11,19 +15,22 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsForm implements Configurable {
+    final private Project myProject;
     private JPanel mainPanel;
     private JTextField tablePrefixTextbox;
     private JCheckBox insertTableNamesWithCheckBox;
     private JPanel tablePanel;
-    private JTextField migrationTable;
     private JPanel migrationPanel;
-    private JTextField dbConnection;
     private Yii2SupportSettings settings;
 
     public SettingsForm(Project project) {
-        settings = Yii2SupportSettings.getInstance(project);
+        myProject = project;
+
+        settings = getSettings();
 
         tablePrefixTextbox.addKeyListener(new KeyAdapter() {
             @Override
@@ -35,11 +42,15 @@ public class SettingsForm implements Configurable {
 
         UIUtil.addBorder(tablePanel, IdeBorderFactory.createTitledBorder("Table Prefix Support", false));
         UIUtil.addBorder(migrationPanel, IdeBorderFactory.createTitledBorder("Migrations", false));
+
+//        migrationPanel = new MigrationPanel(myProject);
     }
 
     private void adjustInputs() {
-        if (tablePrefixTextbox.getText().length() > 0)
+        if (tablePrefixTextbox.getText().length() > 0) {
             insertTableNamesWithCheckBox.setSelected(true);
+        }
+
         insertTableNamesWithCheckBox.setEnabled(tablePrefixTextbox.getText().length() == 0);
     }
 
@@ -63,13 +74,9 @@ public class SettingsForm implements Configurable {
 
     @Override
     public boolean isModified() {
-        boolean migrationTableChanged = !settings.migrationTable.equals(migrationTable.getText());
-        boolean dbConnectionChanged = !settings.dbConnection.equals(dbConnection.getText());
-
         return !tablePrefixTextbox.getText().equals(settings.tablePrefix)
                 || settings.insertWithTablePrefix != insertTableNamesWithCheckBox.isSelected()
-                || migrationTableChanged
-                || dbConnectionChanged;
+                || !getCommandList().equals(((MigrationPanel) migrationPanel).getData());
     }
 
     @Override
@@ -77,24 +84,49 @@ public class SettingsForm implements Configurable {
         settings.tablePrefix = tablePrefixTextbox.getText();
         settings.insertWithTablePrefix = insertTableNamesWithCheckBox.isSelected();
 
-        settings.migrationTable = migrationTable.getText();
-        settings.dbConnection = dbConnection.getText();
+        List<MigrateCommand> newCommandList = new SmartList<>();
+        for (MigrateCommand command : ((MigrationPanel) migrationPanel).getData()) {
+            newCommandList.add(command.clone());
+        }
+
+        if (!settings.migrateCommands.equals(newCommandList)) {
+            settings.migrateCommands = newCommandList;
+
+            MigrationService.getInstance(myProject).sync();
+        }
     }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
+        List<MigrateCommand> commandList = new ArrayList<>(getSettings().migrateCommands.size());
+        for (MigrateCommand migrateCommand : getSettings().migrateCommands) {
+            commandList.add(migrateCommand.clone());
+        }
+
+        migrationPanel = new MigrationPanel(myProject, commandList);
     }
 
     @Override
     public void reset() {
         tablePrefixTextbox.setText(settings.tablePrefix);
         insertTableNamesWithCheckBox.setSelected(settings.insertWithTablePrefix);
-        migrationTable.setText(settings.migrationTable);
-        dbConnection.setText(settings.dbConnection);
+//        migrationTable.setText(settings.migrationTable);
+//        dbConnection.setText(settings.dbConnection);
         adjustInputs();
     }
 
     @Override
     public void disposeUIResources() {
+    }
+
+    private Yii2SupportSettings getSettings() {
+        if (settings == null) {
+            settings = Yii2SupportSettings.getInstance(myProject);
+        }
+
+        return settings;
+    }
+
+    private List<MigrateCommand> getCommandList() {
+        return getSettings().migrateCommands;
     }
 }

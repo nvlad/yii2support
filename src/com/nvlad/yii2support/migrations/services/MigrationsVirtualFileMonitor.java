@@ -1,4 +1,4 @@
-package com.nvlad.yii2support.migrations;
+package com.nvlad.yii2support.migrations.services;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.*;
@@ -10,21 +10,15 @@ import com.jetbrains.php.codeInsight.controlFlow.instructions.PhpInstruction;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.nvlad.yii2support.common.ClassUtils;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
-import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-
-class MigrationsVirtualFileMonitor implements VirtualFileListener {
+public class MigrationsVirtualFileMonitor implements VirtualFileListener {
     private final Project myProject;
-    private final JTree myTree;
-    private final Yii2SupportSettings mySettings;
+    private final MigrationService service;
 
-    MigrationsVirtualFileMonitor(Project project, JTree tree) {
+    public MigrationsVirtualFileMonitor(Project project) {
         myProject = project;
-        myTree = tree;
-        mySettings = Yii2SupportSettings.getInstance(project);
+        service = MigrationService.getInstance(project);
     }
 
     @Override
@@ -34,23 +28,20 @@ class MigrationsVirtualFileMonitor implements VirtualFileListener {
 
     @Override
     public void contentsChanged(@NotNull VirtualFileEvent virtualFileEvent) {
-
+//        MigrationService service = MigrationService.getInstance(myProject);
+//        service.findMigrationByFile(virtualFileEvent.getFile());
     }
 
     @Override
     public void fileCreated(@NotNull VirtualFileEvent event) {
         if (isMigrationFile(event.getFile())) {
-            MigrationService manager = MigrationService.getInstance(myProject);
-            manager.refresh();
-            MigrationUtil.updateTree(myTree, manager.getMigrations(), mySettings.newestFirst);
+            service.sync();
         }
     }
 
     @Override
     public void fileDeleted(@NotNull VirtualFileEvent event) {
-        MigrationService service = MigrationService.getInstance(myProject);
-        service.refresh();
-        MigrationUtil.updateTree(myTree, service.getMigrations(), mySettings.newestFirst);
+        service.sync();
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.nvlad.yii2support.migrations.commands.MigrationDown;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
@@ -45,8 +47,21 @@ public class MigrateDownAction extends MigrateBaseAction {
                 }
             }
 
-            migrationPath = (String) userObject;
-            migrationDown = new MigrationDown(project, migrationPath, migrationsToDown);
+            migrationPath = getMigrationPath(project, treeNode);
+            migrationDown = new MigrationDown(project, migrationsToDown, getCommand(treeNode), migrationPath);
+        }
+
+        if (userObject instanceof MigrateCommand && !(userObject instanceof DefaultMigrateCommand)) {
+            Enumeration migrationEnumeration = treeNode.children();
+            while (migrationEnumeration.hasMoreElements()) {
+                Migration migration = (Migration) ((DefaultMutableTreeNode) migrationEnumeration.nextElement()).getUserObject();
+                if (migration.status == MigrationStatus.Success || migration.status == MigrationStatus.RollbackError) {
+                    migrationsToDown.add(migration);
+                }
+            }
+
+            migrationPath = getMigrationPath(project, treeNode);
+            migrationDown = new MigrationDown(project, migrationsToDown, (MigrateCommand) userObject, migrationPath);
         }
 
         if (userObject instanceof Migration) {
@@ -78,10 +93,9 @@ public class MigrateDownAction extends MigrateBaseAction {
                 return;
             }
 
-            migrationPath = (String) ((DefaultMutableTreeNode) treeNode.getParent()).getUserObject();
-            migrationDown = new MigrationDown(project, migrationPath, migrationsToDown);
+            migrationPath = getMigrationPath(project, treeNode.getParent());
+            migrationDown = new MigrationDown(project, migrationsToDown, getCommand(treeNode), migrationPath);
         }
-
 
         if (migrationDown != null) {
             executeCommand(project, migrationDown);

@@ -63,13 +63,48 @@ public class YiiApplicationUtils {
         return "app";
     }
 
+    public static YiiApplicationTemplate getAppTemplate(Project project) {
+        return getAppTemplate(getYiiRootVirtualFile(project));
+    }
+
+    public static YiiApplicationTemplate getAppTemplate(Project project, String path) {
+        return getAppTemplate(getYiiRootVirtualFile(project, path));
+    }
+
+    public static YiiApplicationTemplate getAppTemplate(@Nullable VirtualFile yiiRoot) {
+        if (yiiRoot == null) {
+            return YiiApplicationTemplate.Unknown;
+        }
+
+        if (yiiRoot.findChild("web") != null && yiiRoot.findChild("config") != null && yiiRoot.findChild("controllers") != null) {
+            return YiiApplicationTemplate.Basic;
+        }
+
+        VirtualFile checkFile = yiiRoot.findChild("common");
+        if (checkFile != null) {
+            checkFile = checkFile.findChild("migrations");
+            if (checkFile != null) {
+                if (checkFile.findChild("db") != null && checkFile.findChild("rbac") != null) {
+                    return YiiApplicationTemplate.StarterKit;
+                }
+            }
+        }
+
+        return YiiApplicationTemplate.Advanced;
+    }
+
     @Nullable
     public static VirtualFile getYiiRootVirtualFile(Project project) {
+        return getYiiRootVirtualFile(project, Yii2SupportSettings.getInstance(project).yiiRootPath);
+
+    }
+
+    @Nullable
+    public static VirtualFile getYiiRootVirtualFile(Project project, String path) {
         if (yiiRootPaths.containsKey(project)) {
             return yiiRootPaths.get(project);
         }
 
-        String path = Yii2SupportSettings.getInstance(project).yiiRootPath;
         VirtualFile yiiRootPath;
         if (path == null) {
             yiiRootPath = project.getBaseDir();
@@ -82,9 +117,11 @@ public class YiiApplicationUtils {
                 if (path.startsWith("./")) {
                     path = path.substring(2);
                 }
+
                 if (path.startsWith("/")) {
                     path = path.substring(1);
                 }
+
                 List<String> pathEntries = StringUtil.split(path, "/");
                 for (String pathEntry : pathEntries) {
                     yiiRootPath = yiiRootPath.findChild(pathEntry);

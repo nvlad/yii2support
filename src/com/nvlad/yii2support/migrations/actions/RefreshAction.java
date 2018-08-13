@@ -3,12 +3,15 @@ package com.nvlad.yii2support.migrations.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.nvlad.yii2support.migrations.MigrationService;
+import com.nvlad.yii2support.migrations.commands.CommandBase;
 import com.nvlad.yii2support.migrations.commands.MigrationHistory;
-import com.nvlad.yii2support.migrations.util.MigrationUtil;
-import com.nvlad.yii2support.utils.Yii2SupportSettings;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
+import com.nvlad.yii2support.migrations.entities.Migration;
+import com.nvlad.yii2support.migrations.services.MigrationService;
+import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 
-import javax.swing.*;
+import java.util.*;
 
 @SuppressWarnings("ComponentNotRegistered")
 public class RefreshAction extends MigrateBaseAction {
@@ -24,14 +27,39 @@ public class RefreshAction extends MigrateBaseAction {
         }
 
         MigrationService service = MigrationService.getInstance(project);
-        service.refresh();
+        service.sync();
 
-        JTree tree = getTree();
-        Yii2SupportSettings settings = Yii2SupportSettings.getInstance(project);
-        MigrationUtil.updateTree(tree, service.getMigrations(), settings.newestFirst);
+        Map<MigrateCommand, Set<Migration>> migrateCommandMap = new HashMap<>();
+        MigrateCommand defaultCommand = null;
+        for (MigrateCommand command : service.getMigrationCommandMap().keySet()) {
+            migrateCommandMap.put(command, new HashSet<>());
+            if (command.isDefault) {
+                defaultCommand = command;
+            }
+        }
 
-        MigrationHistory migrationHistory = new MigrationHistory(project);
-        executeCommand(project, migrationHistory);
+        for (Migration migration : service.getMigrations()) {
+            for (MigrateCommand command : migrateCommandMap.keySet()) {
+                if (command.containsMigration(project, migration)) {
+                    if (command instanceof DefaultMigrateCommand) {
+                        migrateCommandMap.get(defaultCommand).add(migration);
+                    } else {
+                        migrateCommandMap.get(command).add(migration);
+                    }
+                }
+            }
+        }
+
+        List<CommandBase> commands = new SmartList<>();
+        for (MigrateCommand command : migrateCommandMap.keySet()) {
+            if (migrateCommandMap.get(command).isEmpty()) {
+                continue;
+            }
+
+            commands.add(new MigrationHistory(project, command, new ArrayList<>(migrateCommandMap.get(command))));
+        }
+
+        executeCommand(project, commands);
     }
 
     @Override

@@ -8,7 +8,10 @@ import com.intellij.database.util.DbImplUtil;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.nvlad.yii2support.common.YiiCommandLineUtil;
+import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
+import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
 import org.jetbrains.annotations.NotNull;
@@ -16,23 +19,21 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.time.Duration;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 abstract class CommandUpDownRedoBase extends CommandBase {
-    private static final Pattern migratePattern = Pattern.compile("\\*\\*\\* (applying|applied|reverting|reverted|failed to apply|failed to revert) (m\\d{6}_\\d{6}_.+?)\\s+(\\(time: ([\\d.]+)s\\))?");
+    private static final Pattern migratePattern = Pattern.compile("\\*\\*\\* (applying|applied|reverting|reverted|failed to apply|failed to revert) ([\\w\\\\-]*?\\\\)?([mM]\\d{6}_?\\d{6}\\D.+?)\\s+(\\(time: ([\\d.]+)s\\))?");
 
     final String myPath;
     final List<Migration> myMigrations;
-    private Map<String, DefaultMutableTreeNode> treeNodeMap;
-    private String direction = null;
+    String direction = null;
+    private Map<String, DefaultMutableTreeNode> myMigrationNodeMap;
+    private Map<Migration, MigrationStatus> myMigrationStatusMap;
 
-    CommandUpDownRedoBase(Project project, String path, @NotNull List<Migration> migrations) {
-        super(project);
+    CommandUpDownRedoBase(@NotNull Project project, @NotNull List<Migration> migrations, @NotNull MigrateCommand command, String path) {
+        super(project, command);
 
         myPath = path;
         myMigrations = migrations;
@@ -43,7 +44,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         Matcher matcher = migratePattern.matcher(text);
 
         if (matcher.find()) {
-            Migration migration = findMigration(matcher.group(2));
+            Migration migration = findMigration("\\" + StringUtil.defaultIfEmpty(matcher.group(2), ""), matcher.group(3));
             if (migration == null) {
                 return;
             }
@@ -58,7 +59,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                     break;
                 case "applied":
                     migration.status = MigrationStatus.Success;
-                    migration.upDuration = Duration.parse("PT" + matcher.group(4) + "S");
+                    migration.upDuration = Duration.parse("PT" + matcher.group(5) + "S");
                     break;
                 case "failed to apply":
                     migration.status = MigrationStatus.ApplyError;
@@ -73,7 +74,7 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                     break;
                 case "reverted":
                     migration.status = MigrationStatus.NotApply;
-                    migration.downDuration = Duration.parse("PT" + matcher.group(4) + "S");
+                    migration.downDuration = Duration.parse("PT" + matcher.group(5) + "S");
                     break;
                 case "failed to revert":
                     migration.status = MigrationStatus.RollbackError;
@@ -84,16 +85,22 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
     }
 
-    void executeCommandWithParams(String command, List<String> parameters) {
+    void executeActionWithParams(String action, List<String> parameters) {
         try {
+            String command = myCommand.command + "/" + action;
             ProcessHandler processHandler = YiiCommandLineUtil.configureHandler(myProject, command, parameters);
             if (processHandler == null) {
                 return;
             }
 
+            myMigrationStatusMap = new HashMap<>();
+            for (Migration migration : myMigrations) {
+                myMigrationStatusMap.put(migration, migration.status);
+            }
+
             executeProcess(processHandler);
 
-            setErrorStatusForMigrationInProgress();
+            setErrorStatusForMigrationInProgress(action);
         } catch (ExecutionException e) {
             YiiCommandLineUtil.processError(e);
         }
@@ -103,35 +110,35 @@ abstract class CommandUpDownRedoBase extends CommandBase {
 
     DefaultMutableTreeNode findTreeNode(Migration migration) {
         if (myComponent instanceof JTree) {
-            if (treeNodeMap == null) {
-                JTree tree = (JTree) myComponent;
-                DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-                Enumeration pathEnumeration = root.children();
-                while (pathEnumeration.hasMoreElements()) {
-                    DefaultMutableTreeNode pathNode = ((DefaultMutableTreeNode) pathEnumeration.nextElement());
-                    String path = (String) pathNode.getUserObject();
-                    if (path.equals(myPath)) {
-                        treeNodeMap = new HashMap<>();
-                        Enumeration migrationEnumeration = pathNode.children();
-                        while (migrationEnumeration.hasMoreElements()) {
-                            DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) migrationEnumeration.nextElement();
-                            treeNodeMap.put(((Migration) treeNode.getUserObject()).name, treeNode);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            return treeNodeMap.get(migration.name);
+            return getMigrationNodeMap().get(migration.name);
         }
 
         return null;
     }
 
-    private void setErrorStatusForMigrationInProgress() {
+    private Map<String, DefaultMutableTreeNode> getMigrationNodeMap() {
+        if (myMigrationNodeMap == null) {
+            myMigrationNodeMap = new HashMap<>();
+            buildMigrationNodeMap((DefaultMutableTreeNode) ((JTree) myComponent).getModel().getRoot());
+        }
+
+        return myMigrationNodeMap;
+    }
+
+    private void buildMigrationNodeMap(DefaultMutableTreeNode parentNode) {
+        Enumeration pathEnumeration = parentNode.children();
+        while (pathEnumeration.hasMoreElements()) {
+            DefaultMutableTreeNode node = ((DefaultMutableTreeNode) pathEnumeration.nextElement());
+            if (node.getUserObject() instanceof Migration) {
+                myMigrationNodeMap.put(((Migration) node.getUserObject()).name, node);
+            }
+        }
+    }
+
+    private void setErrorStatusForMigrationInProgress(String action) {
         if (myMigrations.size() > 0) {
             for (Migration migration : myMigrations) {
-                if (migration.status == MigrationStatus.Progress) {
+                if (isInvalidMigrationStatus(migration, action)) {
                     if (direction.equals("reverting")) {
                         migration.status = MigrationStatus.RollbackError;
                     } else {
@@ -140,6 +147,19 @@ abstract class CommandUpDownRedoBase extends CommandBase {
                 }
             }
         }
+    }
+
+    private boolean isInvalidMigrationStatus(Migration migration, String action) {
+        if (migration.status == MigrationStatus.Progress) {
+            return true;
+        }
+
+        if (action.equals("redo") && migration.status != myMigrationStatusMap.get(migration)) {
+            return true;
+        }
+
+        return !action.equals("redo") && migration.status == myMigrationStatusMap.get(migration);
+
     }
 
     private void syncDataSources() {
@@ -154,13 +174,28 @@ abstract class CommandUpDownRedoBase extends CommandBase {
         }
     }
 
-    private Migration findMigration(String name) {
+    private Migration findMigration(String namespace, String name) {
         for (Migration migration : myMigrations) {
-            if (migration.name.equals(name)) {
+            if (StringUtil.equals(name, migration.name) && StringUtil.equals(namespace, migration.namespace)) {
                 return migration;
             }
         }
 
         return null;
+    }
+
+    void prepareCommandParams(List<String> params, MigrateCommand command, String path) {
+        boolean useNamespaces = myMigrations.stream().anyMatch(migration -> !migration.namespace.equals("\\"));
+        super.prepareCommandParams(params, useNamespaces ? "@vendor" : path);
+        if (command instanceof DefaultMigrateCommand && useNamespaces) {
+            Set<String> namespaces = new HashSet<>();
+            for (Migration migration : myMigrations) {
+                if (!migration.namespace.equals("\\")) {
+                    namespaces.add(migration.namespace);
+                }
+            }
+
+            params.add("--migrationNamespaces=" + StringUtil.join(namespaces, ","));
+        }
     }
 }

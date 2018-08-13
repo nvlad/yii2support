@@ -3,6 +3,7 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+- Migrations v2 (support namespaced migration, multiple commands, sync freezes)
 - Fix showing "Search for references" checkbox on php file rename dialog
 - Skip include for "Goto View render call"
 - Code completion for inherited GridView [Issue #202]
