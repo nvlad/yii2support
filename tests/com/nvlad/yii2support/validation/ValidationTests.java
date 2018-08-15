@@ -3,8 +3,6 @@ package com.nvlad.yii2support.validation;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.jetbrains.php.lang.PhpFileType;
 
-import java.io.File;
-
 /**
  * Created by oleg on 2017-06-11.
  */
@@ -13,7 +11,6 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         myFixture.configureFromExistingVirtualFile(myFixture.copyFileToProject("classes.php"));
-
     }
 
     @Override
@@ -23,7 +20,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
 
     public void testCompletionField() {
 
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+        myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
                 "        public $name;\n" +
@@ -43,7 +40,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
 
     public void testCompletionField2() {
 
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+        myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
                 "        public $name;\n" +
@@ -63,7 +60,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
 
     public void testCompletionValidators() {
 
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+        myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
                 "        public $name;\n" +
@@ -76,7 +73,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
                 "                ];\n" +
                 "        }\n" +
                 "       function validateCompany() {" +
-                        "}" +
+                "}" +
                 "    }");
         myFixture.completeBasic();
         assertEquals(2, myFixture.getLookupElementStrings().size());
@@ -84,7 +81,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
 
     public void testCompletionValidatorParams() {
 
-        myFixture.configureByText(PhpFileType.INSTANCE,   "<?php \n" +
+        myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
                 "        public $name;\n" +
