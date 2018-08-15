@@ -19,7 +19,7 @@ public class PsiUtil {
             }
         }
         if (next.getText().equals(endArray)) {
-            Boolean deleteComma = false;
+            boolean deleteComma = false;
             if (element.getPrevSibling() instanceof PsiWhiteSpace) {
                 deleteComma = !element.getPrevSibling().getText().contains("\n");
                 element.getPrevSibling().delete();
