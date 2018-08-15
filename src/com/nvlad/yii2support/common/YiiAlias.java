@@ -1,7 +1,6 @@
 package com.nvlad.yii2support.common;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
 import org.apache.commons.lang.StringUtils;

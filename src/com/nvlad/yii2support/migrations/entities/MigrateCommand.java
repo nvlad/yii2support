@@ -6,7 +6,6 @@ import com.intellij.util.SmartList;
 import com.nvlad.yii2support.common.YiiAlias;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class MigrateCommand implements Comparable<MigrateCommand>, Cloneable {

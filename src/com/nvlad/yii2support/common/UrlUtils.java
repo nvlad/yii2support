@@ -1,15 +1,12 @@
 package com.nvlad.yii2support.common;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.nvlad.yii2support.common.StringUtils;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Created by oleg on 25.04.2017.

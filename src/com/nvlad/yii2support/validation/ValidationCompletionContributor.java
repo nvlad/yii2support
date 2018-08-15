@@ -7,7 +7,6 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.nvlad.yii2support.common.Patterns;
-import com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionProvider;
 import org.jetbrains.annotations.NotNull;
 
 /**

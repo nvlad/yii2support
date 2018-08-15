@@ -1,7 +1,6 @@
 package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.css.CssFileType;
 import com.intellij.util.ProcessingContext;
 
 import org.jetbrains.annotations.NotNull;
