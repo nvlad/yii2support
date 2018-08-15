@@ -18,8 +18,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return new File(this.getClass().getResource("fixtures").getFile()).getAbsolutePath();
-
+        return "tests/com/nvlad/yii2support/validation/fixtures";
     }
 
     public void testCompletionField() {

@@ -19,8 +19,7 @@ public class ObjectFactoryTests  extends LightCodeInsightFixtureTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return new File(this.getClass().getResource("fixtures").getFile()).getAbsolutePath();
-
+        return "tests/com/nvlad/yii2support/objectfactory/fixtures";
     }
 
     public void testCompletionWidget_widget() {
