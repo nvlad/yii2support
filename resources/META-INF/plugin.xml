@@ -176,7 +176,7 @@
     <!--
     <project-components>
         <component>
-            <implementation-class>com.nvlad.yii2support.utils.Yii2SupportSettings</implementation-class>
+            <implementation-class>Yii2SupportSettings</implementation-class>
         </component>
 
     </project-components>
