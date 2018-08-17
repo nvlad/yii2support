@@ -2,7 +2,7 @@
 
 namespace yii\base {
 
-    class Object
+    class BaseObject
     {
         function __construct($config)
         {
@@ -29,13 +29,10 @@ namespace yii\validators {
         public $param3;
         public $param4;
         public $param5;
-
     }
-
 }
 
 namespace app {
-
     use yii\base\Model;
 
     class ContactForm extends Model
@@ -51,5 +48,4 @@ namespace app {
                 ];
         }
     }
-
 }

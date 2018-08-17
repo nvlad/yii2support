@@ -42,7 +42,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                     completionResultSet.addAllElements(items);
                 } else if (getPosition.equals(RulePositionEnum.TYPE)) {
                     // Put class validators
-                    HashMap<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
+                    Map<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
                     for (Map.Entry<String, PhpPsiElement> entry : validators.entrySet()) {
                         completionResultSet.addElement(buildLookup(entry.getKey(), (PhpClass) entry.getValue(), phpExpression));
                     }
@@ -68,18 +68,18 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                             PhpClass validator = null;
 
                             if (validatorIdentifier instanceof StringLiteralExpression) {
-                                HashMap<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
+                                Map<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
                                 String value = validatorIdentifier.getText();
                                 if (value != null) {
                                     PhpPsiElement validatorElement = validators.get(ClassUtils.removeQuotes(value));
                                     if (validatorElement instanceof PhpClass) {
-                                        validator = (PhpClass)validatorElement;
+                                        validator = (PhpClass) validatorElement;
                                     }
                                 }
                             }
 
                             if (validator == null && validatorIdentifier instanceof PhpPsiElement) {
-                                validator = ClassUtils.getPhpClassUniversal(phpClass.getProject(), (PhpPsiElement)validatorIdentifier);
+                                validator = ClassUtils.getPhpClassUniversal(phpClass.getProject(), (PhpPsiElement) validatorIdentifier);
                             }
 
                             if (validator != null) {
@@ -87,7 +87,6 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                                     completionResultSet.addElement(buildLookup(field, phpExpression, true));
                                 }
                             }
-
                         }
                     }
                 }
@@ -104,6 +103,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 validators.put(validatorClass.getName(), validatorClass);
             }
         }
+
         return validators;
     }
 
@@ -115,10 +115,12 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 validators.put(method.getName(), method);
             }
         }
+
         return validators;
     }
 
-    private static HashMap<String, PhpPsiElement> getDefaultValidators(Project project) {
+    @NotNull
+    private static Map<String, PhpPsiElement> getDefaultValidators(Project project) {
         HashMap<String, PhpPsiElement> validators = new LinkedHashMap<>();
         PhpIndex phpIndex = PhpIndex.getInstance(project);
         Collection<PhpClass> classesByFQN = phpIndex.getClassesByFQN("\\yii\\validators\\Validator");
@@ -126,22 +128,28 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
             PhpClass validatorClass = classesByFQN.iterator().next();
             Field builtInValidatorsField = validatorClass.findOwnFieldByName("builtInValidators", false);
             // Default validators not found
-            if (builtInValidatorsField == null)
-                return null;
+            if (builtInValidatorsField == null) {
+                return validators;
+            }
+
             ArrayCreationExpression fieldArray = (ArrayCreationExpression) builtInValidatorsField.getDefaultValue();
+            if (fieldArray == null) {
+                return validators;
+            }
+
             Iterable<ArrayHashElement> hashElements = fieldArray.getHashElements();
             for (ArrayHashElement elem : hashElements) {
                 if (elem.getValue() instanceof ArrayCreationExpression) {
                     PhpClass phpClass = ObjectFactoryUtils.findClassByArray((ArrayCreationExpression) elem.getValue());
                     validators.put(ClassUtils.removeQuotes(elem.getKey().getText()), phpClass);
                 } else {
-
                     PhpClass phpClass = phpIndex.getClassesByFQN(ClassUtils.removeQuotes(elem.getValue().getText())).iterator().next();
                     String validatorName = ClassUtils.removeQuotes(elem.getKey().getText());
                     validators.put(validatorName, phpClass);
                 }
             }
         }
+
         return validators;
     }
 
@@ -151,10 +159,8 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         LookupElementBuilder builder = LookupElementBuilder.create(field, lookupString).withIcon(field.getIcon());
         if (autoValue) {
             builder = builder.withInsertHandler((insertionContext, lookupElement) -> {
-
                 Document document = insertionContext.getDocument();
                 int insertPosition = insertionContext.getSelectionEndOffset();
-
                 if (position.getParent().getParent() instanceof ArrayCreationExpression) {
                     document.insertString(insertPosition + 1, " => ");
                     insertPosition += 5;
@@ -162,9 +168,11 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 }
             });
         }
+
         if (field instanceof Field) {
             builder = builder.withTypeText(field.getType().toString());
         }
+
         return builder;
     }
 
@@ -175,10 +183,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 .withInsertHandler((insertionContext, lookupElement) -> {
                 });
 
-        builder = builder.withTypeText(method.getFQN());
-
-
-        return builder;
+        return builder.withTypeText(method.getFQN());
     }
 
     @NotNull
@@ -245,20 +250,19 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         List<ArrayCreationExpression> arrayCreationExpressionList = new ArrayList<>();
         PsiElement currentElement = position.getParent();
         int limit = 15;
-        while (limit > 0 && ! (currentElement instanceof Method )) {
+        while (limit > 0 && !(currentElement instanceof Method)) {
             if (currentElement instanceof ArrayCreationExpression)
-                arrayCreationExpressionList.add ((ArrayCreationExpression)currentElement);
+                arrayCreationExpressionList.add((ArrayCreationExpression) currentElement);
             currentElement = currentElement.getParent();
             limit--;
         }
-        if (arrayCreationExpressionList.size() < 2)
+        if (arrayCreationExpressionList.size() < 2) {
             return RulePositionEnum.UNKNOWN;
-        else
+        } else {
             arrayCreationExpression = arrayCreationExpressionList.get(arrayCreationExpressionList.size() - 2);
+        }
 
-
-        Boolean innerArray = false;
-
+        boolean innerArray = false;
         if (position.getParent().getParent().getParent() == arrayCreationExpression) {
             validationParameter = position.getParent().getParent();
         } else if (position.getParent().getParent().getParent().getParent().getParent() == arrayCreationExpression) {
@@ -274,7 +278,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 return RulePositionEnum.FIELD;
             else if (index == 1 && !innerArray)
                 return RulePositionEnum.TYPE;
-            else if (index > 1 && ! innerArray)
+            else if (index > 1 && !innerArray)
                 return RulePositionEnum.OPTIONS;
             else
                 return RulePositionEnum.UNKNOWN;

@@ -19,7 +19,6 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
     }
 
     public void testCompletionField() {
-
         myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
@@ -39,7 +38,6 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
     }
 
     public void testCompletionField2() {
-
         myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
@@ -59,7 +57,6 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
     }
 
     public void testCompletionValidators() {
-
         myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
@@ -72,15 +69,13 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
                 "                    [['name'], '<caret>']\n" +
                 "                ];\n" +
                 "        }\n" +
-                "       function validateCompany() {" +
-                "}" +
+                "       function validateCompany() {}" +
                 "    }");
         myFixture.completeBasic();
         assertEquals(2, myFixture.getLookupElementStrings().size());
     }
 
     public void testCompletionValidatorParams() {
-
         myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
@@ -93,8 +88,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
                 "                    [['name'], 'test', '<caret>']\n" +
                 "                ];\n" +
                 "        }\n" +
-                "       function validateCompany() {" +
-                "}" +
+                "       function validateCompany() {}" +
                 "    }");
         myFixture.completeBasic();
         assertEquals(5, myFixture.getLookupElementStrings().size());

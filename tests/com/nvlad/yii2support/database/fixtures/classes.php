@@ -6,8 +6,6 @@ namespace yii\db {
         {
 
         }
-
-
     }
 
     class BaseActiveRecord {
@@ -34,6 +32,7 @@ namespace test {
     /**
      * Class Person
      * @package test
+     *
      * @property $prop1
      * @property $prop2
      * @property $test

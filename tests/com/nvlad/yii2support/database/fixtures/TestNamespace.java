@@ -1,7 +1,6 @@
 package com.nvlad.yii2support.database.fixtures;
 
-import com.intellij.database.model.DasObject;
-import com.intellij.database.model.ObjectKind;
+import com.intellij.database.model.*;
 import com.intellij.database.psi.DbDataSource;
 import com.intellij.database.psi.DbElement;
 import com.intellij.lang.ASTNode;
@@ -10,54 +9,50 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.JBIterable;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by oleg on 03.04.2017.
  */
 public class TestNamespace implements DasObject, DbElement {
-    @Override
-    public boolean isDirectory() {
-        return false;
+    private List<DasTable> myTables;
+
+    public TestNamespace() {
+        myTables = new ArrayList<>();
+    }
+
+    public void addTable(DasTable table) {
+        myTables.add(table);
     }
 
     @Nullable
     @Override
-    public PsiFileSystemItem getParent() {
+    public Object getDelegate() {
         return null;
     }
 
+    @NotNull
     @Override
-    public VirtualFile getVirtualFile() {
+    public CharSequence getDocumentation() {
         return null;
-    }
-
-    @Override
-    public boolean processChildren(PsiElementProcessor<PsiFileSystemItem> psiElementProcessor) {
-        return false;
-    }
-
-    @Override
-    public void checkSetName(String s) throws IncorrectOperationException {
-
     }
 
     @NotNull
     @Override
     public ObjectKind getKind() {
-        return null;
+        return ObjectKind.SCHEMA;
     }
 
     @Override
@@ -87,25 +82,13 @@ public class TestNamespace implements DasObject, DbElement {
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String s) throws IncorrectOperationException {
+    public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
         return null;
     }
 
     @Nullable
     @Override
     public ItemPresentation getPresentation() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public Object getDelegate() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public CharSequence getDocumentation() {
         return null;
     }
 
@@ -123,6 +106,37 @@ public class TestNamespace implements DasObject, DbElement {
 
     @NotNull
     @Override
+    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> aClass, @NotNull ObjectKind objectKind) {
+        if (aClass == DasTable.class) {
+            return new JBIterable<C>() {
+                @Override
+                public Iterator<C> iterator() {
+                    return new Iterator<C>() {
+                        int counter = 0;
+
+                        @Override
+                        public boolean hasNext() {
+                            return myTables.size() > counter;
+                        }
+
+                        @Override
+                        public C next() {
+                            if (aClass == DasColumn.class) {
+                                return (C) myTables.get(counter++);
+                            }
+
+                            return null;
+                        }
+                    };
+                }
+            };
+        }
+
+        return JBIterable.empty();
+    }
+
+    @NotNull
+    @Override
     public DbDataSource getDataSource() {
         return null;
     }
@@ -130,12 +144,6 @@ public class TestNamespace implements DasObject, DbElement {
     @Override
     public boolean isCaseSensitive() {
         return false;
-    }
-
-    @NotNull
-    @Override
-    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> clazz, @NotNull ObjectKind kind) {
-        return null;
     }
 
     @Override
@@ -181,6 +189,10 @@ public class TestNamespace implements DasObject, DbElement {
         return new PsiElement[0];
     }
 
+    @Override
+    public PsiElement getParent() {
+        return null;
+    }
 
     @Override
     public PsiElement getFirstChild() {
@@ -261,7 +273,7 @@ public class TestNamespace implements DasObject, DbElement {
     }
 
     @Override
-    public boolean textMatches(@NotNull @NonNls CharSequence charSequence) {
+    public boolean textMatches(@NotNull CharSequence charSequence) {
         return false;
     }
 
@@ -347,7 +359,7 @@ public class TestNamespace implements DasObject, DbElement {
 
     @Override
     public boolean isValid() {
-        return false;
+        return true;
     }
 
     @Override

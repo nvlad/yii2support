@@ -1,8 +1,9 @@
 package com.nvlad.yii2support.database.fixtures;
 
 import com.intellij.database.model.*;
-import com.intellij.database.psi.*;
+import com.intellij.database.psi.DbElement;
 import com.intellij.database.util.Casing;
+import com.intellij.database.util.DasUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.JBIterable;
 import com.intellij.util.containers.JBTreeTraverser;
@@ -18,17 +19,42 @@ import java.util.List;
  * Created by oleg on 03.04.2017.
  */
 public class TestModel implements DasModel {
-
-    Project project;
-
+    private Project myProject;
+    private TestNamespace myNamespace;
+    private List<DasObject> myList;
     public TestModel(Project project) {
-        this.project = project;
+        this.myProject = project;
+
+        myList = new LinkedList<>();
+        myNamespace = new TestNamespace();
+
+        TestTable personTestTable = new TestTable("person", myProject);
+        personTestTable.addColumn(new TestColumn(personTestTable, "name", myProject));
+        personTestTable.addColumn(new TestColumn(personTestTable, "surname", myProject));
+        personTestTable.addColumn(new TestColumn(personTestTable, "birth_date", myProject));
+        myList.add(personTestTable);
+        myNamespace.addTable(personTestTable);
+
+        TestTable addressTestTable = new TestTable("address", myProject);
+        addressTestTable.addColumn(new TestColumn(addressTestTable, "street", myProject));
+        addressTestTable.addColumn(new TestColumn(addressTestTable, "city", myProject));
+        myList.add(addressTestTable);
+        myNamespace.addTable(addressTestTable);
     }
 
     @NotNull
     @Override
     public JBIterable<? extends DasObject> getModelRoots() {
-        return null;
+        List<DasObject> roots = new ArrayList<>(1);
+        roots.add(myNamespace);
+
+        return new JBIterable<DasObject>() {
+            @NotNull
+            @Override
+            public Iterator<DasObject> iterator() {
+                return roots.iterator();
+            }
+        };
     }
 
     @Nullable
@@ -70,33 +96,8 @@ public class TestModel implements DasModel {
     @NotNull
     @Override
     public JBTreeTraverser<DasObject> traverser() {
-
-        List<DasObject> list = new LinkedList<>();
-        TestNamespace namespace = new TestNamespace();
-        TestTable table1 = new TestTable("person", namespace, project);
-
-        table1.addColumn(new TestColumn("name", project));
-        table1.addColumn(new TestColumn("surname", project));
-        table1.addColumn(new TestColumn("birth_date", project));
-        list.add(table1);
-        TestTable table2 = new TestTable("address", namespace, project);
-        table2.addColumn(new TestColumn("street", project));
-        table2.addColumn(new TestColumn("city", project));
-        list.add(table2);
-        return new JBTreeTraverser<>(dasObject -> () -> new Iterator<DasObject>() {
-            int current = 0;
-
-            @Override
-            public boolean hasNext() {
-                return list.size() > current;
-            }
-
-            @Override
-            public DasObject next() {
-                return list.get(current++);
-
-            }
-        });
+        return DasUtil.dasTraverser().withRoots(myList);
+//        return new JBTreeTraverser<DasObject>(o -> () -> myList.iterator());
     }
 
     @NotNull
