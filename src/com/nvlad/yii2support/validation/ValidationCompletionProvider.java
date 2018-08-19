@@ -5,7 +5,6 @@ import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
@@ -14,7 +13,6 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.DatabaseUtils;
 import com.nvlad.yii2support.common.PsiUtil;
-import com.nvlad.yii2support.objectfactory.ObjectFactoryUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,25 +39,17 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
                     completionResultSet.addAllElements(items);
                 } else if (getPosition.equals(RulePositionEnum.TYPE)) {
-                    // Put class validators
-                    Map<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
-                    for (Map.Entry<String, PhpPsiElement> entry : validators.entrySet()) {
-                        completionResultSet.addElement(buildLookup(entry.getKey(), (PhpClass) entry.getValue(), phpExpression));
-                    }
-                    HashMap<String, PhpPsiElement> customValidators = getCustomValidators(phpClass);
-                    for (Map.Entry<String, PhpPsiElement> entry : customValidators.entrySet()) {
-                        completionResultSet.addElement(buildLookup((PhpClass) entry.getValue(), phpExpression));
-                    }
-
-                    // Put method validators
-                    HashMap<String, PhpPsiElement> methodValidators = getMethodValidators(phpClass);
-                    for (Map.Entry<String, PhpPsiElement> entry : methodValidators.entrySet()) {
-                        completionResultSet.addElement(buildLookup((Method) entry.getValue(), phpExpression));
+                    Map<String, PhpNamedElement> validators = ValidationUtil.getAllValidators(phpClass);
+                    for (Map.Entry<String, PhpNamedElement> entry : validators.entrySet()) {
+                        if (entry.getValue() instanceof PhpClass) {
+                            completionResultSet.addElement(buildLookup(entry.getKey(), (PhpClass) entry.getValue(), phpExpression));
+                        } else if (entry.getValue() instanceof Method) {
+                            completionResultSet.addElement(buildLookup((Method) entry.getValue(), phpExpression));
+                        }
                     }
                 } else if (getPosition.equals(RulePositionEnum.OPTIONS)) {
                     ArrayCreationExpression arrayCreation = (ArrayCreationExpression) PsiUtil.getSuperParent(position, ArrayCreationExpression.class, 4);
                     if (arrayCreation != null) {
-
                         if (arrayCreation.getChildren().length > 2) {
                             PsiElement elem = arrayCreation.getChildren()[1];
                             if (elem.getChildren().length == 0)
@@ -68,7 +58,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                             PhpClass validator = null;
 
                             if (validatorIdentifier instanceof StringLiteralExpression) {
-                                Map<String, PhpPsiElement> validators = getDefaultValidators(phpClass.getProject());
+                                Map<String, PhpNamedElement> validators = ValidationUtil.getDefaultValidators(phpClass);
                                 String value = validatorIdentifier.getText();
                                 if (value != null) {
                                     PhpPsiElement validatorElement = validators.get(ClassUtils.removeQuotes(value));
@@ -92,65 +82,6 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 }
             }
         }
-    }
-
-    private static HashMap<String, PhpPsiElement> getCustomValidators(PhpClass phpClass) {
-        Collection<PhpClass> validatorClasses = PhpIndex.getInstance(phpClass.getProject()).getAllSubclasses("yii\\validators\\Validator");
-        HashMap<String, PhpPsiElement> validators = new HashMap<>();
-
-        for (PhpClass validatorClass : validatorClasses) {
-            if (validatorClass.getSuperFQN() == null || !validatorClass.getFQN().startsWith("\\yii")) {
-                validators.put(validatorClass.getName(), validatorClass);
-            }
-        }
-
-        return validators;
-    }
-
-    private static HashMap<String, PhpPsiElement> getMethodValidators(PhpClass phpClass) {
-        HashMap<String, PhpPsiElement> validators = new HashMap<>();
-        Collection<Method> methods = phpClass.getMethods();
-        for (Method method : methods) {
-            if (method.getName().startsWith("validate") && method.getName().length() > "validate".length()) {
-                validators.put(method.getName(), method);
-            }
-        }
-
-        return validators;
-    }
-
-    @NotNull
-    private static Map<String, PhpPsiElement> getDefaultValidators(Project project) {
-        HashMap<String, PhpPsiElement> validators = new LinkedHashMap<>();
-        PhpIndex phpIndex = PhpIndex.getInstance(project);
-        Collection<PhpClass> classesByFQN = phpIndex.getClassesByFQN("\\yii\\validators\\Validator");
-        if (!classesByFQN.isEmpty()) {
-            PhpClass validatorClass = classesByFQN.iterator().next();
-            Field builtInValidatorsField = validatorClass.findOwnFieldByName("builtInValidators", false);
-            // Default validators not found
-            if (builtInValidatorsField == null) {
-                return validators;
-            }
-
-            ArrayCreationExpression fieldArray = (ArrayCreationExpression) builtInValidatorsField.getDefaultValue();
-            if (fieldArray == null) {
-                return validators;
-            }
-
-            Iterable<ArrayHashElement> hashElements = fieldArray.getHashElements();
-            for (ArrayHashElement elem : hashElements) {
-                if (elem.getValue() instanceof ArrayCreationExpression) {
-                    PhpClass phpClass = ObjectFactoryUtils.findClassByArray((ArrayCreationExpression) elem.getValue());
-                    validators.put(ClassUtils.removeQuotes(elem.getKey().getText()), phpClass);
-                } else {
-                    PhpClass phpClass = phpIndex.getClassesByFQN(ClassUtils.removeQuotes(elem.getValue().getText())).iterator().next();
-                    String validatorName = ClassUtils.removeQuotes(elem.getKey().getText());
-                    validators.put(validatorName, phpClass);
-                }
-            }
-        }
-
-        return validators;
     }
 
     @NotNull
@@ -201,9 +132,10 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
     @NotNull
     private LookupElementBuilder buildLookup(String lookupString, PhpClass phpClass, PhpExpression position) {
-        LookupElementBuilder builder = LookupElementBuilder.create(phpClass, lookupString).withIcon(phpClass.getIcon())
-                .withInsertHandler((insertionContext, lookupElement) -> {
-                });
+        LookupElementBuilder builder = LookupElementBuilder
+                .create(phpClass, lookupString)
+                .withIcon(phpClass.getIcon())
+                .withInsertHandler((insertionContext, lookupElement) -> {});
 
         builder = builder.withTypeText(phpClass.getFQN(), true);
 
@@ -242,9 +174,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
     }
 
     private RulePositionEnum getPosition(PsiElement position) {
-
         PsiElement validationParameter = null;
-
 
         ArrayCreationExpression arrayCreationExpression = null;
         List<ArrayCreationExpression> arrayCreationExpressionList = new ArrayList<>();

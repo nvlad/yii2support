@@ -85,7 +85,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
                 "            return [\n" +
                 "                [\n" +
                 "                    ['name', 'email', 'subject', 'body'], 'required'],\n" +
-                "                    [['name'], 'test', '<caret>']\n" +
+                "                    [['name'], 'yii\\validators\\TestValidator', '<caret>']\n" +
                 "                ];\n" +
                 "        }\n" +
                 "       function validateCompany() {}" +
