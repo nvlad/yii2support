@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.DatabaseUtils;
 import com.nvlad.yii2support.common.PsiUtil;
+import com.nvlad.yii2support.validation.entities.Validator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,31 +40,42 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
 
                     completionResultSet.addAllElements(items);
                 } else if (getPosition.equals(RulePositionEnum.TYPE)) {
-                    Map<String, PhpNamedElement> validators = ValidationUtil.getAllValidators(phpClass);
-                    for (Map.Entry<String, PhpNamedElement> entry : validators.entrySet()) {
-                        if (entry.getValue() instanceof PhpClass) {
-                            completionResultSet.addElement(buildLookup(entry.getKey(), (PhpClass) entry.getValue(), phpExpression));
-                        } else if (entry.getValue() instanceof Method) {
-                            completionResultSet.addElement(buildLookup((Method) entry.getValue(), phpExpression));
+                    List<Validator> validators = ValidationUtil.getAllValidators(phpClass);
+                    for (Validator validator : validators) {
+                        if (validator.validator instanceof PhpClass) {
+                            if (validator.alias == null) {
+                                completionResultSet.addElement(buildLookup((PhpClass) validator.validator));
+                            } else {
+                                completionResultSet.addElement(buildLookup(validator.alias, (PhpClass) validator.validator));
+                            }
+                        } else if (validator.validator instanceof Method) {
+                            completionResultSet.addElement(buildLookup((Method) validator.validator));
                         }
                     }
+//                    for (Map.Entry<String, PhpNamedElement> entry : validators.entrySet()) {
+//                        if (entry.getValue() instanceof PhpClass) {
+//                            completionResultSet.addElement(buildLookup(entry.getKey(), (PhpClass) entry.getValue(), phpExpression));
+//                        } else if (entry.getValue() instanceof Method) {
+//                            completionResultSet.addElement(buildLookup((Method) entry.getValue(), phpExpression));
+//                        }
+//                    }
                 } else if (getPosition.equals(RulePositionEnum.OPTIONS)) {
                     ArrayCreationExpression arrayCreation = (ArrayCreationExpression) PsiUtil.getSuperParent(position, ArrayCreationExpression.class, 4);
                     if (arrayCreation != null) {
                         if (arrayCreation.getChildren().length > 2) {
                             PsiElement elem = arrayCreation.getChildren()[1];
-                            if (elem.getChildren().length == 0)
+                            if (elem.getChildren().length == 0) {
                                 return;
+                            }
+
                             PsiElement validatorIdentifier = elem.getChildren()[0];
                             PhpClass validator = null;
-
                             if (validatorIdentifier instanceof StringLiteralExpression) {
-                                Map<String, PhpNamedElement> validators = ValidationUtil.getDefaultValidators(phpClass);
                                 String value = validatorIdentifier.getText();
                                 if (value != null) {
-                                    PhpPsiElement validatorElement = validators.get(ClassUtils.removeQuotes(value));
-                                    if (validatorElement instanceof PhpClass) {
-                                        validator = (PhpClass) validatorElement;
+                                    Validator validatorElement = ValidationUtil.getDefaultValidator(phpClass, ClassUtils.removeQuotes(value));
+                                    if (validatorElement != null && validatorElement.validator instanceof PhpClass) {
+                                        validator = (PhpClass) validatorElement.validator;
                                     }
                                 }
                             }
@@ -73,7 +85,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                             }
 
                             if (validator != null) {
-                                for (Field field : ClassUtils.getClassFields((PhpClass) validator)) {
+                                for (Field field : ClassUtils.getClassFields(validator)) {
                                     completionResultSet.addElement(buildLookup(field, phpExpression, true));
                                 }
                             }
@@ -108,7 +120,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
     }
 
     @NotNull
-    private LookupElementBuilder buildLookup(Method method, PhpExpression position) {
+    private LookupElementBuilder buildLookup(Method method) {
         String lookupString = method.getName();
         LookupElementBuilder builder = LookupElementBuilder.create(method, lookupString).withIcon(method.getIcon())
                 .withInsertHandler((insertionContext, lookupElement) -> {
@@ -118,20 +130,20 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
     }
 
     @NotNull
-    private LookupElementBuilder buildLookup(PhpClass phpClass, PhpExpression position) {
+    private LookupElementBuilder buildLookup(PhpClass phpClass) {
         String lookupString = phpClass.getFQN();
         lookupString = lookupString.replaceAll("^\\\\", "");
         LookupElementBuilder builder = LookupElementBuilder.create(phpClass, lookupString).withIcon(phpClass.getIcon())
                 .withInsertHandler((insertionContext, lookupElement) -> {
                 })
-                .withTypeText(phpClass.getNamespaceName().replaceAll("^\\\\", "").replaceAll("\\\\$", ""), true)
+                .withTypeText(phpClass.getNamespaceName().replaceAll("\\\\$", ""), true)
                 .withPresentableText(phpClass.getName());
 
         return builder;
     }
 
     @NotNull
-    private LookupElementBuilder buildLookup(String lookupString, PhpClass phpClass, PhpExpression position) {
+    private LookupElementBuilder buildLookup(String lookupString, PhpClass phpClass) {
         LookupElementBuilder builder = LookupElementBuilder
                 .create(phpClass, lookupString)
                 .withIcon(phpClass.getIcon())
@@ -174,9 +186,8 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
     }
 
     private RulePositionEnum getPosition(PsiElement position) {
-        PsiElement validationParameter = null;
-
-        ArrayCreationExpression arrayCreationExpression = null;
+        PsiElement validationParameter;
+        ArrayCreationExpression arrayCreationExpression;
         List<ArrayCreationExpression> arrayCreationExpressionList = new ArrayList<>();
         PsiElement currentElement = position.getParent();
         int limit = 15;

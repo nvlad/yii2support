@@ -75,4 +75,4 @@ intellij {
 }
 
 group 'com.nvlad.yii2support'
-version '0.10.56.15'
+version '0.10.56.15-dev'

@@ -37,7 +37,7 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
         assertEquals(3, myFixture.getLookupElementStrings().size());
     }
 
-    public void testCompletionField2() {
+    public void testCompletionAdditionalField() {
         myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
                 " use yii\\base\\Model; \n" +
                 " class ContactForm extends Model {\n" +
@@ -73,6 +73,30 @@ public class ValidationTests extends LightCodeInsightFixtureTestCase {
                 "    }");
         myFixture.completeBasic();
         assertEquals(2, myFixture.getLookupElementStrings().size());
+    }
+
+    public void testCompletionValidatorForClassesWithEqualNames() {
+        myFixture.configureByText(PhpFileType.INSTANCE, "<?php \n" +
+                "namespace test\\validators {\n" +
+                "    class TestValidator extends \\yii\\validators\\Validator\n" +
+                "    {\n" +
+                "    }\n" +
+                "}\n" +
+                " use yii\\base\\Model; \n" +
+                " class ContactForm extends Model {\n" +
+                "        public $name;\n" +
+                "        public $email;\n" +
+                "        public function rules() {\n" +
+                "            return [\n" +
+                "                [\n" +
+                "                    ['name', 'email', 'subject', 'body'], 'required'],\n" +
+                "                    [['name'], '<caret>']\n" +
+                "                ];\n" +
+                "        }\n" +
+                "       function validateCompany() {}" +
+                "    }");
+        myFixture.completeBasic();
+        assertEquals(3, myFixture.getLookupElementStrings().size());
     }
 
     public void testCompletionValidatorParams() {
