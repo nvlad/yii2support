@@ -5,8 +5,6 @@
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds/
  */
 
-//apply from: 'https://raw.github.com/bat-cha/gradle-plugin-git-dependencies/0.2/git-dependencies.gradle'
-
 apply plugin: 'java'
 
 allprojects {
@@ -72,6 +70,7 @@ intellij {
             "remote-run",
             "properties",
     ]
+//    sandboxDirectory project.rootDir.canonicalPath + "/.sandbox"
 }
 
 group 'com.nvlad.yii2support'

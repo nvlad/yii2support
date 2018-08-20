@@ -3,6 +3,7 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+- Show validators with equal class name
 
 0.10.56.15 August 13, 2018
 --------------------------
