@@ -7,9 +7,11 @@ import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.impl.ApplicationInfoImpl;
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.Consumer;
 import com.rollbar.api.payload.Payload;
 import com.rollbar.api.payload.data.Person;
 import com.rollbar.notifier.Rollbar;
@@ -26,6 +28,11 @@ import static com.rollbar.notifier.config.ConfigBuilder.withAccessToken;
 public class PluginApplicationComponent implements ApplicationComponent {
     private static final PluginId PLUGIN_ID = PluginId.getId("com.yii2support");
     private static Rollbar rollbar;
+    private final Object lock;
+
+    public PluginApplicationComponent() {
+        lock = new Object();
+    }
 
     @Override
     public void initComponent() {
@@ -65,13 +72,38 @@ public class PluginApplicationComponent implements ApplicationComponent {
         return "PluginApplicationComponent";
     }
 
+    private SubmittedReportInfo reportInfo;
+    public void submitErrorReport(Throwable error, String description, Consumer<SubmittedReportInfo> consumer) {
+        Rollbar rollbar = getRollbar();
+        Thread thread = new Thread(() -> {
+            synchronized(lock) {
+                reportInfo = null;
+                rollbar.error(error, description);
+                while(reportInfo == null) {
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-    public Rollbar getRollbar() {
+            consumer.consume(reportInfo);
+        });
+        thread.start();
+    }
+
+    private Rollbar getRollbar() {
         if (rollbar == null) {
             Config config = rollbarConfig();
             config.sender().addListener(new SenderListener() {
                 @Override
                 public void onResponse(Payload payload, Response response) {
+                    synchronized(lock) {
+                        reportInfo = new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.NEW_ISSUE);
+                        lock.notifyAll();
+                    }
+
                     if (response.getResult().isError()) {
                         return;
                     }
@@ -81,6 +113,11 @@ public class PluginApplicationComponent implements ApplicationComponent {
 
                 @Override
                 public void onError(Payload payload, Exception e) {
+                    synchronized(lock) {
+                        reportInfo = new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.FAILED);
+                        lock.notifyAll();
+                    }
+
                     showNotification("Error report not sent. Try late.", NotificationType.ERROR);
                 }
 
@@ -95,7 +132,6 @@ public class PluginApplicationComponent implements ApplicationComponent {
                             plugin.getName(), content, notificationType, NotificationListener.URL_OPENING_LISTENER
                     );
                     Notifications.Bus.notify(notification);
-
                 }
             });
             rollbar = Rollbar.init(config);
