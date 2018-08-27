@@ -2,7 +2,7 @@
 
 namespace yii\base {
 
-    class Object
+    class BaseObject
     {
         function __construct($config)
         {
@@ -13,6 +13,10 @@ namespace yii\base {
     {
         function __construct($config)
         {
+        }
+
+        public function rules() {
+
         }
     }
 }
@@ -29,27 +33,5 @@ namespace yii\validators {
         public $param3;
         public $param4;
         public $param5;
-
     }
-
-}
-
-namespace app {
-
-    use yii\base\Model;
-
-    class ContactForm extends Model
-    {
-        public $name;
-        public $email;
-        public function rules()
-        {
-            return [
-                [
-                    ['name', 'email', 'subject', 'body'], 'required'],
-                    ['<caret>']
-                ];
-        }
-    }
-
 }

@@ -8,19 +8,15 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.ArrayListSet;
 import com.intellij.util.containers.JBIterable;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,12 +27,14 @@ import java.util.Set;
  * Created by oleg on 04.04.2017.
  */
 public class TestColumn implements DbColumn, DasColumn {
-    String name;
-    Project project;
+    private DbTable myTable;
+    private String myName;
+    private Project myProject;
 
-    public TestColumn(String name, Project project) {
-        this.name = name;
-        this.project = project;
+    public TestColumn(DbTable table, String name, Project project) {
+        myTable = table;
+        myName = name;
+        myProject = project;
     }
 
     @Nullable
@@ -54,7 +52,7 @@ public class TestColumn implements DbColumn, DasColumn {
     @NotNull
     @Override
     public ObjectKind getKind() {
-        return null;
+        return ObjectKind.COLUMN;
     }
 
     @Override
@@ -70,12 +68,7 @@ public class TestColumn implements DbColumn, DasColumn {
     @NotNull
     @Override
     public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public boolean processChildren(PsiElementProcessor<PsiFileSystemItem> psiElementProcessor) {
-        return false;
+        return myName;
     }
 
     @Override
@@ -89,7 +82,7 @@ public class TestColumn implements DbColumn, DasColumn {
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String s) throws IncorrectOperationException {
+    public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
         return null;
     }
 
@@ -112,14 +105,14 @@ public class TestColumn implements DbColumn, DasColumn {
 
     @NotNull
     @Override
-    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> clazz, @NotNull ObjectKind kind) {
+    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> aClass, @NotNull ObjectKind objectKind) {
         return null;
     }
 
     @NotNull
     @Override
     public DbDataSource getDataSource() {
-        return null;
+        return new TestDataSource(myProject);
     }
 
     @Override
@@ -134,7 +127,7 @@ public class TestColumn implements DbColumn, DasColumn {
 
     @Override
     public DbTable getTable() {
-        return null;
+        return myTable;
     }
 
     @Override
@@ -144,9 +137,22 @@ public class TestColumn implements DbColumn, DasColumn {
 
     @NotNull
     @Override
+    public String getDisplayOrder() {
+        return null;
+    }
+
+    @NotNull
+    @Override
     public DataType getDataType() {
         Set<DataType.Feature> features = new ArrayListSet<>();
-        return new DataType("type", "type", 1,1, LengthUnit.BYTE, true, "a",  "a", false, null, features, 0);
+        return new DataType("testSchema", "testType", 1, 1, LengthUnit.BYTE, null, null, true, true, null, features, 0);
+//        return new DataType(
+//                "type",
+//                "type",
+//                1,
+//                1,
+//                LengthUnit.BYTE, true, "a",  "a", false, null, features, 0);
+//        return null;
     }
 
     @Nullable
@@ -189,7 +195,7 @@ public class TestColumn implements DbColumn, DasColumn {
     @NotNull
     @Override
     public Project getProject() throws PsiInvalidElementAccessException {
-        return project;
+        return myProject;
     }
 
     @NotNull
@@ -210,18 +216,7 @@ public class TestColumn implements DbColumn, DasColumn {
     }
 
     @Override
-    public boolean isDirectory() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public PsiFileSystemItem getParent() {
-        return null;
-    }
-
-    @Override
-    public VirtualFile getVirtualFile() {
+    public PsiElement getParent() {
         return null;
     }
 
@@ -304,7 +299,7 @@ public class TestColumn implements DbColumn, DasColumn {
     }
 
     @Override
-    public boolean textMatches(@NotNull @NonNls CharSequence charSequence) {
+    public boolean textMatches(@NotNull CharSequence charSequence) {
         return false;
     }
 
@@ -484,10 +479,5 @@ public class TestColumn implements DbColumn, DasColumn {
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    @Override
-    public void checkSetName(String s) throws IncorrectOperationException {
-
     }
 }

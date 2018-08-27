@@ -11,18 +11,14 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.JBIterable;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,11 +28,12 @@ import javax.swing.*;
  * Created by oleg on 03.04.2017.
  */
 public class TestDataSource implements DbDataSource {
-
-    Project project;
+    private Project myProject;
+    private DasModel myModel;
 
     public TestDataSource(Project project) {
-        this.project = project;
+        myProject = project;
+        myModel = new TestModel(myProject);
     }
 
     @NotNull
@@ -85,11 +82,6 @@ public class TestDataSource implements DbDataSource {
     }
 
     @Override
-    public boolean processChildren(PsiElementProcessor<PsiFileSystemItem> psiElementProcessor) {
-        return false;
-    }
-
-    @Override
     public void init(PsiElement psiElement) {
 
     }
@@ -100,7 +92,7 @@ public class TestDataSource implements DbDataSource {
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String s) throws IncorrectOperationException {
+    public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
         return null;
     }
 
@@ -124,7 +116,7 @@ public class TestDataSource implements DbDataSource {
 
     @NotNull
     @Override
-    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> clazz, @NotNull ObjectKind kind) {
+    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> aClass, @NotNull ObjectKind objectKind) {
         return null;
     }
 
@@ -165,7 +157,7 @@ public class TestDataSource implements DbDataSource {
     @NotNull
     @Override
     public DasModel getModel() {
-        return new TestModel(this.project);
+        return myModel;
     }
 
     @Override
@@ -191,7 +183,7 @@ public class TestDataSource implements DbDataSource {
     @NotNull
     @Override
     public Project getProject() throws PsiInvalidElementAccessException {
-        return this.project;
+        return myProject;
     }
 
     @NotNull
@@ -212,18 +204,7 @@ public class TestDataSource implements DbDataSource {
     }
 
     @Override
-    public boolean isDirectory() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public PsiFileSystemItem getParent() {
-        return null;
-    }
-
-    @Override
-    public VirtualFile getVirtualFile() {
+    public PsiElement getParent() {
         return null;
     }
 
@@ -306,7 +287,7 @@ public class TestDataSource implements DbDataSource {
     }
 
     @Override
-    public boolean textMatches(@NotNull @NonNls CharSequence charSequence) {
+    public boolean textMatches(@NotNull CharSequence charSequence) {
         return false;
     }
 
@@ -392,7 +373,7 @@ public class TestDataSource implements DbDataSource {
 
     @Override
     public boolean isValid() {
-        return false;
+        return true;
     }
 
     @Override
@@ -486,10 +467,5 @@ public class TestDataSource implements DbDataSource {
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    @Override
-    public void checkSetName(String s) throws IncorrectOperationException {
-
     }
 }

@@ -17,7 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     public static final ID<String, ViewInfo> identity = ID.create("Yii2Support.ViewFileIndex");
@@ -63,7 +66,6 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
-        System.out.println("FileBasedIndex.InputFilter getInputFilter()");
         return myInputFilter;
     }
 

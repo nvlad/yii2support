@@ -4,6 +4,12 @@ Yii2 Support Change Log
 Waiting for Release
 -------------------
 
+0.10.56.18 August 27, 2018
+--------------------------
+- Show validators with equal class name
+- Fix submit error report for PhpStorm 2018.2
+- Enhance error report submitting
+
 0.10.56.15 August 13, 2018
 --------------------------
 - Migrations v2 (support namespaced migration, multiple commands, sync freezes)

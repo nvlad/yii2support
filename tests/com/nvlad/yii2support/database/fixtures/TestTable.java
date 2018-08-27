@@ -1,9 +1,6 @@
 package com.nvlad.yii2support.database.fixtures;
 
-import com.intellij.database.model.DasColumn;
-import com.intellij.database.model.DasObject;
-import com.intellij.database.model.DasTable;
-import com.intellij.database.model.ObjectKind;
+import com.intellij.database.model.*;
 import com.intellij.database.psi.DbDataSource;
 import com.intellij.database.psi.DbElement;
 import com.intellij.database.psi.DbTable;
@@ -12,18 +9,14 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.JBIterable;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,21 +29,19 @@ import java.util.Set;
 /**
  * Created by oleg on 03.04.2017.
  */
-public class TestTable implements DbTable {
+public class TestTable implements DbTable, DasTable {
 
-    String name;
-    TestNamespace parent;
-    Project project;
-    List<DasColumn> columns = new ArrayList<>();
+    private String myName;
+    private Project myProject;
+    private List<DasColumn> myColumns = new ArrayList<>();
 
-    public TestTable(String name, TestNamespace parent, Project project) {
-        this.name = name;
-        this.parent = parent;
-        this.project = project;
+    public TestTable(String name, Project project) {
+        this.myName = name;
+        this.myProject = project;
     }
 
     public void addColumn(DasColumn column) {
-        columns.add(column);
+        myColumns.add(column);
     }
 
     @Override
@@ -65,10 +56,8 @@ public class TestTable implements DbTable {
 
     @NotNull
     @Override
-    public Set<DasColumn.Attribute> getColumnAttrs(@Nullable DasColumn columnInfo) {
-
+    public Set<DasColumn.Attribute> getColumnAttrs(@Nullable DasColumn dasColumn) {
         return DasUtil.NO_ATTRS;
-
     }
 
     @Nullable
@@ -86,7 +75,7 @@ public class TestTable implements DbTable {
     @NotNull
     @Override
     public ObjectKind getKind() {
-        return null;
+        return ObjectKind.TABLE;
     }
 
     @Override
@@ -102,12 +91,7 @@ public class TestTable implements DbTable {
     @NotNull
     @Override
     public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public boolean processChildren(PsiElementProcessor<PsiFileSystemItem> psiElementProcessor) {
-        return false;
+        return myName;
     }
 
     @Override
@@ -121,7 +105,7 @@ public class TestTable implements DbTable {
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String s) throws IncorrectOperationException {
+    public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
         return null;
     }
 
@@ -140,42 +124,38 @@ public class TestTable implements DbTable {
     @Nullable
     @Override
     public DbElement getDbParent() {
-        return parent;
+        return null;
     }
 
     @NotNull
     @Override
-    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> clazz, @NotNull ObjectKind kind) {
-        if (clazz == DasColumn.class) {
-            JBIterable<C> iter = new JBIterable<C>() {
+    public <C> JBIterable<C> getDbChildren(@NotNull Class<C> aClass, @NotNull ObjectKind objectKind) {
+        if (aClass == DasColumn.class) {
+            return new JBIterable<C>() {
                 @Override
                 public Iterator<C> iterator() {
                     return new Iterator<C>() {
                         int counter = 0;
+
                         @Override
                         public boolean hasNext() {
-                            if (clazz == DasColumn.class) {
-                                return columns.size() > counter;
-                            } else
-                                return false;
+                            return myColumns.size() > counter;
                         }
 
                         @Override
                         public C next() {
-                            if (clazz == DasColumn.class) {
-                                return (C)columns.get(counter++);
-                            } else
-                                return null;
+                            if (aClass == DasColumn.class) {
+                                return (C) myColumns.get(counter++);
+                            }
 
+                            return null;
                         }
                     };
                 }
             };
-            return iter;
-
-
         }
-        return null;
+
+        return JBIterable.empty();
     }
 
     @NotNull
@@ -212,7 +192,7 @@ public class TestTable implements DbTable {
     @NotNull
     @Override
     public Project getProject() throws PsiInvalidElementAccessException {
-        return this.project;
+        return myProject;
     }
 
     @NotNull
@@ -233,19 +213,7 @@ public class TestTable implements DbTable {
     }
 
     @Override
-    public boolean isDirectory() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public PsiFileSystemItem getParent() {
-        return null;
-    }
-
-
-    @Override
-    public VirtualFile getVirtualFile() {
+    public PsiElement getParent() {
         return null;
     }
 
@@ -328,7 +296,7 @@ public class TestTable implements DbTable {
     }
 
     @Override
-    public boolean textMatches(@NotNull @NonNls CharSequence charSequence) {
+    public boolean textMatches(@NotNull CharSequence charSequence) {
         return false;
     }
 
@@ -373,7 +341,6 @@ public class TestTable implements DbTable {
     }
 
     @Override
-    @Deprecated
     public void checkAdd(@NotNull PsiElement psiElement) throws IncorrectOperationException {
 
     }
@@ -399,7 +366,6 @@ public class TestTable implements DbTable {
     }
 
     @Override
-    @Deprecated
     public void checkDelete() throws IncorrectOperationException {
 
     }
@@ -510,10 +476,5 @@ public class TestTable implements DbTable {
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    @Override
-    public void checkSetName(String s) throws IncorrectOperationException {
-
     }
 }
