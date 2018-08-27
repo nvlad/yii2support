@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.10.56.15</version>
+    <version>0.10.56.18</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -26,12 +26,15 @@
       <b>Enhances</b><br/>
       - Migrations v2 (support namespaced migration, multiple commands, sync freezes)<br/>
       - Use fixed font for "Goto View render call"<br/>
+      - Enhance error report submitting<br/>
       <br/>
       <b>Fixes</b><br/>
       - Fix showing "Search for references" checkbox on php file rename dialog<br/>
       - Skip include for "Goto View render call"<br/>
       - Code completion for inherited GridView [Issue #202]<br/>
       - NullPointerException fix<br/>
+      - Show validators with equal class name<br/>
+      - Fix submit error report for PhpStorm 2018.2<br/>
       <br/>
       Full <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG</a><br/>
     ]]></change-notes>

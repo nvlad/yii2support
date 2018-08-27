@@ -3,6 +3,9 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+
+0.10.56.18 August 27, 2018
+--------------------------
 - Show validators with equal class name
 - Fix submit error report for PhpStorm 2018.2
 - Enhance error report submitting
