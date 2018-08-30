@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.Alarm;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import org.jetbrains.annotations.NotNull;
@@ -21,14 +20,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public abstract class CommandBase implements Runnable {
     final Project myProject;
     final MigrateCommand myCommand;
     protected JComponent myComponent;
     private ConsoleView myConsoleView;
-    private Alarm myAlarm;
     private Application myApplication;
+    private ScheduledExecutorService myExecutorService;
 
     CommandBase(Project project, MigrateCommand command) {
         myProject = project;
@@ -45,7 +47,7 @@ public abstract class CommandBase implements Runnable {
 
     public void repaintComponent(JComponent component) {
         myComponent = component;
-        this.myAlarm = new Alarm();
+        myExecutorService = Executors.newScheduledThreadPool(1);
     }
 
     abstract void processOutput(String text);
@@ -70,13 +72,16 @@ public abstract class CommandBase implements Runnable {
         if (myComponent != null) {
             myApplication.invokeLater(() -> myComponent.setEnabled(false));
 
-            myAlarm.addRequest(this::updateComponent, 125);
+            myExecutorService.scheduleWithFixedDelay(this::updateComponent, 0, 125, TimeUnit.MILLISECONDS);
         }
 
         processHandler.waitFor();
 
         if (myComponent != null) {
-            myAlarm.cancelAllRequests();
+            myExecutorService.shutdown();
+            if (!myExecutorService.isShutdown()) {
+                myExecutorService.shutdownNow();
+            }
 
             myApplication.invokeLater(() -> {
                 myComponent.repaint();
@@ -106,7 +111,6 @@ public abstract class CommandBase implements Runnable {
 
     private void updateComponent() {
         myComponent.repaint();
-        myAlarm.addRequest(this::updateComponent, 125);
     }
 
     public void setApplication(Application application) {
