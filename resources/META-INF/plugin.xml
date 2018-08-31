@@ -101,6 +101,8 @@
                              parentId="Yii2Support.SettingsForm"
                              nonDefaultProject="true"/>
 
+        <projectStructure.sourceRootEditHandler implementation="com.nvlad.yii2support.views.handlers.YiiViewRootEditHandler" />
+
         <!-- Object Factory -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.objectfactory.ObjectFactoryCompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.objectfactory.ObjectFactoryReferenceContributor"/>
@@ -168,6 +170,11 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt R"/>
             <keyboard-shortcut keymap="Mac OS X" first-keystroke="alt R"/>
         </action>
+        <group id="MarkViewsRootGroup">
+            <action id="MarkViewsRoot" class="com.nvlad.yii2support.views.actions.MarkViewsRootAction"/>
+            <!--<action id="UnmarkMarkViewsRoot" class="com.intellij.ide.projectView.actions.UnmarkGeneratedSourceRootAction"/>-->
+            <add-to-group group-id="MarkRootGroup" anchor="after" relative-to-action="MarkSourceRootGroup"/>
+        </group>
     </actions>
 
     <application-components>
