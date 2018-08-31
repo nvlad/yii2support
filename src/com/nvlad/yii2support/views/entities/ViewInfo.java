@@ -4,6 +4,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.indexing.FileContent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +25,7 @@ public class ViewInfo {
         fileUrl = myVirtualFile.getUrl();
     }
 
+    @Nullable
     public VirtualFile getVirtualFile() {
         if (myVirtualFile == null) {
             myVirtualFile = VirtualFileManager.getInstance().findFileByUrl(fileUrl);
