@@ -50,8 +50,8 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
 
 
                 // Check check if array creation and it is in url/route param
-                boolean isInArray = position.getParent().getParent().getParent() instanceof ArrayHashElement
-                        || position.getParent().getParent().getParent() instanceof ArrayCreationExpression;
+                final PsiElement array = PsiUtil.getSuperParent(position, 3);
+                boolean isInArray = array instanceof ArrayHashElement || array instanceof ArrayCreationExpression;
                 MethodReference mRef = getMethodReference(position);
                 if (isInArray && mRef != null && mRef.getName() != null) {
                     boolean isUrlParam = false;
