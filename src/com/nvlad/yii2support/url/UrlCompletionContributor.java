@@ -128,10 +128,15 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
     private MethodReference getMethodReference(PsiElement position) {
         MethodReference mRef = null;
         try {
-            if (position.getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
-                mRef = (MethodReference) position.getParent().getParent().getParent().getParent().getParent();
-            if (position.getParent().getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
-                mRef = (MethodReference) position.getParent().getParent().getParent().getParent().getParent().getParent();
+            final PsiElement reference = PsiUtil.getSuperParent(position, 5);
+            if (reference instanceof MethodReference) {
+                mRef = (MethodReference) reference;
+            }
+
+            if (reference != null && reference.getParent() instanceof MethodReference) {
+                mRef = (MethodReference) reference.getParent();
+            }
+
             return mRef;
         } catch (NullPointerException ex) {
             return null;
@@ -140,11 +145,7 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
 
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-        if ((typeChar == '\'' || typeChar == '"') && position.getParent() instanceof ArrayCreationExpression) {
-            return true;
-        }
-
-        return false;
+        return (typeChar == '\'' || typeChar == '"') && position.getParent() instanceof ArrayCreationExpression;
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {
