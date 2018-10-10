@@ -56,7 +56,6 @@ public class YiiCommandLineUtil {
 
         PhpCommandSettings commandSettings = commandSettings(project, command, parameters);
         GeneralCommandLine commandLine = commandSettings.createGeneralCommandLine();
-
         if (commandSettings.isRemote()) {
             PhpRemoteInterpreterManager interpreterManager = PhpRemoteInterpreterManager.getInstance();
             if (interpreterManager == null) {
@@ -118,13 +117,13 @@ public class YiiCommandLineUtil {
 
     private static PhpCommandSettings commandSettings(Project project, String command, List<String> parameters) throws ExecutionException {
         String yiiRootPath = YiiApplicationUtils.getYiiRootPath(project);
-
         PhpCommandSettings commandSettings = PhpCommandSettingsBuilder.create(project, false);
         if (YiiApplicationUtils.getAppTemplate(project) == YiiApplicationTemplate.StarterKit) {
             commandSettings.setScript(yiiRootPath + "/console/yii");
         } else {
             commandSettings.setScript(yiiRootPath + "/yii");
         }
+
         commandSettings.addArgument(command);
         commandSettings.addArguments(parameters);
 
