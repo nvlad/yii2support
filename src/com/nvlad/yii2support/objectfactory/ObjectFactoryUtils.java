@@ -92,11 +92,13 @@ public class ObjectFactoryUtils {
                     if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass)
                             && method.getParameters().length == 2 &&
                             method.getParameters()[0].getName().equals("class")) {
-                        PhpPsiElement element = (PhpPsiElement) methodRef.getParameters()[0];
-                        PhpClass widgetClass = ClassUtils.getPhpClassUniversal(methodRef.getProject(), element);
-                        if (widgetClass != null)
-                            return widgetClass;
-
+                        PsiElement element = methodRef.getParameters()[0];
+                        if (element instanceof PhpPsiElement) {
+                            PhpClass widgetClass = ClassUtils.getPhpClassUniversal(methodRef.getProject(), (PhpPsiElement) element);
+                            if (widgetClass != null) {
+                                return widgetClass;
+                            }
+                        }
                     }
 
                 }
