@@ -42,7 +42,7 @@ public class YiiApplicationUtils {
     @NotNull
     public static String getApplicationName(@NotNull VirtualFile file, @NotNull Project project) {
         VirtualFile yiiRoot = getYiiRootVirtualFile(project);
-        if (yiiRoot == null) {
+        if (yiiRoot == null || !yiiRoot.isValid()) {
             return "";
         }
 
@@ -72,7 +72,7 @@ public class YiiApplicationUtils {
     }
 
     public static YiiApplicationTemplate getAppTemplate(@Nullable VirtualFile yiiRoot) {
-        if (yiiRoot == null) {
+        if (yiiRoot == null || !yiiRoot.isValid()) {
             return YiiApplicationTemplate.Unknown;
         }
 
