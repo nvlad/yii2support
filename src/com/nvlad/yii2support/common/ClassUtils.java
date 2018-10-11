@@ -92,8 +92,10 @@ public class ClassUtils {
                     }
                 }
             }
-            if (phpPsiElement.getParent() instanceof  PhpPsiElement)
+
+            if (phpPsiElement != null && phpPsiElement.getParent() instanceof PhpPsiElement) {
                 phpPsiElement = (PhpPsiElement) phpPsiElement.getParent();
+            }
         }
 
         return null;
