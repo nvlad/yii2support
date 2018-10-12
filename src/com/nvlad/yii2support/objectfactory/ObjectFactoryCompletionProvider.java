@@ -59,8 +59,13 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
         final PsiDirectory dir = file.getContainingDirectory();
         final PhpClass phpClass = ObjectFactoryUtils.findClassByArrayCreation(arrayCreation, dir);
 
+        final PsiElement element = completionParameters.getPosition().getParent();
+        if (!(element instanceof PhpExpression)) {
+            return;
+        }
+
         final Hashtable<String, Object> uniqTracker = new Hashtable<>();
-        final PhpExpression position = (PhpExpression) completionParameters.getPosition().getParent();
+        final PhpExpression position = (PhpExpression) element;
         if (phpClass != null) {
             for (Field field : ClassUtils.getWritableClassFields(phpClass)) {
                 uniqTracker.put(field.getName(), field);
