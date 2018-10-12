@@ -76,7 +76,9 @@ public class YiiApplicationUtils {
             return YiiApplicationTemplate.Unknown;
         }
 
-        if (yiiRoot.findChild("web") != null && yiiRoot.findChild("config") != null && yiiRoot.findChild("controllers") != null) {
+        if (yiiRoot.findChild("web") != null
+                && yiiRoot.findChild("config") != null
+                && (yiiRoot.findChild("controllers") != null || yiiRoot.findChild("modules") != null)) {
             return YiiApplicationTemplate.Basic;
         }
 
