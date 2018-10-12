@@ -60,6 +60,7 @@ public class YiiApplicationUtils {
 
             return fileUrl.substring(yiiRootLength + 1, slashIndex);
         }
+
         return "app";
     }
 
@@ -135,6 +136,7 @@ public class YiiApplicationUtils {
         }
 
         yiiRootPaths.put(project, yiiRootPath);
+
         return yiiRootPath;
     }
 }

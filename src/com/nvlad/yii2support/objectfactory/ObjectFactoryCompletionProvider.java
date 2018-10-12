@@ -117,10 +117,8 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
         String lookupString = field instanceof Method ? ClassUtils.getAsPropertyName((Method) field) : field.getName();
         LookupElementBuilder builder = LookupElementBuilder.create(field, lookupString).withIcon(field.getIcon())
                 .withInsertHandler((insertionContext, lookupElement) -> {
-
                     Document document = insertionContext.getDocument();
                     int insertPosition = insertionContext.getSelectionEndOffset();
-
                     if (position.getParent().getParent() instanceof ArrayCreationExpression) {
                         document.insertString(insertPosition + 1, " => ");
                         insertPosition += 5;
@@ -130,6 +128,7 @@ public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.co
         if (field instanceof Field) {
             builder = builder.withTypeText(field.getType().toString());
         }
+
         return builder;
     }
 

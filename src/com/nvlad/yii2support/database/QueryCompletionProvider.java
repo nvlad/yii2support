@@ -159,18 +159,17 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                                 lookups = DatabaseUtils.getLookupItemsByTable(table, project, expr);
                             }
                         }
-                    }
-                    else if (isTabledPrefix(prefix)) {
+                    } else if (isTabledPrefix(prefix)) {
                         String table = getTable(prefix, null);
                         lookups = DatabaseUtils.getLookupItemsByTable(table, project, expr);
                     } else {
                         lookups = DatabaseUtils.getLookupItemsTables(project, expr);
                     }
+
                     addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                 }
             }
         }
-
     }
 
     @Nullable
@@ -207,6 +206,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
         for (char prefix: prefixes) {
             completionResultSet = adjustPrefix(prefix, completionResultSet);
         }
+
         return completionResultSet;
     }
 
@@ -232,7 +232,4 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
             }
         }
     }
-
-
-
 }
