@@ -12,15 +12,7 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Consumer;
-//import com.rollbar.api.payload.Payload;
-//import com.rollbar.api.payload.data.Person;
-//import com.rollbar.notifier.Rollbar;
-//import com.rollbar.notifier.config.Config;
-//import com.rollbar.notifier.config.ConfigBuilder;
-//import com.rollbar.notifier.sender.listener.SenderListener;
-//import com.rollbar.notifier.sender.result.Response;
-import io.sentry.DefaultSentryClientFactory;
-import io.sentry.Sentry;
+import com.nvlad.yii2support.errorreport.SentryErrorReporter;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
 import io.sentry.connection.EventSendCallback;
@@ -29,13 +21,23 @@ import io.sentry.event.Event;
 import io.sentry.event.UserBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+//import com.rollbar.api.payload.Payload;
+//import com.rollbar.api.payload.data.Person;
+//import com.rollbar.notifier.Rollbar;
+//import com.rollbar.notifier.config.Config;
+//import com.rollbar.notifier.config.ConfigBuilder;
+//import com.rollbar.notifier.sender.listener.SenderListener;
+//import com.rollbar.notifier.sender.result.Response;
 
 //import static com.rollbar.notifier.config.ConfigBuilder.withAccessToken;
 
 public class PluginApplicationComponent implements ApplicationComponent {
     private static final PluginId PLUGIN_ID = PluginId.getId("com.yii2support");
-//    private static Rollbar rollbar;
+    //    private static Rollbar rollbar;
     private final Object lock;
 
     public PluginApplicationComponent() {
@@ -81,15 +83,14 @@ public class PluginApplicationComponent implements ApplicationComponent {
     }
 
     private SubmittedReportInfo reportInfo;
+
     public void submitErrorReport(Throwable error, String description, Consumer<SubmittedReportInfo> consumer) {
 //        Sentry.init("https://e467771bed0c4bb2a39be4c46064d5e5@sentry.io/1271822");
 //        Sentry.init(new DefaultSentryClientFactory());
 //        Sentry.getContext();
 //        Sentry.capture(error);
 
-        SentryClient sentry = SentryClientFactory.sentryClient("https://e467771bed0c4bb2a39be4c46064d5e5@sentry.io/1271822");
-        Context context = sentry.getContext();
-        context.setUser(new UserBuilder().setId("nvlad").setUsername("NVlad").build());
+        SentryClient sentry = SentryClientFactory.sentryClient("https://27bfc50c49954bd49dc69c1fb4ece7fd@sentry.nvlad.com/2");
         sentry.addEventSendCallback(new EventSendCallback() {
             @Override
             public void onFailure(Event event, Exception exception) {
@@ -101,6 +102,40 @@ public class PluginApplicationComponent implements ApplicationComponent {
                 consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.NEW_ISSUE));
             }
         });
+
+        final ApplicationInfoImpl applicationInfo = (ApplicationInfoImpl) ApplicationInfo.getInstance();
+        sentry.addBuilderHelper(eventBuilder -> {
+            Map<String, Object> os = new HashMap<>();
+            os.put("name", SystemInfo.OS_NAME);
+            os.put("version", SystemInfo.OS_VERSION);
+            os.put("kernel_version", SystemInfo.OS_ARCH);
+
+            Map<String, Object> runtime = new HashMap<>();
+            String ideName = applicationInfo.getBuild().getProductCode().equals("PS") ? "PhpStorm" : "IntelliJ IDEA";
+            runtime.put("name", ideName);
+            runtime.put("version", applicationInfo.getFullVersion());
+
+            Map<String, Map<String, Object>> contexts = new HashMap<>();
+            contexts.put("os", os);
+            contexts.put("runtime", runtime);
+
+            eventBuilder.withContexts(contexts);
+
+            if (!StringUtil.isEmptyOrSpaces(description)) {
+                eventBuilder.withMessage(description);
+            }
+        });
+
+        Context context = sentry.getContext();
+        context.setUser(new UserBuilder().setId("nvlad").setUsername("NVlad").build());
+
+        context.addTag("plugin.php", SentryErrorReporter.getPluginVersion("com.jetbrains.php"));
+        context.addTag("plugin.database", SentryErrorReporter.getPluginVersion("com.intellij.database"));
+        context.addTag("plugin.twig", SentryErrorReporter.getPluginVersion("com.jetbrains.twig"));
+        context.addTag("plugin.terminal", SentryErrorReporter.getPluginVersion("org.jetbrains.plugins.terminal"));
+        context.addTag("phpstorm-remote-interpreter", SentryErrorReporter.getPluginVersion("org.jetbrains.plugins.phpstorm-remote-interpreter"));
+
+        context.addTag("java", SystemInfo.JAVA_RUNTIME_VERSION);
 
         final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PLUGIN_ID);
         if (plugin != null) {
