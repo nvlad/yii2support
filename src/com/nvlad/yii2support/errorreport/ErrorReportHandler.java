@@ -1,4 +1,4 @@
-package com.nvlad.yii2support;
+package com.nvlad.yii2support.errorreport;
 
 import com.intellij.diagnostic.AbstractMessage;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
@@ -25,8 +25,9 @@ public class ErrorReportHandler extends ErrorReportSubmitter {
                 throwable = ((AbstractMessage) event.getData()).getThrowable();
             }
 
-            PluginApplicationComponent.getInstance().submitErrorReport(throwable, additionalInfo, consumer);
+            SentryErrorReporter.submitErrorReport(throwable, additionalInfo, consumer);
         }
+
         return true;
     }
 }
