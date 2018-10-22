@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yii2support</id>
     <name>Yii2 Support</name>
-    <version>0.10.56.18</version>
+    <version>0.10.56.22</version>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
     <description><![CDATA[
@@ -35,6 +35,7 @@
       - NullPointerException fix<br/>
       - Show validators with equal class name<br/>
       - Fix submit error report for PhpStorm 2018.2<br/>
+      - Fix errors & exceptions
       <br/>
       Full <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG</a><br/>
     ]]></change-notes>
