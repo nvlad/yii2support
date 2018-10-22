@@ -13,9 +13,16 @@ allprojects {
     }
 }
 
+//dependencies {
+//    compile("com.rollbar:rollbar-java:1.3.1") {
+//        exclude group: 'org.slf4j', module: 'slf4j-api'
+//    }
+//}
+
 dependencies {
-    compile("com.rollbar:rollbar-java:1.3.1") {
+    compile ('io.sentry:sentry:1.7.12') {
         exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
     }
 }
 
@@ -26,7 +33,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.3.6"
+        classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.3.12"
     }
 }
 
@@ -74,4 +81,4 @@ intellij {
 }
 
 group 'com.nvlad.yii2support'
-version '0.10.56.18-dev'
+version '0.10.56.22-dev'
