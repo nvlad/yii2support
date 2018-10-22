@@ -139,11 +139,17 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                                 method.getParameters()[paramPosition].getName().startsWith("refColumn") ||
                                 method.getParameters()[paramPosition].getName().startsWith("sql")) ) {
                     ArrayList<LookupElementBuilder> lookups = null;
-                    PhpExpression expr = (PhpExpression) completionParameters.getPosition().getParent();
-                    if ((
+
+                    final PsiElement element = completionParameters.getPosition().getParent();
+                    if (!(element instanceof PhpExpression)) {
+                        return;
+                    }
+
+                    final PhpExpression expr = (PhpExpression) element;
+                    if (paramPosition > 0 && (
                             ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) ||
                             ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
-                    ) && paramPosition > 0) {
+                    )) {
                         PsiElement paramRef = methodRef.getParameters()[paramPosition - 1];
                         Parameter param = method.getParameters()[paramPosition - 1];
                         if (param.getName().equals("table") || param.getName().equals("refTable")) {
@@ -153,18 +159,17 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                                 lookups = DatabaseUtils.getLookupItemsByTable(table, project, expr);
                             }
                         }
-                    }
-                    else if (isTabledPrefix(prefix)) {
+                    } else if (isTabledPrefix(prefix)) {
                         String table = getTable(prefix, null);
                         lookups = DatabaseUtils.getLookupItemsByTable(table, project, expr);
                     } else {
                         lookups = DatabaseUtils.getLookupItemsTables(project, expr);
                     }
+
                     addAllElementsWithPriority(lookups, completionResultSet, 1); // tables
                 }
             }
         }
-
     }
 
     @Nullable
@@ -201,6 +206,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
         for (char prefix: prefixes) {
             completionResultSet = adjustPrefix(prefix, completionResultSet);
         }
+
         return completionResultSet;
     }
 
@@ -226,7 +232,4 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
             }
         }
     }
-
-
-
 }

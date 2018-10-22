@@ -57,12 +57,13 @@ public class PsiUtil {
     @Nullable
     public static PsiElement getSuperParent(PsiElement element, int level) {
         for (int i = 0; i < level; i++) {
-            if (element.getParent() == null) {
-                return null;
-            } else {
-                element = element.getParent();
+            if (element == null) {
+                break;
             }
+
+            element = element.getParent();
         }
+
         return element;
     }
 

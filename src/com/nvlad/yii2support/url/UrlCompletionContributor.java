@@ -50,8 +50,8 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
 
 
                 // Check check if array creation and it is in url/route param
-                boolean isInArray = position.getParent().getParent().getParent() instanceof ArrayHashElement
-                        || position.getParent().getParent().getParent() instanceof ArrayCreationExpression;
+                final PsiElement array = PsiUtil.getSuperParent(position, 3);
+                boolean isInArray = array instanceof ArrayHashElement || array instanceof ArrayCreationExpression;
                 MethodReference mRef = getMethodReference(position);
                 if (isInArray && mRef != null && mRef.getName() != null) {
                     boolean isUrlParam = false;
@@ -128,10 +128,15 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
     private MethodReference getMethodReference(PsiElement position) {
         MethodReference mRef = null;
         try {
-            if (position.getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
-                mRef = (MethodReference) position.getParent().getParent().getParent().getParent().getParent();
-            if (position.getParent().getParent().getParent().getParent().getParent().getParent() instanceof MethodReference)
-                mRef = (MethodReference) position.getParent().getParent().getParent().getParent().getParent().getParent();
+            final PsiElement reference = PsiUtil.getSuperParent(position, 5);
+            if (reference instanceof MethodReference) {
+                mRef = (MethodReference) reference;
+            }
+
+            if (reference != null && reference.getParent() instanceof MethodReference) {
+                mRef = (MethodReference) reference.getParent();
+            }
+
             return mRef;
         } catch (NullPointerException ex) {
             return null;
@@ -140,11 +145,7 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
 
     @Override
     public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-        if ((typeChar == '\'' || typeChar == '"') && position.getParent() instanceof ArrayCreationExpression) {
-            return true;
-        }
-
-        return false;
+        return (typeChar == '\'' || typeChar == '"') && position.getParent() instanceof ArrayCreationExpression;
     }
 
     private static ElementPattern<PsiElement> ElementPattern() {

@@ -42,7 +42,7 @@ public class YiiApplicationUtils {
     @NotNull
     public static String getApplicationName(@NotNull VirtualFile file, @NotNull Project project) {
         VirtualFile yiiRoot = getYiiRootVirtualFile(project);
-        if (yiiRoot == null) {
+        if (yiiRoot == null || !yiiRoot.isValid()) {
             return "";
         }
 
@@ -60,6 +60,7 @@ public class YiiApplicationUtils {
 
             return fileUrl.substring(yiiRootLength + 1, slashIndex);
         }
+
         return "app";
     }
 
@@ -72,11 +73,13 @@ public class YiiApplicationUtils {
     }
 
     public static YiiApplicationTemplate getAppTemplate(@Nullable VirtualFile yiiRoot) {
-        if (yiiRoot == null) {
+        if (yiiRoot == null || !yiiRoot.isValid()) {
             return YiiApplicationTemplate.Unknown;
         }
 
-        if (yiiRoot.findChild("web") != null && yiiRoot.findChild("config") != null && yiiRoot.findChild("controllers") != null) {
+        if (yiiRoot.findChild("web") != null
+                && yiiRoot.findChild("config") != null
+                && (yiiRoot.findChild("controllers") != null || yiiRoot.findChild("modules") != null)) {
             return YiiApplicationTemplate.Basic;
         }
 
@@ -133,6 +136,7 @@ public class YiiApplicationUtils {
         }
 
         yiiRootPaths.put(project, yiiRootPath);
+
         return yiiRootPath;
     }
 }
