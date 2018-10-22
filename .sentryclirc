@@ -1,0 +1,7 @@
+[auth]
+token=enter token here
+
+[defaults]
+url=https://sentry.nvlad.com/
+org=nvlad
+project=yii2support
