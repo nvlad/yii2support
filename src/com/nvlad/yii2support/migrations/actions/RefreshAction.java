@@ -21,47 +21,45 @@ public class RefreshAction extends MigrateBaseAction {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-        throw new NullPointerException();
-//
-//        Project project = event.getProject();
-//        if (project == null) {
-//            return;
-//        }
-//
-//        MigrationService service = MigrationService.getInstance(project);
-//        service.sync();
-//
-//        Map<MigrateCommand, Set<Migration>> migrateCommandMap = new HashMap<>();
-//        MigrateCommand defaultCommand = null;
-//        for (MigrateCommand command : service.getMigrationCommandMap().keySet()) {
-//            migrateCommandMap.put(command, new HashSet<>());
-//            if (command.isDefault) {
-//                defaultCommand = command;
-//            }
-//        }
-//
-//        for (Migration migration : service.getMigrations()) {
-//            for (MigrateCommand command : migrateCommandMap.keySet()) {
-//                if (command.containsMigration(project, migration)) {
-//                    if (command instanceof DefaultMigrateCommand) {
-//                        migrateCommandMap.get(defaultCommand).add(migration);
-//                    } else {
-//                        migrateCommandMap.get(command).add(migration);
-//                    }
-//                }
-//            }
-//        }
-//
-//        List<CommandBase> commands = new SmartList<>();
-//        for (MigrateCommand command : migrateCommandMap.keySet()) {
-//            if (migrateCommandMap.get(command).isEmpty()) {
-//                continue;
-//            }
-//
-//            commands.add(new MigrationHistory(project, command, new ArrayList<>(migrateCommandMap.get(command))));
-//        }
-//
-//        executeCommand(project, commands);
+        Project project = event.getProject();
+        if (project == null) {
+            return;
+        }
+
+        MigrationService service = MigrationService.getInstance(project);
+        service.sync();
+
+        Map<MigrateCommand, Set<Migration>> migrateCommandMap = new HashMap<>();
+        MigrateCommand defaultCommand = null;
+        for (MigrateCommand command : service.getMigrationCommandMap().keySet()) {
+            migrateCommandMap.put(command, new HashSet<>());
+            if (command.isDefault) {
+                defaultCommand = command;
+            }
+        }
+
+        for (Migration migration : service.getMigrations()) {
+            for (MigrateCommand command : migrateCommandMap.keySet()) {
+                if (command.containsMigration(project, migration)) {
+                    if (command instanceof DefaultMigrateCommand) {
+                        migrateCommandMap.get(defaultCommand).add(migration);
+                    } else {
+                        migrateCommandMap.get(command).add(migration);
+                    }
+                }
+            }
+        }
+
+        List<CommandBase> commands = new SmartList<>();
+        for (MigrateCommand command : migrateCommandMap.keySet()) {
+            if (migrateCommandMap.get(command).isEmpty()) {
+                continue;
+            }
+
+            commands.add(new MigrationHistory(project, command, new ArrayList<>(migrateCommandMap.get(command))));
+        }
+
+        executeCommand(project, commands);
     }
 
     @Override
