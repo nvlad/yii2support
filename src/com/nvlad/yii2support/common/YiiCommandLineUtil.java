@@ -74,6 +74,11 @@ public class YiiCommandLineUtil {
                             .invoke(interpreterManager, project, "Unknown string", additionalData, commandLine);
                 } else {
                     PathMappingSettings.PathMapping[] pathMappings = new PathMappingSettings.PathMapping[0];
+                    if (getRemoteProcessHandler.getParameterCount() == 5) {
+                        return (ProcessHandler) getRemoteProcessHandler
+                                .invoke(interpreterManager, project, additionalData, commandLine, true, pathMappings);
+
+                    }
 
                     return (ProcessHandler) getRemoteProcessHandler
                             .invoke(interpreterManager, project, additionalData, commandLine, pathMappings);
