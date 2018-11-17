@@ -79,7 +79,7 @@ public class ObjectFactoryUtils {
                 if (ref instanceof ClassReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 0) {
                     PhpClass callingClass = (PhpClass) ((ClassReference) ref).resolve();
                     PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "\\yii\\base\\Widget");
-                    if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass)) {
+                    if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass, 100)) {
                         return callingClass;
                     }
                 } else if (method != null && ref instanceof MethodReference && ClassUtils.indexForElementInParameterList(arrayCreation) == 1) {
@@ -87,7 +87,7 @@ public class ObjectFactoryUtils {
                     // $form->field($model, 'username')->widget(\Class::className())
                     PhpClass callingClass = method.getContainingClass();
                     PhpClass superClass = ClassUtils.getClass(PhpIndex.getInstance(methodRef.getProject()), "yii\\widgets\\ActiveField");
-                    if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass)
+                    if (ClassUtils.isClassInheritsOrEqual(callingClass, superClass, 100)
                             && method.getParameters().length == 2 &&
                             method.getParameters()[0].getName().equals("class")) {
                         PsiElement element = methodRef.getParameters()[0];
@@ -247,7 +247,7 @@ public class ObjectFactoryUtils {
                 yiiObjectClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), "\\yii\\base\\Object");
             }
 
-            if (!ClassUtils.isClassInheritsOrEqual(phpClass, yiiObjectClass)) {
+            if (!ClassUtils.isClassInheritsOrEqual(phpClass, yiiObjectClass, 100)) {
                 return null;
             }
 
