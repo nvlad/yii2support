@@ -28,7 +28,7 @@ public class UndetectableTableInspection extends PhpInspection {
 
                 PhpIndex index = PhpIndex.getInstance(problemsHolder.getProject());
                 if (DatabaseUtils.HasConnections(problemsHolder.getProject()) &&
-                        ClassUtils.isClassInheritsOrEqual(clazz, ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord"))) {
+                        ClassUtils.isClassInheritsOrEqual(clazz, ClassUtils.getClass(index, "\\yii\\db\\ActiveRecord"), 100)) {
                     String table = DatabaseUtils.getTableByActiveRecordClass(clazz);
                     if (table == null) {
                         problemsHolder.registerProblem(clazz.getFirstChild(), "Can not detect database table for class " + clazz.getFQN(), ProblemHighlightType.WEAK_WARNING);

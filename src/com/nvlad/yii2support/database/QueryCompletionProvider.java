@@ -56,7 +56,7 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
                 if ( ClassUtils.isClassInherit(possibleActiveRecordClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord")))
                     activeRecordClass = possibleActiveRecordClass;
                 // Calls inside ActiveQuery paired with ActiveRecord
-                else if (ClassUtils.isClassInheritsOrEqual(possibleActiveRecordClass, ClassUtils.getClass(index, "\\yii\\db\\ActiveQuery"))) {
+                else if (ClassUtils.isClassInheritsOrEqual(possibleActiveRecordClass, ClassUtils.getClass(index, "\\yii\\db\\ActiveQuery"), 100)) {
                     if (possibleActiveRecordClass.getDocComment() != null) {
                         activeRecordClass = ClassUtils.findClassInSeeTags(index, possibleActiveRecordClass, "\\yii\\db\\BaseActiveRecord");
                     }
@@ -147,8 +147,8 @@ public class QueryCompletionProvider extends com.intellij.codeInsight.completion
 
                     final PhpExpression expr = (PhpExpression) element;
                     if (paramPosition > 0 && (
-                            ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command")) ||
-                            ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"))
+                            ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Command"), 100) ||
+                            ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\Migration"), 100)
                     )) {
                         PsiElement paramRef = methodRef.getParameters()[paramPosition - 1];
                         Parameter param = method.getParameters()[paramPosition - 1];

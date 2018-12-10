@@ -38,7 +38,7 @@ public class PropertiesInspection extends PhpInspection {
                     PhpIndex index = PhpIndex.getInstance(element.getProject());
 
                     PhpClass phpClass = DatabaseUtils.getClassByClassPhpDoc(docComment);
-                    if (phpClass != null && ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"))) {
+                    if (phpClass != null && ClassUtils.isClassInheritsOrEqual(phpClass, ClassUtils.getClass(index, "\\yii\\db\\BaseActiveRecord"), 100)) {
                         Collection<Field> fields = phpClass.getFields();
                         String table = DatabaseUtils.getTableByActiveRecordClass(phpClass);
                         ArrayList<VirtualProperty> notDeclaredColumns = DatabaseUtils.getNotDeclaredColumns(table, fields, element.getProject());

@@ -148,10 +148,10 @@ public class ClassUtils {
     public static boolean isClassInheritsOrEqual(PhpClass classObject, String className, PhpIndex index) {
         PhpClass phpClass = ClassUtils.getClass(index, className);
 
-        return isClassInheritsOrEqual(classObject, phpClass);
+        return isClassInheritsOrEqual(classObject, phpClass, 100);
     }
 
-    public static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass) {
+    public static boolean isClassInheritsOrEqual(PhpClass classObject, PhpClass superClass, int recursionLimit) {
         if (classObject == null || superClass == null) {
             return false;
         }
@@ -159,8 +159,10 @@ public class ClassUtils {
         if (classObject.isEquivalentTo(superClass)) {
             return true;
         }
+        if (recursionLimit < 1)
+            return false;
 
-        return isClassInheritsOrEqual(classObject.getSuperClass(), superClass);
+        return isClassInheritsOrEqual(classObject.getSuperClass(), superClass, recursionLimit--);
     }
 
     public static boolean isClassInherit(PhpClass classObject, String parentClassName, PhpIndex index) {
@@ -394,7 +396,7 @@ public class ClassUtils {
             }
 
             PhpClass classInSee = getClass(index, className);
-            if (isClassInheritsOrEqual(classInSee, getClass(index, searchClassFQN))) {
+            if (isClassInheritsOrEqual(classInSee, getClass(index, searchClassFQN), 100)) {
                 activeRecordClass = classInSee;
                 break;
             }
