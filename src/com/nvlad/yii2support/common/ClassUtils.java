@@ -473,18 +473,19 @@ public class ClassUtils {
         PhpType type = element.getType();
         String typeString = type.toString();
         String[] split = typeString.split("\\|");
-        typeString = split[0];
-        Pattern pattern = Pattern.compile("\\\\[A-Za-z\\\\]+");
-        Matcher matcher = pattern.matcher(typeString);
-        if (matcher.find()) {
-            typeString = matcher.group();
-        }
+        for (String classText: split) {
+            Pattern pattern = Pattern.compile("\\\\[A-Za-z\\\\]+");
+            Matcher matcher = pattern.matcher(classText);
+            if (matcher.find()) {
+                classText = matcher.group();
+            }
+            Collection<PhpClass> anyByFQN = PhpIndex.getInstance(element.getProject()).getAnyByFQN(classText);
+            if (anyByFQN.isEmpty()) {
 
-        Collection<PhpClass> anyByFQN = PhpIndex.getInstance(element.getProject()).getAnyByFQN(typeString);
-        if (anyByFQN.isEmpty()) {
-            return null;
-        } else {
-            return anyByFQN.iterator().next();
+            } else {
+                return anyByFQN.iterator().next();
+            }
         }
+        return null;
     }
 }

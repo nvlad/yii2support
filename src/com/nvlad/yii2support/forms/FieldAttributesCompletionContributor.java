@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class FieldAttributesCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     public FieldAttributesCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new FieldAttributesCompletionProvider());
+        extend(CompletionType.BASIC, ElementPattern(), new FieldAttributesCompletionProvider());
     }
 
     @Override
