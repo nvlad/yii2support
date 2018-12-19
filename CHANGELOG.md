@@ -4,6 +4,10 @@ Yii2 Support Change Log
 Waiting for Release
 -------------------
 
+0.10.56.23 December 19
+--------------------------
+- Attribute autocomplete for ActiveForm::Field method [issue #137]
+
 0.10.56.18 August 27, 2018
 --------------------------
 - Show validators with equal class name

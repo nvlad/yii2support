@@ -118,6 +118,7 @@
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.QueryCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.database.ParamsCompletionContributor"/>
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.forms.FieldAttributesCompletionContributor"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.forms.ActiveFormCompletionContributor"/>
 
         <localInspection language="PHP" shortName="MissedParamInspection"
                          displayName="Wrong database parameters"
