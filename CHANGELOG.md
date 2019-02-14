@@ -4,8 +4,8 @@ Yii2 Support Change Log
 Waiting for Release
 -------------------
 
-0.10.56.23 December 19
---------------------------
+0.10.57.23 February 14, 2019
+----------------------------
 - Attribute autocomplete for ActiveForm::Field method [issue #137]
 
 0.10.56.18 August 27, 2018

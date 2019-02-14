@@ -86,4 +86,4 @@ publishPlugin {
 }
 
 group "com.nvlad"
-version '0.10.56.23'
+version "0.10.57.23"
