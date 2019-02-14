@@ -80,5 +80,10 @@ intellij {
 //    sandboxDirectory project.rootDir.canonicalPath + "/.sandbox"
 }
 
-group 'com.nvlad.yii2support'
+publishPlugin {
+    username ORG_GRADLE_PROJECT_USERNAME
+    password ORG_GRADLE_PROJECT_PASSWORD
+}
+
+group "com.nvlad"
 version '0.10.56.23'
