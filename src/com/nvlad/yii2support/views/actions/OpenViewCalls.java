@@ -96,11 +96,11 @@ public class OpenViewCalls extends AnAction {
                         setIcon(PhpIcons.METHOD);
                     }
 
-                    @Override
-                    public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                        jList.setFont(EditorUtil.getEditorFont());
-                        return super.getListCellRendererComponent(jList, o, i, b, b1);
-                    }
+//                    @Override
+//                    public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
+//                        jList.setFont(EditorUtil.getEditorFont());
+//                        return super.getListCellRendererComponent(jList, o, i, b, b1);
+//                    }
                 };
             }
         };

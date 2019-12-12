@@ -1,6 +1,8 @@
 package com.nvlad.yii2support.database;
 
-import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionProvider;
+import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.openapi.util.Pair;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
@@ -12,7 +14,7 @@ import com.nvlad.yii2support.common.ClassUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class QueryCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
-    private final MultiMap<CompletionType, Pair<ElementPattern<? extends PsiElement>, CompletionProvider<CompletionParameters>>> myMap = new MultiMap();
+    private final MultiMap<CompletionType, Pair<ElementPattern<? extends PsiElement>, CompletionProvider<CompletionParameters>>> myMap = new MultiMap<>();
 
     public QueryCompletionContributor() {
         extend(CompletionType.BASIC, ElementPattern(), new QueryCompletionProvider());

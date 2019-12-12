@@ -33,24 +33,25 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
     @Override
     public PhpType getType(PsiElement psiElement) {
         if (MethodUtils.isYiiCreateObjectMethod(psiElement)) {
-                    PhpPsiElement firstParam = (PhpPsiElement)MethodUtils.getParameter((MethodReference)psiElement, 0);
-                    //  Case: Yii::createObject($obj->array_var)
-                    if (firstParam instanceof FieldReference ) {
-                        String signature = ((MethodReference)psiElement).getSignature();
-                        return new PhpType().add("#" + this.getKey() + signature + TRIM_KEY + ((FieldReference) firstParam).getSignature());
-                    }
-                    // Case: Yii::createObject($array_var)
-                    if (firstParam instanceof Variable  && ((VariableImpl) firstParam).getType().getTypes().contains("\\array") ) {
-                        firstParam = getArrayCreationByVariableRef(firstParam);
-                    }
-                    if (firstParam instanceof ArrayCreationExpression) {
-                        PhpType elem = getClassByArrayCreationOptimized((ArrayCreationExpression) firstParam);
-                        if (elem != null) return elem;
-                    }
-                    else {
-                        return getClass(firstParam);
-                    }
+            PhpPsiElement firstParam = (PhpPsiElement)MethodUtils.getParameter((MethodReference)psiElement, 0);
+            //  Case: Yii::createObject($obj->array_var)
+            if (firstParam instanceof FieldReference ) {
+                String signature = ((MethodReference)psiElement).getSignature();
+                return new PhpType().add("#" + this.getKey() + signature + TRIM_KEY + ((FieldReference) firstParam).getSignature());
+            }
+            // Case: Yii::createObject($array_var)
+            if (firstParam instanceof Variable  && ((VariableImpl) firstParam).getType().getTypes().contains("\\array") ) {
+                firstParam = getArrayCreationByVariableRef(firstParam);
+            }
+            if (firstParam instanceof ArrayCreationExpression) {
+                PhpType elem = getClassByArrayCreationOptimized((ArrayCreationExpression) firstParam);
+                if (elem != null) return elem;
+            }
+            else {
+                return getClass(firstParam);
+            }
         }
+
         return null;
     }
 
