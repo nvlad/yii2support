@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ObjectFactoryCompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     public ObjectFactoryCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new ObjectFactoryCompletionProvider());
+        extend(CompletionType.BASIC, ElementPattern(), new ObjectFactoryCompletionProvider());
     }
 
     @Override
