@@ -33,7 +33,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.3.12"
+        classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.15"
     }
 }
 
@@ -61,6 +61,7 @@ apply plugin: 'idea'
 apply plugin: 'org.jetbrains.intellij'
 
 intellij {
+    type 'IU'
     version ideVersion
     alternativeIdePath runIdePath
     updateSinceUntilBuild false
@@ -70,7 +71,7 @@ intellij {
             "com.jetbrains.twig:${twigPluginVersion}",
             "DatabaseTools",
             "webDeployment",
-            "css",
+            "CSS",
             "terminal",
             "coverage",
             "java-i18n",
@@ -86,4 +87,4 @@ publishPlugin {
 }
 
 group "com.nvlad"
-version "0.10.57.23"
+version "0.10.57.24"

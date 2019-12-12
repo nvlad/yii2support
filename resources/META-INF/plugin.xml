@@ -29,7 +29,7 @@
     ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="163"/>
+    <idea-version since-build="163" until-build="2019.3"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -140,7 +140,7 @@
 
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
-      <!--  <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/> -->
+<!--        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/>-->
 
         <!-- Migrations -->
         <toolWindow id="Migrations" anchor="bottom"
@@ -153,7 +153,7 @@
     <actions>
         <!-- Add your actions here -->
         <action id="yii2support.GotoViewCalls" class="com.nvlad.yii2support.views.actions.OpenViewCalls"
-                text="Goto View render call">
+                text="Goto View Render Call">
             <add-to-group group-id="GoToMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt R"/>
             <keyboard-shortcut keymap="Mac OS X" first-keystroke="alt R"/>
