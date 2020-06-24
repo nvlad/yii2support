@@ -37,6 +37,10 @@ class Util {
             if (file != null) {
                 messages.addAll(loadMessagesFromFile(file));
             }
+            PsiFile fileJson = directory.findFile(category.concat(".json"));
+            if (fileJson != null) {
+                messages.addAll(loadMessagesFromFile(fileJson));
+            }
         }
 
         return messages.toArray(new ArrayHashElement[0]);
