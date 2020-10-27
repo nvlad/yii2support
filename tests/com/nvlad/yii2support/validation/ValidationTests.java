@@ -1,12 +1,12 @@
 package com.nvlad.yii2support.validation;
 
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.jetbrains.php.lang.PhpFileType;
 
 /**
  * Created by oleg on 2017-06-11.
  */
-public class ValidationTests extends LightCodeInsightFixtureTestCase {
+public class ValidationTests extends BasePlatformTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();

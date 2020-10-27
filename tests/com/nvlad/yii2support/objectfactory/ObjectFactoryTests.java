@@ -1,13 +1,13 @@
 package com.nvlad.yii2support.objectfactory;
 
 
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.jetbrains.php.lang.PhpFileType;
 
 /**
  * Created by oleg on 16.03.2017..
  */
-public class ObjectFactoryTests extends LightCodeInsightFixtureTestCase {
+public class ObjectFactoryTests extends BasePlatformTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
