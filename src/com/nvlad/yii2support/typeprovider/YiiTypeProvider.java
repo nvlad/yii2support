@@ -103,7 +103,7 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
         int trimIndex = s.indexOf(TRIM_KEY);
         if (trimIndex > -1 && s.length() + 1 > trimIndex) {
             String origSignature = s.substring(0, trimIndex);
-            if (origSignature != null && origSignature.endsWith("\\Yii.createObject")) {
+            if (origSignature.endsWith("\\Yii.createObject")) {
                 String variableRef = s.substring(trimIndex + 1);
                 final Collection<? extends PhpNamedElement> indexedVariabled = PhpIndex.getInstance(project).getBySignature(variableRef);
                 for (PhpNamedElement elem : indexedVariabled) {

@@ -20,7 +20,7 @@ import java.util.Hashtable;
  */
 public class ObjectFactoryCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
-    protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+    protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         if (getArrayCreation(completionParameters) == null &&
                 !(walkParents(completionParameters, 4) instanceof ArrayCreationExpression) &&
                 !(walkParents(completionParameters, 3) instanceof ArrayAccessExpression)) {

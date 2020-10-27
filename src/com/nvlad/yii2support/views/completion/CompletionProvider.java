@@ -31,7 +31,7 @@ import java.util.Set;
 class CompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters,
-                                  ProcessingContext processingContext,
+                                  @NotNull ProcessingContext processingContext,
                                   @NotNull CompletionResultSet completionResultSet) {
 
         final PsiElement psiElement = completionParameters.getPosition();

@@ -111,7 +111,7 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
 
         if (object instanceof DefaultMigrateCommand) {
             renderer.append("  applied with ", SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
-            renderer.append("default", new SimpleTextAttributes(2 | 16, JBColor.GRAY), false);
+            renderer.append("default", new SimpleTextAttributes(SimpleTextAttributes.STYLE_ITALIC | SimpleTextAttributes.STYLE_UNDERLINE, JBColor.GRAY), false);
             renderer.append(" migration command", SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
         }
     }
