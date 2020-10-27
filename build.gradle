@@ -4,8 +4,10 @@
  * This is a general purpose Gradle build.
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds/
  */
-
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.5.1'
+}
 
 allprojects {
     repositories {
@@ -23,17 +25,6 @@ dependencies {
     compile ('io.sentry:sentry:1.7.12') {
         exclude group: 'org.slf4j', module: 'slf4j-api'
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
-    }
-}
-
-buildscript {
-    repositories {
-        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-
-    dependencies {
-        classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.15"
     }
 }
 
@@ -63,7 +54,7 @@ apply plugin: 'org.jetbrains.intellij'
 intellij {
     type 'IU'
     version ideVersion
-    alternativeIdePath runIdePath
+    alternativeIdePath "${System.getenv('USERPROFILE')}${runIdePath}"
     updateSinceUntilBuild false
     plugins = [
             "com.jetbrains.php:${phpPluginVersion}",

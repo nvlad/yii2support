@@ -8,3 +8,10 @@
  */
 
 rootProject.name = 'yii2support'
+
+buildCache {
+    local {
+        // Set local build cache directory.
+        directory = "${settingsDir}/build-cache"
+    }
+}
