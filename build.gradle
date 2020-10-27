@@ -50,11 +50,11 @@ sourceSets {
             srcDirs 'resources'
         }
     }
-//    test {
-//        java {
-//            srcDirs 'tests'
-//        }
-//    }
+    test {
+        java {
+            srcDirs 'tests'
+        }
+    }
 }
 
 apply plugin: 'idea'
