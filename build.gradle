@@ -50,11 +50,11 @@ sourceSets {
             srcDirs 'resources'
         }
     }
-    test {
-        java {
-            srcDirs 'tests'
-        }
-    }
+//    test {
+//        java {
+//            srcDirs 'tests'
+//        }
+//    }
 }
 
 apply plugin: 'idea'
@@ -87,4 +87,4 @@ publishPlugin {
 }
 
 group "com.nvlad"
-version "0.10.57.24"
+version "0.10.57.30"

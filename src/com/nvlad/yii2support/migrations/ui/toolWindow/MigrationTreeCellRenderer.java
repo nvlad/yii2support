@@ -21,14 +21,14 @@ import java.util.Enumeration;
 
 class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
     private static final Icon[] progressIcons = {
-            AllIcons.RunConfigurations.TestInProgress1,
-            AllIcons.RunConfigurations.TestInProgress2,
-            AllIcons.RunConfigurations.TestInProgress3,
-            AllIcons.RunConfigurations.TestInProgress4,
-            AllIcons.RunConfigurations.TestInProgress5,
-            AllIcons.RunConfigurations.TestInProgress6,
-            AllIcons.RunConfigurations.TestInProgress7,
-            AllIcons.RunConfigurations.TestInProgress8,
+            AllIcons.Process.Step_1,
+            AllIcons.Process.Step_2,
+            AllIcons.Process.Step_3,
+            AllIcons.Process.Step_4,
+            AllIcons.Process.Step_5,
+            AllIcons.Process.Step_6,
+            AllIcons.Process.Step_7,
+            AllIcons.Process.Step_8,
     };
 
     @Override
@@ -37,7 +37,7 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
         Object object = treeNode.getUserObject();
         ColoredTreeCellRenderer renderer = getTextRenderer();
         if (object instanceof String) {
-            renderer.setIcon(DatabaseIcons.Catalog);
+            renderer.setIcon(AllIcons.Nodes.Folder);
             renderer.append(treeNode.toString(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES, true);
 
             appliedCount(treeNode, renderer);
@@ -63,11 +63,11 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
                     }
                     break;
                 case Unknown:
-                    renderer.setIcon(AllIcons.RunConfigurations.Unknown);
+                    renderer.setIcon(AllIcons.RunConfigurations.TestIgnored);
                     renderer.append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     break;
                 case NotApply:
-                    renderer.setIcon(AllIcons.General.Bullet);
+                    renderer.setIcon(AllIcons.RunConfigurations.TestNotRan);
                     renderer.append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                     if (migration.downDuration != null) {
                         renderer.append("  down time " + formatDuration(migration.downDuration), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES, false);
@@ -101,7 +101,7 @@ class MigrationTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
 
         if (object instanceof MigrateCommand) {
             MigrateCommand command = (MigrateCommand) object;
-            renderer.setIcon(AllIcons.Debugger.CommandLine);
+            renderer.setIcon(AllIcons.Nodes.Folder);
             renderer.append(command.command, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
 
             if (!(object instanceof DefaultMigrateCommand)) {
