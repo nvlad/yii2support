@@ -213,7 +213,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
             return RulePositionEnum.UNKNOWN;
         }
 
-        if (validationParameter.toString().equals("Array value") && validationParameter.getParent() instanceof ArrayCreationExpression) {
+        if (validationParameter.getNode().toString().equals("Element(Array value)") && validationParameter.getParent() instanceof ArrayCreationExpression) {
             int index = PsiUtil.getValueIndexInArray(validationParameter, (ArrayCreationExpression) validationParameter.getParent());
             if (index == 0)
                 return RulePositionEnum.FIELD;
