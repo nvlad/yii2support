@@ -22,14 +22,21 @@
     ]]></description>
 
     <change-notes><![CDATA[
+      <b>Fixes</b><br/>
+      - Compatible with PhpStorm 2020.*<br/>
+      - Frizzes in PhpStorm 2019.3<br/>
+      - Work code completion<br/>
+      <br/>
+
       <b>Features</b><br/>
-      - Attribute autocomplete for ActiveForm::Field method [issue #137]<br/>
+      - Add Icon :D<br/>
+
       <br/>
       Full <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG</a><br/>
     ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="163" until-build="2019.3"/>
+    <idea-version since-build="2019.*" until-build="2020.*"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
