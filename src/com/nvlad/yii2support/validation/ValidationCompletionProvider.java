@@ -17,7 +17,8 @@ import com.nvlad.yii2support.validation.entities.Validator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by oleg on 20.04.2017.
@@ -213,6 +214,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
             return RulePositionEnum.UNKNOWN;
         }
 
+        //TODO: Поискать решение без костылей типа "Element(Array value)", как выяснилось может сломаться
         if (validationParameter.getNode().toString().equals("Element(Array value)") && validationParameter.getParent() instanceof ArrayCreationExpression) {
             int index = PsiUtil.getValueIndexInArray(validationParameter, (ArrayCreationExpression) validationParameter.getParent());
             if (index == 0)
