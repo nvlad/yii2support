@@ -1,9 +1,12 @@
 package com.nvlad.yii2support.url;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 public class UrlTests  extends BasePlatformTestCase {
     @Override
@@ -17,6 +20,7 @@ public class UrlTests  extends BasePlatformTestCase {
         myFixture.configureFromExistingVirtualFile(myFixture.copyFileToProject("classes.php"));
     }
 
+    @Test
     public void testControllerRedirectMethod() {
         myFixture.configureByFile("testControllerRedirectMethod.php");
         myFixture.completeBasic();
@@ -30,6 +34,7 @@ public class UrlTests  extends BasePlatformTestCase {
         assertContainsElements(lookupElements, expected);
     }
 
+    @Test
     public void testControllerRedirectMethodArrayArgument() {
         myFixture.configureByFile("testControllerRedirectMethodArrayArgument.php");
         myFixture.completeBasic();
@@ -43,6 +48,7 @@ public class UrlTests  extends BasePlatformTestCase {
         assertContainsElements(lookupElements, expected);
     }
 
+    @Test
     public void testUrlTo() {
         myFixture.configureByFile("testUrlTo.php");
         myFixture.completeBasic();
@@ -55,6 +61,7 @@ public class UrlTests  extends BasePlatformTestCase {
         assertContainsElements(lookupElements, expected);
     }
 
+    @Test
     public void testUrlParameterCompletion() {
         myFixture.configureByFile("testUrlParameterCompletion.php");
         myFixture.completeBasic();
@@ -69,6 +76,7 @@ public class UrlTests  extends BasePlatformTestCase {
         assertContainsElements(lookupElements, expected);
     }
 
+    @Test
     public void testUrlToArrayArgument() {
         myFixture.configureByFile("testUrlToArrayArgument.php");
         myFixture.completeBasic();
@@ -81,6 +89,7 @@ public class UrlTests  extends BasePlatformTestCase {
         assertContainsElements(lookupElements, expected);
     }
 
+    @Test
     public void testUrlRemember() {
         myFixture.configureByFile("testUrlRemember.php");
         myFixture.completeBasic();
@@ -93,6 +102,7 @@ public class UrlTests  extends BasePlatformTestCase {
         assertContainsElements(lookupElements, expected);
     }
 
+    @Test
     public void testUrlRememberArrayArgument() {
         myFixture.configureByFile("testUrlRememberArrayArgument.php");
         myFixture.completeBasic();
