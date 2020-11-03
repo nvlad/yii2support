@@ -50,7 +50,7 @@ public class UrlUtils {
         HashMap<String, Method> routes = new HashMap<>();
         for (Method method: methods ) {
             if (method.getName().length() > 6 && method.getName().substring(0, 6).equals("action") && Character.isUpperCase(method.getName().charAt(6))) {
-                String part2 = method.getName().replace("action", "");
+                String part2 = method.getName().substring(6); // remove "action" prefix
                 part1 = StringUtils.CamelToId(part1, "-");
                 part2 = StringUtils.CamelToId(part2, "-") ; // part2.replaceAll("(?<=[\\p{Lower}\\p{Digit}])[\\p{Upper}]", "-$0").toLowerCase();
                 routes.put(part1 + "/" +part2, method);
