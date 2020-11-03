@@ -12,7 +12,7 @@ import java.util.*;
  * Created by oleg on 25.04.2017.
  */
 public class UrlUtils {
-    private static List<String> excludeControllers =  Arrays.asList(
+    private static final List<String> excludeControllers =  Arrays.asList(
             "\\yii\\rest\\ActiveController",
             "\\yii\\gii\\controllers\\DefaultController",
             "\\yii\\rest\\Controller",
@@ -41,21 +41,27 @@ public class UrlUtils {
             if (!excludeControllers.contains(controller.getFQN()))
                 routes.putAll(controllerToRoutes(controller));
         }
+
         return routes;
     }
 
     private static HashMap<String, Method> controllerToRoutes(PhpClass controller) {
-        String part1 = controller.getName().replace("Controller", "");
+        String controllerName = controller.getName();
+        String controllerPart = controllerName.substring(0, controllerName.length() - 10);
+        controllerPart = StringUtils.CamelToId(controllerPart, "-");
+
         Collection<Method> methods = controller.getMethods();
         HashMap<String, Method> routes = new HashMap<>();
         for (Method method: methods ) {
-            if (method.getName().length() > 6 && method.getName().substring(0, 6).equals("action") && Character.isUpperCase(method.getName().charAt(6))) {
-                String part2 = method.getName().substring(6); // remove "action" prefix
-                part1 = StringUtils.CamelToId(part1, "-");
-                part2 = StringUtils.CamelToId(part2, "-") ; // part2.replaceAll("(?<=[\\p{Lower}\\p{Digit}])[\\p{Upper}]", "-$0").toLowerCase();
-                routes.put(part1 + "/" +part2, method);
+            String methodName = method.getName();
+            if (methodName.length() > 6 && methodName.startsWith("action") && Character.isUpperCase(methodName.charAt(6))) {
+                String actionPart = methodName.substring(6); // remove "action" prefix
+                actionPart = StringUtils.CamelToId(actionPart, "-"); // part2.replaceAll("(?<=[\\p{Lower}\\p{Digit}])[\\p{Upper}]", "-$0").toLowerCase();
+
+                routes.put(controllerPart + "/" +actionPart, method);
             }
         }
+
         return routes;
     }
 
@@ -64,10 +70,8 @@ public class UrlUtils {
         if (routes.containsKey(url)) {
             Method method = routes.get(url);
             return method.getParameters();
-
         }
 
         return null;
-
     }
 }

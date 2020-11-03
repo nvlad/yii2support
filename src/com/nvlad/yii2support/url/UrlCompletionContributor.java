@@ -95,6 +95,7 @@ public class UrlCompletionContributor extends com.intellij.codeInsight.completio
                                                     LookupElementBuilder builder = LookupElementBuilder.create(param, param.getName());
                                                     if (param.getType().isComplete())
                                                         builder = builder.withTypeText(param.getType().toString(), true);
+
                                                     completionResultSet.addElement(builder);
                                                 }
                                             }
