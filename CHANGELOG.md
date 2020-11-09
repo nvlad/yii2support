@@ -4,6 +4,13 @@ Yii2 Support Change Log
 Waiting for Release
 -------------------
 
+0.10.57.33 - October 28, 2020
+-----------------------------
+- Compatible with PhpStorm 2020.*
+- Frizzes in PhpStorm 2019.3
+- Work code completion
+- Add Icon for Plugin
+ 
 0.10.57.23 - February 14, 2019
 ------------------------------
 - Attribute autocomplete for ActiveForm::Field method [issue #137]
