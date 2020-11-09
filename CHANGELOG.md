@@ -3,6 +3,8 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+- Fix possible invalid completion variants when use "Action" string in action name
+- Fix possible invalid completion variants when use "Controller" string in controller name
 
 0.10.57.33 - October 28, 2020
 -----------------------------
