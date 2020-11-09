@@ -10,7 +10,6 @@ import com.nvlad.yii2support.migrations.entities.DefaultMigrateCommand;
 import com.nvlad.yii2support.migrations.entities.MigrateCommand;
 import com.nvlad.yii2support.migrations.entities.Migration;
 import com.nvlad.yii2support.migrations.entities.MigrationStatus;
-import icons.DatabaseIcons;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
