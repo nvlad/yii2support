@@ -46,6 +46,7 @@
         <!-- Views -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.views.completion.CompletionContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.views.references.PsiReferenceContributor"/>
+        <gotoDeclarationHandler implementation="com.nvlad.yii2support.views.navigation.ViewGotoDeclarationHandler"/>
         <renamePsiElementProcessor implementation="com.nvlad.yii2support.views.refactor.RenameViewProcessor" order="first"/>
         <localInspection language="PHP" shortName="MissedViewInspection"
                          displayName="Missing View file"

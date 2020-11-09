@@ -1,6 +1,7 @@
 package com.nvlad.yii2support.common;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -30,6 +31,10 @@ public class PhpUtil {
 
     @NotNull
     public static String getValue(PsiElement expression) {
+        if (expression instanceof LeafPsiElement) {
+            return ((LeafPsiElement) expression).getText();
+        }
+
         if (expression instanceof StringLiteralExpression) {
             String value = ((StringLiteralExpression) expression).getContents();
             if (value.contains("IntellijIdeaRulezzz ")) {
