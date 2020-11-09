@@ -46,9 +46,9 @@
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
-    <depends optional="true">com.jetbrains.twig</depends>
-    <depends optional="true">org.jetbrains.plugins.terminal</depends>
-    <depends optional="true">org.jetbrains.plugins.phpstorm-remote-interpreter</depends>
+    <depends optional="true" config-file="twig.xml">com.jetbrains.twig</depends>
+    <depends optional="true" config-file="terminal.xml">org.jetbrains.plugins.terminal</depends>
+    <depends optional="true" config-file="phpstorm-remote-interpreter.xml">org.jetbrains.plugins.phpstorm-remote-interpreter</depends>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
