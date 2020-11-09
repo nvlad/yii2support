@@ -3,24 +3,6 @@
     <name>Yii2 Support</name>
     <vendor email="support@nvlad.com" url="http://nvlad.com">NVlad</vendor>
 
-    <description><![CDATA[
-       <b>Plugin contains the following functionality</b><br/>
-       <ul>
-       <li>Suggests for render() methods</li>
-       <li>i18n</li>
-       <li>Configuration arrays for object instantiation</li>
-       <li>ActiveQuery, Query and migrations (database connection is required)</li>
-       <li>Autocomplete in model's rules method</li>
-       <li>Calculates return type for Yii::createObject call and one/all method calls of ActiveRecord</li>
-       <li>Url autocomplete</li>
-       <li>Migration tool</li>
-       </ul>
-       <br/>
-       Detailed information can be found in <a href="https://github.com/nvlad/yii2support/blob/master/README.md">README.md</a><br/>
-       <br/>
-       Detailed changelog can be found in <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG.md</a>
-    ]]></description>
-
     <change-notes><![CDATA[
       <b>Fixes</b><br/>
       - Compatible with PhpStorm 2020.*<br/>
@@ -34,9 +16,6 @@
       <br/>
       Full <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG</a><br/>
     ]]></change-notes>
-
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="2019.*" until-build="2020.*"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
