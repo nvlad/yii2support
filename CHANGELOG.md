@@ -5,6 +5,7 @@ Waiting for Release
 -------------------
 - Fix possible invalid completion variants when use "Action" string in action name
 - Fix possible invalid completion variants when use "Controller" string in controller name
+- Fix compatible with PHP Toolbox plugin for open "views"
 
 0.10.57.33 - October 28, 2020
 -----------------------------
