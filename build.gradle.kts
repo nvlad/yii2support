@@ -108,6 +108,13 @@ tasks {
 //        )
     }
 
+    test {
+//        useJUnitPlatform()
+        reports {
+            junitXml.isEnabled = true
+        }
+    }
+
     runPluginVerifier {
         ideVersions(pluginVerifierIdeVersions)
     }

@@ -11,16 +11,22 @@ on:
 
 jobs:
   build:
-
+    name: Run Unit Tests
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v2
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: run Tests with Gradle
+    - name: Run Tests with Gradle
       run: ./gradlew test
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v1
+      with:
+        report_paths: '**/build/test-results/test/TEST-*.xml'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
