@@ -5,10 +5,11 @@ Waiting for Release
 -------------------
 - Fix possible invalid completion variants when use "Action" string in action name
 - Fix possible invalid completion variants when use "Controller" string in controller name
-- Fix compatible with PHP Toolbox plugin for open "views"
+- Fix compatible with PHP Toolbox plugin for open "views" on `Ctrl+B`
 
 0.10.57.33 - October 28, 2020
 -----------------------------
+- No longer support IDE's earlier 2019.1
 - Compatible with PhpStorm 2020.*
 - Frizzes in PhpStorm 2019.3
 - Work code completion
