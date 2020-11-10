@@ -19,7 +19,7 @@ public class ObjectFactoryUtils {
             PhpPsiElement child = arrayHashElement.getKey();
             if (child instanceof StringLiteralExpression) {
                 String key = ((StringLiteralExpression) child).getContents();
-                if (key.equals("class")) {
+                if (key.equals("class") || key.equals("__class")) {
                     Project project = child.getProject();
                     PhpPsiElement value = arrayHashElement.getValue();
                     PhpClass methodRef = ClassUtils.getPhpClassUniversal(project, value);

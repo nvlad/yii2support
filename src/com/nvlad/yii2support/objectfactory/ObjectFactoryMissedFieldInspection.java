@@ -36,7 +36,7 @@ public class ObjectFactoryMissedFieldInspection extends PhpInspection {
                                     ClassUtils.getConstantValue(key) : key.getText();
                             if (keyName != null) {
                                 keyName = ClassUtils.removeQuotes(keyName);
-                                if (keyName != null
+                                if (!keyName.equals("__class")
                                         && !keyName.equals("class")
                                         && !keyName.startsWith("as ")
                                         && !keyName.startsWith("on ")
