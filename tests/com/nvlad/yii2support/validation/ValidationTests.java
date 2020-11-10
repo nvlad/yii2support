@@ -2,9 +2,8 @@ package com.nvlad.yii2support.validation;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.jetbrains.php.lang.PhpFileType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by oleg on 2017-06-11.

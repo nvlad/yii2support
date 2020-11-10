@@ -45,6 +45,8 @@ dependencies {
         exclude("org.slf4j", "slf4j-api");
         exclude("com.fasterxml.jackson.core", "jackson-core");
     }
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
 }
 
 intellij {

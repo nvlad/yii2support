@@ -1,12 +1,13 @@
 package com.nvlad.yii2support.url;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertArrayEquals;
 
 public class UrlTests  extends BasePlatformTestCase {
     @Override
@@ -22,101 +23,66 @@ public class UrlTests  extends BasePlatformTestCase {
 
     @Test
     public void testControllerRedirectMethod() {
-        myFixture.configureByFile("testControllerRedirectMethod.php");
-        myFixture.completeBasic();
-        List<String> lookupElements = myFixture.getLookupElementStrings();
+        List<String> lookupElements = basicCompletionResultsForFile("testControllerRedirectMethod.php");
+        List<String> expected = buildFixtureActionList("test/redirect-test");
 
-        assertNotNull(lookupElements);
-
-        List<String> expected = buildFixtureActionList();
-        expected.add("test/redirect-test");
-
-        assertContainsElements(lookupElements, expected);
+        assertArrayEquals(expected.toArray(), lookupElements.toArray());
     }
 
     @Test
     public void testControllerRedirectMethodArrayArgument() {
-        myFixture.configureByFile("testControllerRedirectMethodArrayArgument.php");
-        myFixture.completeBasic();
+        List<String> lookupElements = basicCompletionResultsForFile("testControllerRedirectMethodArrayArgument.php");
+        List<String> expected = buildFixtureActionList("test/redirect-test");
 
-        List<String> lookupElements = myFixture.getLookupElementStrings();
-        assertNotNull(lookupElements);
-
-        List<String> expected = buildFixtureActionList();
-        expected.add("test/redirect-test");
-
-        assertContainsElements(lookupElements, expected);
+        assertArrayEquals(expected.toArray(), lookupElements.toArray());
     }
 
     @Test
     public void testUrlTo() {
-        myFixture.configureByFile("testUrlTo.php");
-        myFixture.completeBasic();
-
-        List<String> lookupElements = myFixture.getLookupElementStrings();
-        assertNotNull(lookupElements);
-
+        List<String> lookupElements = basicCompletionResultsForFile("testUrlTo.php");
         List<String> expected = buildFixtureActionList();
 
-        assertContainsElements(lookupElements, expected);
+        assertArrayEquals(expected.toArray(), lookupElements.toArray());
     }
 
     @Test
     public void testUrlParameterCompletion() {
-        myFixture.configureByFile("testUrlParameterCompletion.php");
-        myFixture.completeBasic();
-
-        List<String> lookupElements = myFixture.getLookupElementStrings();
-        assertNotNull(lookupElements);
+        List<String> lookupElements = basicCompletionResultsForFile("testUrlParameterCompletion.php");
 
         List<String> expected = new ArrayList<>();
         expected.add("id");
         expected.add("action");
+        expected.sort(String::compareTo);
 
-        assertContainsElements(lookupElements, expected);
+        assertArrayEquals(expected.toArray(), lookupElements.toArray());
     }
 
     @Test
     public void testUrlToArrayArgument() {
-        myFixture.configureByFile("testUrlToArrayArgument.php");
-        myFixture.completeBasic();
-
-        List<String> lookupElements = myFixture.getLookupElementStrings();
-        assertNotNull(lookupElements);
-
+        List<String> lookupElements = basicCompletionResultsForFile("testUrlToArrayArgument.php");
         List<String> expected = buildFixtureActionList();
 
-        assertContainsElements(lookupElements, expected);
+        assertArrayEquals(expected.toArray(), lookupElements.toArray());
     }
 
     @Test
     public void testUrlRemember() {
-        myFixture.configureByFile("testUrlRemember.php");
-        myFixture.completeBasic();
-
-        List<String> lookupElements = myFixture.getLookupElementStrings();
-        assertNotNull(lookupElements);
-
+        List<String> lookupElements = basicCompletionResultsForFile("testUrlRemember.php");
         List<String> expected = buildFixtureActionList();
 
-        assertContainsElements(lookupElements, expected);
+        assertArrayEquals(expected.toArray(), lookupElements.toArray());
     }
 
     @Test
     public void testUrlRememberArrayArgument() {
-        myFixture.configureByFile("testUrlRememberArrayArgument.php");
-        myFixture.completeBasic();
-
-        List<String> lookupElements = myFixture.getLookupElementStrings();
-        assertNotNull(lookupElements);
-
+        List<String> lookupElements = basicCompletionResultsForFile("testUrlRememberArrayArgument.php");
         List<String> expected = buildFixtureActionList();
 
-        assertContainsElements(lookupElements, expected);
+        assertArrayEquals(expected.toArray(), lookupElements.toArray());
     }
 
     private List<String> buildFixtureActionList() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         result.add("home/index");
         result.add("home/about");
         result.add("home/transactions");
@@ -124,7 +90,27 @@ public class UrlTests  extends BasePlatformTestCase {
         result.add("room-controller/index");
         result.add("room-controller/transactions");
         result.add("room-controller/tv-controller");
+        result.sort(String::compareTo);
 
         return result;
+    }
+
+    private List<String> buildFixtureActionList(String ...extraActions) {
+        List<String> result = buildFixtureActionList();
+        Collections.addAll(result, extraActions);
+        result.sort(String::compareTo);
+
+        return result;
+    }
+
+    private List<String> basicCompletionResultsForFile(String filePath) {
+        myFixture.configureByFile(filePath);
+        myFixture.completeBasic();
+
+        List<String> lookupElements = myFixture.getLookupElementStrings();
+        assertNotNull(lookupElements);
+        lookupElements.sort(String::compareTo);
+
+        return lookupElements;
     }
 }

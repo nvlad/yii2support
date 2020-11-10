@@ -3,9 +3,7 @@ package com.nvlad.yii2support.objectfactory;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.jetbrains.php.lang.PhpFileType;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by oleg on 16.03.2017..
