@@ -31,7 +31,7 @@
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
-        <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.ActiveRecordTypeProvider"/>
+        <typeProvider4 implementation="com.nvlad.yii2support.typeprovider.ActiveRecordTypeProvider"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

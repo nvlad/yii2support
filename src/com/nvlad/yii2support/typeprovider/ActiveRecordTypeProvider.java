@@ -5,19 +5,18 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider4;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.SignatureUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by oleg on 2017-06-24.
  */
-public class ActiveRecordTypeProvider  implements PhpTypeProvider3  {
+public class ActiveRecordTypeProvider  implements PhpTypeProvider4  {
     final static char TRIM_KEY = '\u0197';
 
     @Override
@@ -41,29 +40,25 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider3  {
 
     }
 
-//    @Override
-    public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
-        Collection<PhpNamedElement> elements = new HashSet<>();
+    @Override
+    @Nullable
+    public PhpType complete(String s, Project project) {
+        PhpType phpType = new PhpType();
+
         PhpClass classBySignature = SignatureUtils.getClassBySignature(s, project);
         boolean classInheritsFromAD = ClassUtils.isClassInherit(classBySignature, "\\yii\\db\\BaseActiveRecord", PhpIndex.getInstance(project));
         if (classInheritsFromAD) {
             if (s.endsWith(".one"))
-                elements.add(classBySignature);
+                phpType.add(classBySignature.getFQN());
             else if (s.endsWith(".all")) {
-                Collection<? extends PhpNamedElement> bySignature = PhpIndex.getInstance(project).getBySignature(s);
-                if (! bySignature.isEmpty()) {
-                    PhpNamedElement firstItem = bySignature.iterator().next();
-                    if (firstItem instanceof Method) {
-                        ((Method)firstItem).getType().add(classBySignature.getFQN()+ "[]");
-                    }
-                }
+                phpType.add(classBySignature.getFQN()+ "[]");
             }
         }
-        return elements;
+        return phpType;
     }
 
-//    @Override
+    @Override
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
-        return getBySignature(s, project);
+        return null;
     }
 }
