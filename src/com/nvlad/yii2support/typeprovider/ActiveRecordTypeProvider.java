@@ -36,7 +36,7 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider4  {
                 int beginIndex = signature.indexOf("\\");
                 int endIndex = signature.indexOf("|");
                 if (endIndex < 0) {
-                    endIndex = signature.length() - 1;
+                    endIndex = signature.length();
                 }
                 if (beginIndex > -1 && beginIndex < endIndex) {
                     signature = signature.substring(beginIndex, endIndex);
