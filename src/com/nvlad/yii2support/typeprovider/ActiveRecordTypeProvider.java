@@ -33,17 +33,29 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider4  {
                 return null;
             if (methodReference.getName().equals("one") || methodReference.getName().equals("all")) {
                 String signature = methodReference.getSignature();
-                return new PhpType().add("#" + this.getKey() + signature );
+                int beginIndex = signature.indexOf("\\");
+                int endIndex = signature.indexOf("|");
+                if (endIndex < 0) {
+                    endIndex = signature.length() - 1;
+                }
+                if (beginIndex > -1 && beginIndex < endIndex) {
+                    signature = signature.substring(beginIndex, endIndex);
+                    return new PhpType().add("#" + this.getKey() + signature);                    
+                }
             }
         }
         return null;
-
     }
 
     @Override
     @Nullable
     public PhpType complete(String s, Project project) {
         PhpType phpType = new PhpType();
+
+        int endIndex = s.lastIndexOf(this.getKey());
+        if(endIndex == -1) {
+            return null;
+        }
 
         PhpClass classBySignature = SignatureUtils.getClassBySignature(s, project);
         boolean classInheritsFromAD = ClassUtils.isClassInherit(classBySignature, "\\yii\\db\\BaseActiveRecord", PhpIndex.getInstance(project));
