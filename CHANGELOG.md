@@ -3,10 +3,14 @@ Yii2 Support Change Log
 
 Waiting for Release
 -------------------
+
+0.10.58.37 - March 4, 2021
+--------------------------
 - Fix possible invalid completion variants when use "Action" string in action name
 - Fix possible invalid completion variants when use "Controller" string in controller name
-- Fix compatible with PHP Toolbox plugin for open "views" on `Ctrl+B`
+- Fix compatible with `PHP Toolbox plugin` for open "views" on `Ctrl+B`
 - Added support "__class" for an object creator
+- Fix `UnsupportedOperationException: This PHP type is immutable` error
 
 0.10.57.33 - October 28, 2020
 -----------------------------

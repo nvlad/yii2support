@@ -5,13 +5,14 @@
 
     <change-notes><![CDATA[
       <b>Fixes</b><br/>
-      - Compatible with PhpStorm 2020.*<br/>
-      - Frizzes in PhpStorm 2019.3<br/>
-      - Work code completion<br/>
+      - Fix possible invalid completion variants when use "Action" string in action name<br/>
+      - Fix possible invalid completion variants when use "Controller" string in controller name<br/>
+      - Fix compatible with `PHP Toolbox plugin` for open "views" on `Ctrl+B`<br/>
+      - Fix `UnsupportedOperationException: This PHP type is immutable` error<br/>
       <br/>
 
       <b>Features</b><br/>
-      - Add Icon :D<br/>
+      - Added support "__class" for an object creator<br/>
 
       <br/>
       Full <a href="https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md">CHANGELOG</a><br/>

@@ -11,5 +11,5 @@ Plugin contains the following functionality
 - Url autocomplete
 - Migration tool
 
-Detailed information can be found in [README.md](https://github.com/nvlad/yii2support/blob/master/README.md)
+Detailed information can be found in [README.md](https://github.com/nvlad/yii2support/blob/master/README.md)  
 Detailed changelog can be found in [CHANGELOG.md](https://github.com/nvlad/yii2support/blob/master/CHANGELOG.md)  
