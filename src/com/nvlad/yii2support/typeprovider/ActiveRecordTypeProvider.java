@@ -5,19 +5,18 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider4;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.SignatureUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by oleg on 2017-06-24.
  */
-public class ActiveRecordTypeProvider  implements PhpTypeProvider3  {
+public class ActiveRecordTypeProvider  implements PhpTypeProvider4  {
     final static char TRIM_KEY = '\u0197';
 
     @Override
@@ -34,36 +33,44 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider3  {
                 return null;
             if (methodReference.getName().equals("one") || methodReference.getName().equals("all")) {
                 String signature = methodReference.getSignature();
-                return new PhpType().add("#" + this.getKey() + signature );
+                int beginIndex = signature.indexOf("\\");
+                int endIndex = signature.indexOf("|");
+                if (endIndex < 0) {
+                    endIndex = signature.length();
+                }
+                if (beginIndex > -1 && beginIndex < endIndex) {
+                    signature = signature.substring(beginIndex, endIndex);
+                    return new PhpType().add("#" + this.getKey() + signature);                    
+                }
             }
         }
         return null;
-
     }
 
-//    @Override
-    public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
-        Collection<PhpNamedElement> elements = new HashSet<>();
+    @Override
+    @Nullable
+    public PhpType complete(String s, Project project) {
+        PhpType phpType = new PhpType();
+
+        int endIndex = s.lastIndexOf(this.getKey());
+        if(endIndex == -1) {
+            return null;
+        }
+
         PhpClass classBySignature = SignatureUtils.getClassBySignature(s, project);
         boolean classInheritsFromAD = ClassUtils.isClassInherit(classBySignature, "\\yii\\db\\BaseActiveRecord", PhpIndex.getInstance(project));
         if (classInheritsFromAD) {
             if (s.endsWith(".one"))
-                elements.add(classBySignature);
+                phpType.add(classBySignature.getFQN());
             else if (s.endsWith(".all")) {
-                Collection<? extends PhpNamedElement> bySignature = PhpIndex.getInstance(project).getBySignature(s);
-                if (! bySignature.isEmpty()) {
-                    PhpNamedElement firstItem = bySignature.iterator().next();
-                    if (firstItem instanceof Method) {
-                        ((Method)firstItem).getType().add(classBySignature.getFQN()+ "[]");
-                    }
-                }
+                phpType.add(classBySignature.getFQN()+ "[]");
             }
         }
-        return elements;
+        return phpType;
     }
 
-//    @Override
+    @Override
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
-        return getBySignature(s, project);
+        return null;
     }
 }
