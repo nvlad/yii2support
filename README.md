@@ -99,6 +99,33 @@ Use plugin settings window to set up table prefix
 - Sync IDE DataBase schema after Apply/Undo/Redo migration(s)
 - View command execution output
 
+## Inspections
+Inspections can be disabled inline `/** @noinspection MissedViewInspection */`.
+
+### Views
+- `MissedViewInspection`  
+Reports missing view templates
+- `RequireParameterInspection`  
+Analyzes SQL condition and checks if all declared parameters are set
+- `UnusedParameterInspection`  
+Detecting unused View parameters
+- `ViewMissedPhpDocInspection`  
+Inspect PhpDoc for incoming parameters
+
+### Object Factory
+- `ObjectFactoryMissedFieldInspection`  
+Reports missing object properties
+
+### Database
+- `MissedParamInspection`  
+Analyzes SQL condition and checks if all declared parameters are set
+-  `PropertiesInspection`  
+Detects properties do not correspond to class fields or table columns in case of ActiveRecord
+- `UndetectableTableInspection`  
+Finds ActiveRecord table and check if it exists in database connections
+- `MissingActiveRecordInActiveQueryInspection`  
+Check if ActiveQuery correctly linked to ActiveRecord
+
 Installation
 ------------
 - Open your PhpStorm or IntelliJ IDEA IDE.
