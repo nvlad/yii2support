@@ -1,8 +1,10 @@
 package com.nvlad.yii2support.common;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiWhiteSpace;
-import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -99,6 +101,25 @@ public class PsiUtil {
                 return (ArrayCreationExpression) curElement;
             } else {
                 curElement = curElement.getParent();
+            }
+            limit--;
+        }
+        return null;
+    }
+
+    public static ArrayCreationExpression getArrayCreationChild(PsiElement element) {
+        int limit = 10;
+        PsiElement curElement = element;
+        while (limit > 0) {
+            if(curElement instanceof GroupStatement || curElement instanceof PhpReturn){
+                curElement = curElement.getFirstChild();
+            }else if (curElement instanceof ArrayCreationExpression) {
+                return (ArrayCreationExpression) curElement;
+            } else {
+                if(curElement == null){
+                    break;
+                }
+                curElement = curElement.getNextSibling();
             }
             limit--;
         }

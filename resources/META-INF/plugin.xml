@@ -122,6 +122,10 @@
                              parentId="Yii2Support.SettingsForm" order="first"
                              nonDefaultProject="true"/>
 
+        <!-- Yii Configurations -->
+        <fileBasedIndex implementation="com.nvlad.yii2support.configurations.ComponentsIndex" id="components-index"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.configurations.YiiAppCompletionContributor"/>
+
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
 

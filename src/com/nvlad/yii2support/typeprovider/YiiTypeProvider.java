@@ -1,8 +1,11 @@
 package com.nvlad.yii2support.typeprovider;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
@@ -10,6 +13,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.MethodUtils;
+import com.nvlad.yii2support.configurations.ComponentsIndex;
 import com.nvlad.yii2support.objectfactory.ObjectFactoryUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,11 +48,30 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                 firstParam = getArrayCreationByVariableRef(firstParam);
             }
             if (firstParam instanceof ArrayCreationExpression) {
-                PhpType elem = getClassByArrayCreationOptimized((ArrayCreationExpression) firstParam);
-                if (elem != null) return elem;
+                return getClassByArrayCreationOptimized((ArrayCreationExpression) firstParam);
             }
             else {
                 return getClass(firstParam);
+            }
+        }else if(psiElement instanceof FieldReference){
+            final Project project = psiElement.getProject();
+            if(DumbService.getInstance(project).isDumb()){
+                return null;
+            }
+
+            String signature = ((FieldReference) psiElement).getSignature();
+            int fieldIndex = signature.lastIndexOf(".");
+            if(fieldIndex>0) {
+                String fieldName = signature.substring(fieldIndex+1);
+                if (signature.substring(0, fieldIndex).endsWith("Yii.app")) {
+                    final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+
+                    for(String className : FileBasedIndex.getInstance().getValues(ComponentsIndex.identity, fieldName, scope)){
+                        for(PhpClass c : PhpIndex.getInstance(project).getAnyByFQN(className)){
+                            return c.getType();
+                        }
+                    }
+                }
             }
         }
 
