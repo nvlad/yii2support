@@ -23,20 +23,22 @@ public class YiiAppCompletionProvider extends CompletionProvider<CompletionParam
         final Project project = psiElement.getProject();
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
 
-        if((psiElement.getParent() instanceof FieldReference)
-                && ((FieldReference) psiElement.getParent()).getSignature().endsWith("Yii.app.IntellijIdeaRulezzz"))
-        {
-            fileBasedIndex.processAllKeys(ComponentsIndex.identity, key -> {
-                List<String> values = fileBasedIndex.getValues(ComponentsIndex.identity, key, scope);
-                if(values.size() > 0){
-                    LookupElementBuilder lookupElement = LookupElementBuilder.create(key)
-                            .withTypeText(values.get(0), true)
-                            .withIcon(AllIcons.Nodes.Class);
+        if(psiElement.getParent() instanceof FieldReference){
+            String signature = ((FieldReference) psiElement.getParent()).getSignature();
+            int fieldIndex = signature.lastIndexOf(".");
+            if(signature.substring(0, fieldIndex).endsWith("Yii.app")){
+                fileBasedIndex.processAllKeys(ComponentsIndex.identity, key -> {
+                    List<String> values = fileBasedIndex.getValues(ComponentsIndex.identity, key, scope);
+                    if(values.size() > 0){
+                        LookupElementBuilder lookupElement = LookupElementBuilder.create(key)
+                                .withTypeText(values.get(0), true)
+                                .withIcon(AllIcons.Nodes.Class);
 
-                    completionResultSet.addElement(lookupElement);
-                }
-                return true;
-            }, project);
+                        completionResultSet.addElement(lookupElement);
+                    }
+                    return true;
+                }, project);
+            }
         }
     }
 }
