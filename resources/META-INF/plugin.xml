@@ -125,6 +125,9 @@
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
 
+        <!-- AttributeLabels -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.attributeLabels.AttributeLabelCompletionContributor"/>
+
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>
 <!--        <psi.referenceContributor language="PHP" implementation="com.nvlad.yii2support.url.UrlReferenceContributor"/>-->

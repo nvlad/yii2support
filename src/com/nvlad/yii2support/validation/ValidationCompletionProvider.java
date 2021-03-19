@@ -7,15 +7,12 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.DatabaseUtils;
 import com.nvlad.yii2support.common.PsiUtil;
 import com.nvlad.yii2support.validation.entities.Validator;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,19 +22,11 @@ import java.util.List;
  */
 public class ValidationCompletionProvider extends CompletionProvider<CompletionParameters> {
     @Override
-    protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+    protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         PsiElement position = completionParameters.getPosition();
         if (position.getParent() instanceof PhpExpression) {
             PhpExpression phpExpression = (PhpExpression) position.getParent();
-            PhpClass phpClass = getClassIfInMethod(position,"attributeLabels");
-            if (phpClass != null) {
-                for (Field field : ClassUtils.getClassFields(phpClass)) {
-                    LookupElementBuilder lookupBuilder = buildLookup(field, phpExpression, true, true);
-                    completionResultSet.addElement(lookupBuilder);
-                }
-                return;
-            }
-            phpClass = getClassIfInMethod(position,"rules");
+            PhpClass phpClass = ClassUtils.getClassIfInMethod(position,"rules");
             if (phpClass != null) {
                 RulePositionEnum getPosition = getPosition(position);
                 if (getPosition.equals(RulePositionEnum.FIELD)) {
@@ -46,7 +35,6 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                         LookupElementBuilder lookupBuilder = buildLookup(field, phpExpression, false);
                         completionResultSet.addElement(lookupBuilder);
                     }
-
                     completionResultSet.addAllElements(items);
                 } else if (getPosition.equals(RulePositionEnum.TYPE)) {
                     List<Validator> validators = ValidationUtil.getAllValidators(phpClass);
@@ -106,7 +94,7 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
     }
 
     @NotNull
-    private LookupElementBuilder buildLookup(PhpClassMember field, PhpExpression position, boolean autoValue, boolean stringAutoValue) {
+    private LookupElementBuilder buildLookup(PhpClassMember field, PhpExpression position, boolean autoValue) {
         String lookupString = field instanceof Method ? ClassUtils.getAsPropertyName((Method) field) : field.getName();
         LookupElementBuilder builder = LookupElementBuilder.create(field, lookupString).withIcon(field.getIcon());
         if (autoValue) {
@@ -114,11 +102,8 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
                 Document document = insertionContext.getDocument();
                 int insertPosition = insertionContext.getSelectionEndOffset();
                 if (position.getParent().getParent() instanceof ArrayCreationExpression) {
-                    document.insertString(insertPosition + 1, " => " + (stringAutoValue?"'',":""));
+                    document.insertString(insertPosition + 1, " => ");
                     insertPosition += 5;
-                    if(stringAutoValue){
-                        insertPosition += 1;
-                    }
                     insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
                 }
             });
@@ -129,11 +114,6 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         }
 
         return builder;
-    }
-
-    @NotNull
-    private LookupElementBuilder buildLookup(PhpClassMember field, PhpExpression position, boolean autoValue) {
-        return buildLookup(field, position, autoValue, false);
     }
 
     @NotNull
@@ -169,37 +149,6 @@ public class ValidationCompletionProvider extends CompletionProvider<CompletionP
         builder = builder.withTypeText(phpClass.getFQN(), true);
 
         return builder;
-    }
-
-
-    @Nullable
-    private PhpClass getClassIfInMethod(PsiElement position, String methodName) {
-        PsiElement elem = position.getParent();
-        Method currentMethod = null;
-        PhpClass phpClass = null;
-        while (true) {
-            if (elem instanceof Method)
-                currentMethod = (Method) elem;
-            else if (elem instanceof PhpClass) {
-                phpClass = (PhpClass) elem;
-                break;
-            } else if (elem instanceof PhpFile)
-                break;
-            else if (elem == null) {
-                break;
-            }
-            elem = elem.getParent();
-        }
-        if (currentMethod != null && phpClass != null) {
-            if (ClassUtils.isClassInherit(phpClass, "\\yii\\base\\Model", PhpIndex.getInstance(position.getProject())) &&
-                    currentMethod.getName().equals(methodName)) {
-                return phpClass;
-            } else
-                return null;
-
-        } else {
-            return null;
-        }
     }
 
     private RulePositionEnum getPosition(PsiElement position) {

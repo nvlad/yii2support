@@ -6,6 +6,7 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpDefineImpl;
@@ -487,5 +488,35 @@ public class ClassUtils {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public static PhpClass getClassIfInMethod(PsiElement position, String methodName) {
+        PsiElement elem = position.getParent();
+        Method currentMethod = null;
+        PhpClass phpClass = null;
+        while (true) {
+            if (elem instanceof Method)
+                currentMethod = (Method) elem;
+            else if (elem instanceof PhpClass) {
+                phpClass = (PhpClass) elem;
+                break;
+            } else if (elem instanceof PhpFile)
+                break;
+            else if (elem == null) {
+                break;
+            }
+            elem = elem.getParent();
+        }
+        if (currentMethod != null && phpClass != null) {
+            if (ClassUtils.isClassInherit(phpClass, "\\yii\\base\\Model", PhpIndex.getInstance(position.getProject())) &&
+                    currentMethod.getName().equals(methodName)) {
+                return phpClass;
+            } else
+                return null;
+
+        } else {
+            return null;
+        }
     }
 }
