@@ -11,6 +11,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.nvlad.yii2support.common.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -24,9 +25,8 @@ public class YiiAppCompletionProvider extends CompletionProvider<CompletionParam
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
 
         if(psiElement.getParent() instanceof FieldReference){
-            String signature = ((FieldReference) psiElement.getParent()).getSignature();
-            int fieldIndex = signature.lastIndexOf(".");
-            if(signature.substring(0, fieldIndex).endsWith("Yii.app")){
+            String field = PsiUtil.getYiiAppField((FieldReference) psiElement.getParent());
+            if(field != null){
                 fileBasedIndex.processAllKeys(ComponentsIndex.identity, key -> {
                     List<String> values = fileBasedIndex.getValues(ComponentsIndex.identity, key, scope);
                     if(values.size() > 0){

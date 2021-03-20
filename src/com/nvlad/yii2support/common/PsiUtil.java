@@ -125,4 +125,22 @@ public class PsiUtil {
         }
         return null;
     }
+
+    @Nullable
+    public static String getYiiAppField(FieldReference element) {
+        String signature = element.getSignature();
+        int appIndex = signature.indexOf("Yii.app.");
+        if(appIndex != -1){
+            String origSign = signature.substring(appIndex);
+            int endIndex = origSign.indexOf("|");
+            if(endIndex != -1) {
+                origSign = origSign.substring(0, endIndex);
+            }
+            int fieldIndex = origSign.lastIndexOf(".");
+            if(origSign.substring(0,fieldIndex).equals("Yii.app")){
+                return origSign.substring(fieldIndex+1);
+            }
+        }
+        return null;
+    }
 }

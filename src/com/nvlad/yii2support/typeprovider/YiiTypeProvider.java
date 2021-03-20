@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.MethodUtils;
+import com.nvlad.yii2support.common.PsiUtil;
 import com.nvlad.yii2support.configurations.ComponentsIndex;
 import com.nvlad.yii2support.objectfactory.ObjectFactoryUtils;
 import org.jetbrains.annotations.NotNull;
@@ -59,17 +60,15 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                 return null;
             }
 
-            String signature = ((FieldReference) psiElement).getSignature();
-            int fieldIndex = signature.lastIndexOf(".");
-            if(fieldIndex>0) {
-                String fieldName = signature.substring(fieldIndex+1);
-                if (signature.substring(0, fieldIndex).endsWith("Yii.app")) {
-                    final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+            String fieldName = PsiUtil.getYiiAppField((FieldReference) psiElement);
+            if(fieldName != null){
+                System.out.println(fieldName);
+                final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
 
-                    for(String className : FileBasedIndex.getInstance().getValues(ComponentsIndex.identity, fieldName, scope)){
-                        for(PhpClass c : PhpIndex.getInstance(project).getAnyByFQN(className)){
-                            return c.getType();
-                        }
+                for(String className : FileBasedIndex.getInstance().getValues(ComponentsIndex.identity, fieldName, scope)){
+                    for(PhpClass c : PhpIndex.getInstance(project).getAnyByFQN(className)){
+                        System.out.println(c.getType());
+                        return c.getType();
                     }
                 }
             }
