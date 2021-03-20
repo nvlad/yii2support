@@ -62,12 +62,10 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
 
             String fieldName = PsiUtil.getYiiAppField((FieldReference) psiElement);
             if(fieldName != null){
-                System.out.println(fieldName);
                 final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
 
                 for(String className : FileBasedIndex.getInstance().getValues(ComponentsIndex.identity, fieldName, scope)){
                     for(PhpClass c : PhpIndex.getInstance(project).getAnyByFQN(className)){
-                        System.out.println(c.getType());
                         return c.getType();
                     }
                 }
