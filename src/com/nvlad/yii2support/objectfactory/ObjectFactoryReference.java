@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public class ObjectFactoryReference extends PsiReferenceBase<PsiElement> {
     ObjectFactoryReference(@NotNull PsiElement element)
     {
-        super(element);
+        super(element, element.getTextRange());
     }
 
     @Nullable
