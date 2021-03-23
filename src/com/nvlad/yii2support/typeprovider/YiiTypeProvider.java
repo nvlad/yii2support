@@ -1,6 +1,5 @@
 package com.nvlad.yii2support.typeprovider;
 
-import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -10,7 +9,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider4;
 import com.nvlad.yii2support.common.ClassUtils;
 import com.nvlad.yii2support.common.MethodUtils;
 import com.nvlad.yii2support.common.PsiUtil;
@@ -20,14 +19,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by oleg on 2017-06-08.
  */
-public class YiiTypeProvider extends CompletionContributor implements PhpTypeProvider3 {
+public class YiiTypeProvider implements PhpTypeProvider4 {
     final static char TRIM_KEY = '\u0197';
+    final static char TRIM_KEY2 = '\u0199';
 
     @Override
     public char getKey() {
@@ -55,24 +54,57 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
                 return getClass(firstParam);
             }
         }else if(psiElement instanceof FieldReference){
-            final Project project = psiElement.getProject();
-            if(DumbService.getInstance(project).isDumb()){
-                return null;
-            }
-
             String fieldName = PsiUtil.getYiiAppField((FieldReference) psiElement);
             if(fieldName != null){
-                final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
-
-                for(String className : FileBasedIndex.getInstance().getValues(ComponentsIndex.identity, fieldName, scope)){
-                    for(PhpClass c : PhpIndex.getInstance(project).getAnyByFQN(className)){
-                        return c.getType();
-                    }
-                }
+                String signature = ((FieldReference) psiElement).getSignature();
+                return new PhpType().add("#" + this.getKey() + signature + TRIM_KEY2 + fieldName + TRIM_KEY2);
             }
         }
 
         return null;
+    }
+
+    @Override
+    public @Nullable PhpType complete(String s, Project project) {
+        if(DumbService.getInstance(project).isDumb()){
+            return null;
+        }
+
+        PhpType phpType = new PhpType();
+
+        int trimIndex = s.indexOf(TRIM_KEY);
+        if (trimIndex > -1 && s.length() + 1 > trimIndex) {
+            String origSignature = s.substring(0, trimIndex);
+            if (origSignature.endsWith("\\Yii.createObject")) {
+                String variableRef = s.substring(trimIndex + 1);
+                final Collection<? extends PhpNamedElement> indexedVariabled = PhpIndex.getInstance(project).getBySignature(variableRef);
+                for (PhpNamedElement elem : indexedVariabled) {
+                    if (elem instanceof Field) {
+                        Field field = (Field) elem;
+                        if (field.getLastChild() instanceof ArrayCreationExpression) {
+                            PhpClass classByArray = ObjectFactoryUtils.findClassByArray((ArrayCreationExpression) field.getLastChild());
+                            if(classByArray != null) {
+                                phpType.add(classByArray.getType());
+                            }
+                        }
+                    }
+                }
+            }
+        }else {
+            int trimIndexStart = s.indexOf(TRIM_KEY2);
+            int trimIndexEnd = s.lastIndexOf(TRIM_KEY2);
+            if (trimIndexStart > -1 && trimIndexStart < trimIndexEnd) {
+                String fieldName = s.substring(trimIndexStart + 1, trimIndexEnd);
+                final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+
+                for (String className : FileBasedIndex.getInstance().getValues(ComponentsIndex.identity, fieldName, scope)) {
+                    for (PhpClass phpClass : PhpIndex.getInstance(project).getAnyByFQN(className)) {
+                        phpType.add(phpClass.getType());
+                    }
+                }
+            }
+        }
+        return phpType;
     }
 
     @NotNull
@@ -117,32 +149,8 @@ public class YiiTypeProvider extends CompletionContributor implements PhpTypePro
         return null;
     }
 
-//    @Override
-    public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
-        Collection<PhpNamedElement> elements = new HashSet<>();
-        int trimIndex = s.indexOf(TRIM_KEY);
-        if (trimIndex > -1 && s.length() + 1 > trimIndex) {
-            String origSignature = s.substring(0, trimIndex);
-            if (origSignature.endsWith("\\Yii.createObject")) {
-                String variableRef = s.substring(trimIndex + 1);
-                final Collection<? extends PhpNamedElement> indexedVariabled = PhpIndex.getInstance(project).getBySignature(variableRef);
-                for (PhpNamedElement elem : indexedVariabled) {
-                    if (elem instanceof Field) {
-                        Field field = (Field) elem;
-                        if (field.getLastChild() instanceof ArrayCreationExpression) {
-                            PhpClass classByArray = ObjectFactoryUtils.findClassByArray((ArrayCreationExpression) field.getLastChild());
-                            elements.add(classByArray);
-                        }
-                    }
-                }
-            }
-        }
-
-        return elements;
-    }
-
-//    @Override
+    @Override
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
-        return getBySignature(s, project);
+        return null;
     }
 }
