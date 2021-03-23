@@ -30,7 +30,7 @@
     <depends optional="true" config-file="phpstorm-remote-interpreter.xml">org.jetbrains.plugins.phpstorm-remote-interpreter</depends>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
-        <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
+        <typeProvider4 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
         <typeProvider4 implementation="com.nvlad.yii2support.typeprovider.ActiveRecordTypeProvider"/>
     </extensions>
 
