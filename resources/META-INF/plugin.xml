@@ -126,6 +126,8 @@
         <fileBasedIndex implementation="com.nvlad.yii2support.configurations.ComponentsIndex" id="components-index"/>
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.configurations.YiiAppCompletionContributor"/>
 
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.widgetsconfig.WidgetConfigCompletionContributor"/>
+
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
 

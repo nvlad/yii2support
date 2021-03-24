@@ -187,7 +187,11 @@ public class ClassUtils {
 
     public static String getAsPropertyName(Method method) {
         String methodName = method.getName();
-        String propertyName = methodName.substring(3);
+        int trimLen = 3;
+        if(methodName.startsWith("as")){
+            trimLen = 2;
+        }
+        String propertyName = methodName.substring(trimLen);
         propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
 
         return propertyName;
@@ -202,6 +206,21 @@ public class ClassUtils {
             int pCount = method.getParameters().length;
             if (methodName.length() > 3 && methodName.startsWith("set") && pCount == 1 &&
                     Character.isUpperCase(methodName.charAt(3))) {
+                result.add(method);
+            }
+        }
+
+        return result;
+    }
+
+    public static Collection<Method> getFormatterAsMethods(PhpClass phpClass) {
+        final HashSet<Method> result = new HashSet<>();
+        final Collection<Method> methods = phpClass.getMethods();
+
+        for (Method method : methods) {
+            String methodName = method.getName();
+            if (methodName.length() > 2 && methodName.startsWith("as") &&
+                    Character.isUpperCase(methodName.charAt(2))) {
                 result.add(method);
             }
         }
