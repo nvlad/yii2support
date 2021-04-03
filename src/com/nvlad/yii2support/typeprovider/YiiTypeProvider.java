@@ -57,7 +57,7 @@ public class YiiTypeProvider implements PhpTypeProvider4 {
             String fieldName = PsiUtil.getYiiAppField((FieldReference) psiElement);
             if(fieldName != null){
                 String signature = ((FieldReference) psiElement).getSignature();
-                return new PhpType().add("#" + this.getKey() + signature + TRIM_KEY2 + fieldName + TRIM_KEY2);
+                return new PhpType().add("#" + this.getKey() + TRIM_KEY2 + fieldName + TRIM_KEY2);
             }
         }
 
