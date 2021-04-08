@@ -83,6 +83,8 @@ public class WidgetConfigCompletionProvider extends CompletionProvider<Completio
                     for (String attribute : attributes) {
                         completionResultSet.addElement(buildLookup(attribute, false));
                     }
+                }else if(ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\widgets\\BaseListView", phpIndex)){
+                    completionResultSet.addElement(buildValueClosureLookup(false));
                 }
             }
         } else {
@@ -184,6 +186,25 @@ public class WidgetConfigCompletionProvider extends CompletionProvider<Completio
                 }
                 insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
             }
+        });
+    }
+
+    @NotNull
+    private LookupElementBuilder buildValueClosureLookup(boolean allParams){
+        return LookupElementBuilder.create("value")
+            .withIcon(AllIcons.Nodes.Function)
+            .withTypeText(allParams?"function ($model, $key, $index, $column)":"function ($data) {}")
+            .withInsertHandler((insertionContext, lookupElement) -> {
+                Document document = insertionContext.getDocument();
+                int insertPosition = insertionContext.getSelectionEndOffset();
+                if(allParams) {
+                    document.insertString(insertPosition + 1, " => function ($model, $key, $index, $column) {},");
+                    insertPosition += 47;
+                }else{
+                    document.insertString(insertPosition + 1, " => function ($data) {},");
+                    insertPosition += 23;
+                }
+                insertionContext.getEditor().getCaretModel().getCurrentCaret().moveToOffset(insertPosition);
         });
     }
 
