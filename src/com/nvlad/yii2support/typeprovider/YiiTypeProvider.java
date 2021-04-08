@@ -1,6 +1,5 @@
 package com.nvlad.yii2support.typeprovider;
 
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -27,6 +26,7 @@ import java.util.Set;
 public class YiiTypeProvider implements PhpTypeProvider4 {
     final static char TRIM_KEY = '\u0197';
     final static char TRIM_KEY2 = '\u0199';
+    final static char TRIM_KEY3 = '\u0193';
 
     @Override
     public char getKey() {
@@ -53,23 +53,37 @@ public class YiiTypeProvider implements PhpTypeProvider4 {
             else {
                 return getClass(firstParam);
             }
-        }else if(psiElement instanceof FieldReference){
+        }else if(psiElement instanceof FieldReference) {
             String fieldName = PsiUtil.getYiiAppField((FieldReference) psiElement);
-            if(fieldName != null){
-                String signature = ((FieldReference) psiElement).getSignature();
+            if (fieldName != null) {
                 return new PhpType().add("#" + this.getKey() + TRIM_KEY2 + fieldName + TRIM_KEY2);
             }
+        }else if(psiElement instanceof Parameter){
+            PsiElement el = walkParents(psiElement,5); // Get "'value' => function()" element
+            if(el instanceof ArrayHashElement){
+                String s = getHashKeyContents(el);
+                if(s != null && s.equals("value")){
+                    PsiElement top = walkParents(el,6); // Get config array of widget
+                    if(top instanceof ArrayCreationExpression){
+                        for (PsiElement conf : top.getChildren()){
+                            String key = getHashKeyContents(conf);
+                            if(key != null && (key.equals("model") || key.equals("filterModel"))){
+                                PsiElement val = ((ArrayHashElement) conf).getValue();
+                                if(val instanceof Variable){
+                                    String signature = ((Variable) val).getSignature();
+                                    return new PhpType().add("#" + this.getKey() + TRIM_KEY3 + signature + TRIM_KEY3);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-
         return null;
     }
 
     @Override
     public @Nullable PhpType complete(String s, Project project) {
-        if(DumbService.getInstance(project).isDumb()){
-            return null;
-        }
-
         PhpType phpType = new PhpType();
 
         int trimIndex = s.indexOf(TRIM_KEY);
@@ -100,6 +114,17 @@ public class YiiTypeProvider implements PhpTypeProvider4 {
                 for (String className : FileBasedIndex.getInstance().getValues(ComponentsIndex.identity, fieldName, scope)) {
                     for (PhpClass phpClass : PhpIndex.getInstance(project).getAnyByFQN(className)) {
                         phpType.add(phpClass.getType());
+                    }
+                }
+            }else{
+                trimIndexStart = s.indexOf(TRIM_KEY3);
+                trimIndexEnd = s.lastIndexOf(TRIM_KEY3);
+                if (trimIndexStart > -1 && trimIndexStart < trimIndexEnd) {
+                    String signature = s.substring(trimIndexStart + 1, trimIndexEnd);
+                    for (PhpNamedElement elem : PhpIndex.getInstance(project).getBySignature(signature)) {
+                        if(elem instanceof PhpClass) {
+                            phpType.add(elem.getType());
+                        }
                     }
                 }
             }
@@ -151,6 +176,29 @@ public class YiiTypeProvider implements PhpTypeProvider4 {
 
     @Override
     public Collection<? extends PhpNamedElement> getBySignature(String s, Set<String> set, int i, Project project) {
+        return null;
+    }
+
+    @Nullable
+    private PsiElement walkParents(PsiElement el, int level) {
+        PsiElement element = el;
+        for (int i = 0; i < level; i++) {
+            if (element == null) {
+                return null;
+            }
+            element = element.getParent();
+        }
+        return element;
+    }
+
+    @Nullable
+    private String getHashKeyContents(PsiElement e) {
+        if (e instanceof ArrayHashElement) {
+            PhpPsiElement key = ((ArrayHashElement) e).getKey();
+            if (key instanceof StringLiteralExpression) {
+                return ((StringLiteralExpression) key).getContents();
+            }
+        }
         return null;
     }
 }
