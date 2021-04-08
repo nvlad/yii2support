@@ -29,6 +29,8 @@ version = pluginVersion
 val platformPluginsAssociation = hashMapOf<String, String>()
 platformPluginsAssociation["2019.1.4"] = "com.jetbrains.php:191.8026.56, org.jetbrains.plugins.phpstorm-remote-interpreter:191.5849.22, com.jetbrains.twig:191.6183.95"
 platformPluginsAssociation["2020.2.3"] = "com.jetbrains.php:202.7660.42, org.jetbrains.plugins.phpstorm-remote-interpreter:202.6397.59, com.jetbrains.twig:202.6397.21"
+platformPluginsAssociation["2020.3.3"] = "com.jetbrains.php:203.7717.11, org.jetbrains.plugins.phpstorm-remote-interpreter:203.5981.155, com.jetbrains.twig:203.6682.75"
+platformPluginsAssociation["2021.1"] = "com.jetbrains.php:211.6693.120, org.jetbrains.plugins.phpstorm-remote-interpreter:211.6693.65, com.jetbrains.twig:211.6693.44"
 val bundledPlugins = "DatabaseTools, webDeployment, CSS, terminal, coverage, java-i18n, remote-run, properties"
 
 val platformPlugins = platformPluginsAssociation[platformVersion] + ", $bundledPlugins"
