@@ -5,8 +5,8 @@ import org.jetbrains.changelog.markdownToHTML
 plugins {
     id("java")
 //    id("org.jetbrains.kotlin.jvm") version "1.4.10"
-    id("org.jetbrains.intellij") version "0.6.3"
-    id("org.jetbrains.changelog") version "0.6.2"
+    id("org.jetbrains.intellij") version "0.7.2"
+    id("org.jetbrains.changelog") version "1.1.2"
     id("io.gitlab.arturbosch.detekt") version "1.14.2"
 }
 
@@ -30,7 +30,7 @@ val platformPluginsAssociation = hashMapOf<String, String>()
 platformPluginsAssociation["2019.1.4"] = "com.jetbrains.php:191.8026.56, org.jetbrains.plugins.phpstorm-remote-interpreter:191.5849.22, com.jetbrains.twig:191.6183.95"
 platformPluginsAssociation["2020.2.3"] = "com.jetbrains.php:202.7660.42, org.jetbrains.plugins.phpstorm-remote-interpreter:202.6397.59, com.jetbrains.twig:202.6397.21"
 platformPluginsAssociation["2020.3.3"] = "com.jetbrains.php:203.7717.11, org.jetbrains.plugins.phpstorm-remote-interpreter:203.5981.155, com.jetbrains.twig:203.6682.75"
-platformPluginsAssociation["2021.1"] = "com.jetbrains.php:211.6693.120, org.jetbrains.plugins.phpstorm-remote-interpreter:211.6693.65, com.jetbrains.twig:211.6693.44"
+platformPluginsAssociation["2021.1"] = "com.jetbrains.php:211.6693.120, org.jetbrains.plugins.phpstorm-remote-interpreter:211.6693.65, com.jetbrains.twig:211.6693.44, PsiViewer:211.6305.21-EAP-SNAPSHOT"
 val bundledPlugins = "DatabaseTools, webDeployment, CSS, terminal, coverage, java-i18n, remote-run, properties"
 
 val platformPlugins = platformPluginsAssociation[platformVersion] + ", $bundledPlugins"
@@ -98,7 +98,7 @@ tasks {
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription(
             closure {
-                File("./DESCRIPTION.md").readText().lines().joinToString("\n").run { markdownToHTML(this) }
+                File(projectDir,"./DESCRIPTION.md").readText().lines().joinToString("\n").run { markdownToHTML(this) }
             }
         )
 
@@ -111,7 +111,7 @@ tasks {
     }
 
     test {
-//        useJUnitPlatform()
+        //useJUnitPlatform()
         reports {
             junitXml.isEnabled = true
         }
