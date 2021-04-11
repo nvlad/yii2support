@@ -451,6 +451,9 @@ public class ClassUtils {
                 }
             } else {
                 resultClass = getClass(PhpIndex.getInstance(param.getProject()), type);
+                if(resultClass == null){
+                    continue;
+                }
 
                 return resultClass;
             }
