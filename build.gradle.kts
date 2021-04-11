@@ -21,7 +21,6 @@ val pluginVerifierIdeVersions: String by project
 val platformType: String by project
 val platformVersion: String by project
 val platformDownloadSources: String by project
-val runIdePath: String by project
 
 group = "com.nvlad"
 version = pluginVersion
@@ -58,7 +57,6 @@ intellij {
     type = platformType
     downloadSources = platformDownloadSources.toBoolean()
     updateSinceUntilBuild = true
-    //localPath = runIdePath
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     setPlugins(*platformPlugins.split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
@@ -74,11 +72,11 @@ sourceSets {
             srcDirs("resources")
         }
     }
-    /*test {
+    test {
         java {
             srcDirs("tests")
         }
-    }*/
+    }
 }
 
 tasks {
@@ -98,11 +96,11 @@ tasks {
         untilBuild(null)
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        /*pluginDescription(
+        pluginDescription(
             closure {
-                File("./DESCRIPTION.md").readText().lines().joinToString("\n").run { markdownToHTML(this) }
+                File(projectDir,"./DESCRIPTION.md").readText().lines().joinToString("\n").run { markdownToHTML(this) }
             }
-        )*/
+        )
 
         // Get the latest available change notes from the changelog file
 //        changeNotes(
@@ -112,23 +110,23 @@ tasks {
 //        )
     }
 
-   // test {
-//        useJUnitPlatform()
-     //   reports {
-       //     junitXml.isEnabled = true
-        //}
-   // }
+    test {
+        //useJUnitPlatform()
+        reports {
+            junitXml.isEnabled = true
+        }
+    }
 
-   // runPluginVerifier {
-     //   ideVersions(pluginVerifierIdeVersions)
-    //}
+    runPluginVerifier {
+        ideVersions(pluginVerifierIdeVersions)
+    }
 
-    //publishPlugin {
-      //  dependsOn("patchChangelog")
-        //token(System.getenv("PUBLISH_TOKEN"))
+    publishPlugin {
+        dependsOn("patchChangelog")
+        token(System.getenv("PUBLISH_TOKEN"))
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html#specifying-a-release-channel
-        //channels(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
-    //}
+        channels(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
+    }
 }
