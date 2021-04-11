@@ -408,6 +408,11 @@ public class ClassUtils {
 
     @Nullable
     public static PhpClass getElementType(PhpNamedElement param) {
+        return getElementType(param, true);
+    }
+
+    @Nullable
+    public static PhpClass getElementType(PhpNamedElement param, boolean onlyFirst) {
         Set<String> types = param.getType().getTypes();
         PhpClass resultClass;
         for (String type : types) {
@@ -423,7 +428,7 @@ public class ClassUtils {
                         try {
                             int index = Integer.parseInt(parts[2]);
                             if (method != null && method.getParameters().length > index) {
-                                return getElementType(method.getParameters()[index]);
+                                return getElementType(method.getParameters()[index], true);
                             }
                         } catch (NumberFormatException ex) {
                             // pass
@@ -432,7 +437,7 @@ public class ClassUtils {
                 }
             } else {
                 resultClass = getClass(PhpIndex.getInstance(param.getProject()), type);
-                if(resultClass == null){
+                if(resultClass == null && !onlyFirst){
                     continue;
                 }
 
