@@ -1,13 +1,10 @@
 package com.nvlad.yii2support.widgetsconfig;
 
 import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.NlsContexts;
-import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
@@ -15,18 +12,14 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.nvlad.yii2support.common.ClassUtils;
-import com.nvlad.yii2support.common.SignatureUtils;
 import com.nvlad.yii2support.configurations.ComponentsIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Hashtable;
 
 public class WidgetConfigCompletionProvider extends CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         boolean isArrayItem = false;
-        boolean modelArray = false;
         final Project project = completionParameters.getPosition().getProject();
         final PhpIndex phpIndex = PhpIndex.getInstance(project);
 
@@ -36,7 +29,7 @@ public class WidgetConfigCompletionProvider extends CompletionProvider<Completio
             // Case of ['?'] in attribute/column array
             top = walkParents(completionParameters, 10);
             if(top instanceof MethodReference){
-                if (completionParameters.getPosition().getParent().getParent().getParent() instanceof ArrayCreationExpression) {
+                if (walkParents(completionParameters, 3) instanceof ArrayCreationExpression) {
                     isArrayItem = true;
                 }
             }else{
@@ -52,16 +45,14 @@ public class WidgetConfigCompletionProvider extends CompletionProvider<Completio
             if(method instanceof Method && ((Method) method).getName().equals("widget")){
                 for(PsiElement child : top.getChildren()){
                     if(child instanceof ParameterList){
-                        for(PsiElement conf : ((ParameterList) child).getParameter(0).getChildren()){
+                        PsiElement[] params = ((ParameterList) child).getParameters();
+                        for(PsiElement conf : params[0].getChildren()){
                             String key = getHashKeyContents(conf);
                             // 'model' key for DetailView widget and 'filterModel' for GridView
                             if(key != null && (key.equals("model") || key.equals("filterModel"))){
                                 PsiElement val = ((ArrayHashElement) conf).getValue();
                                 if(val instanceof Variable){
                                     modelClass = ClassUtils.getClassByVariable((Variable) val);
-                                    if(modelClass == null){
-                                        modelArray = true;
-                                    }
                                 }
                             }
                         }
@@ -70,7 +61,7 @@ public class WidgetConfigCompletionProvider extends CompletionProvider<Completio
             }
         }
 
-        if(isArrayItem && (modelArray || modelClass != null)){
+        if(isArrayItem){
             PhpClass phpClass = ClassUtils.getPhpClassByCallChain((MethodReference) top);
             if(phpClass != null) {
                 if (ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\widgets\\DetailView", phpIndex)) {
