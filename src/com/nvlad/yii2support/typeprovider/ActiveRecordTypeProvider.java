@@ -29,9 +29,11 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider4  {
     public PhpType getType(PsiElement psiElement) {
         if (psiElement instanceof MethodReference) {
             MethodReference methodReference = (MethodReference)psiElement;
-            if (methodReference.getName() == null)
+            String methodName = methodReference.getName();
+            if (methodName == null)
                 return null;
-            if (methodReference.getName().equals("one") || methodReference.getName().equals("all")) {
+            if (methodName.equals("one") || methodName.equals("all")
+                    || methodName.equals("each") || methodName.equals("batch")) {
                 String signature = methodReference.getSignature();
                 int beginIndex = signature.indexOf("\\");
                 int endIndex = signature.indexOf("|");
@@ -62,8 +64,10 @@ public class ActiveRecordTypeProvider  implements PhpTypeProvider4  {
         if (classInheritsFromAD) {
             if (s.endsWith(".one"))
                 phpType.add(classBySignature.getFQN());
-            else if (s.endsWith(".all")) {
+            else if (s.endsWith(".all") || s.endsWith(".each")) {
                 phpType.add(classBySignature.getFQN()+ "[]");
+            }else if (s.endsWith(".batch")) {
+                phpType.add(classBySignature.getFQN()+ "[][]");
             }
         }
         return phpType;

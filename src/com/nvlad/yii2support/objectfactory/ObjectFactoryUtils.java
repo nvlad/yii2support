@@ -232,6 +232,9 @@ public class ObjectFactoryUtils {
             }
 
             PsiElement possiblePhpClass = ref.resolve();
+            if(possiblePhpClass instanceof Method){ // Since 2021.1 resolved into Method __construct() of BaseObject class
+                possiblePhpClass = ClassUtils.getClass(PhpIndex.getInstance(element.getProject()), ref.getFQN());
+            }
             if (!(possiblePhpClass instanceof PhpClass)) {
                 return null;
             }

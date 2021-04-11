@@ -45,7 +45,7 @@ public class ActiveFormCompletionContributor extends com.intellij.codeInsight.co
                     return;
                 Variable modelVar = (Variable)possibleVariable;
 
-                PhpClass modelClass = ClassUtils.getElementType(modelVar);
+                PhpClass modelClass = ClassUtils.getElementType(modelVar, false);
                 if (modelClass == null)
                     return;
 

@@ -86,7 +86,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             }
 
             final String absolutePath = inputData.getFile().getPath();
-            System.out.println("ViewDataIndexer.map > " + absolutePath + " => " + resolve.key);
+            //System.out.println("ViewDataIndexer.map > " + absolutePath + " => " + resolve.key);
 
             Map<String, ViewInfo> map = new HashMap<>();
             ViewInfo viewInfo = new ViewInfo(inputData);
@@ -97,12 +97,12 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
             map.put(resolve.key, viewInfo);
             if (resolve.key.startsWith("@app/modules/") && !resolve.relativePath.startsWith("/modules/")) {
                 map.put("@app/views/modules" + resolve.key.substring(12), viewInfo);
-                System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/modules" + resolve.key.substring(12));
+                //System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/modules" + resolve.key.substring(12));
             }
 
             if (resolve.key.startsWith("@app/widgets/") && !resolve.relativePath.startsWith("/widgets/")) {
                 map.put("@app/views/widgets" + resolve.key.substring(12), viewInfo);
-                System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/widgets" + resolve.key.substring(12));
+                //System.out.println("ViewDataIndexer.map > " + absolutePath + " => @app/views/widgets" + resolve.key.substring(12));
             }
 
             return map;
@@ -112,7 +112,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
     private static class ViewInfoDataExternalizer implements DataExternalizer<ViewInfo> {
         @Override
         public void save(@NotNull DataOutput dataOutput, @NotNull ViewInfo viewInfo) throws IOException {
-            System.out.println("ViewInfoDataExternalizer.save ==> " + viewInfo.fileUrl);
+            //System.out.println("ViewInfoDataExternalizer.save ==> " + viewInfo.fileUrl);
 
             writeString(dataOutput, viewInfo.fileUrl);
             writeString(dataOutput, viewInfo.application);
@@ -137,7 +137,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
                 viewInfo.parameters.add(readString(dataInput));
             }
 
-            System.out.println("ViewInfoDataExternalizer.read <== " + viewInfo.fileUrl);
+            //System.out.println("ViewInfoDataExternalizer.read <== " + viewInfo.fileUrl);
             return viewInfo;
         }
 

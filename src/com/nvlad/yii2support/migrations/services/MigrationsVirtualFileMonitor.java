@@ -1,5 +1,7 @@
 package com.nvlad.yii2support.migrations.services;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.*;
 import com.intellij.psi.PsiFile;
@@ -34,14 +36,14 @@ public class MigrationsVirtualFileMonitor implements VirtualFileListener {
 
     @Override
     public void fileCreated(@NotNull VirtualFileEvent event) {
-        if (isMigrationFile(event.getFile())) {
+        if (isMigrationFile(event)) {
             service.sync();
         }
     }
 
     @Override
     public void fileDeleted(@NotNull VirtualFileEvent event) {
-        service.sync();
+        ApplicationManager.getApplication().invokeLater(service::sync);
     }
 
     @Override
@@ -74,7 +76,8 @@ public class MigrationsVirtualFileMonitor implements VirtualFileListener {
 
     }
 
-    private boolean isMigrationFile(VirtualFile virtualFile) {
+    private boolean isMigrationFile(VirtualFileEvent event) {
+        VirtualFile virtualFile = event.getFile();
         PsiFile psiFile = PsiManager.getInstance(myProject).findFile(virtualFile);
         if (!(psiFile instanceof PhpFile)) {
             return false;
@@ -87,6 +90,10 @@ public class MigrationsVirtualFileMonitor implements VirtualFileListener {
                     continue;
                 }
 
+                if(DumbService.getInstance(myProject).isDumb()){
+                    DumbService.getInstance(myProject).runWhenSmart(() -> this.fileCreated(event));
+                    return false;
+                }
                 PhpIndex phpIndex = PhpIndex.getInstance(myProject);
                 if (ClassUtils.isClassInheritsOrEqual(phpClass, "\\yii\\db\\Migration", phpIndex)) {
                     return true;

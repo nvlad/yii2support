@@ -16,7 +16,7 @@ public class SignatureUtils {
         int beginClassIndex = signature.indexOf("\\");
         int endClassIndex = signature.indexOf(".");
         if (endClassIndex < 0) {
-            endClassIndex = signature.length() - 1;
+            endClassIndex = signature.length();
         }
         if (beginClassIndex > -1 && beginClassIndex < endClassIndex) {
             String className = signature.substring(beginClassIndex, endClassIndex);
