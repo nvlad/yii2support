@@ -58,7 +58,7 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
         }
 
         @Override
-        public void stateChanged() {
+        public void stateChanged(@NotNull ToolWindowManager toolWindowManager) {
             ToolWindow window = ToolWindowManager
                     .getInstance(myProject)
                     .getToolWindow(MigrationsToolWindowFactory.TOOL_WINDOW_ID);
@@ -75,7 +75,7 @@ public class MigrationsToolWindowFactory implements ToolWindowFactory {
                     service.addListener(serviceListener);
                     fileSystem.addVirtualFileListener(fileMonitor);
 
-                    ApplicationManager.getApplication().invokeLater(service::sync);
+                    ApplicationManager.getApplication().executeOnPooledThread(service::sync);
                 }
 
                 myToolWindowVisible = toolWindowVisible;
