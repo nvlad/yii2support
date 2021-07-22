@@ -1,6 +1,7 @@
 package com.nvlad.yii2support.migrations.services;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.*;
@@ -36,14 +37,20 @@ public class MigrationsVirtualFileMonitor implements VirtualFileListener {
 
     @Override
     public void fileCreated(@NotNull VirtualFileEvent event) {
-        if (isMigrationFile(event)) {
-            service.sync();
-        }
+        ApplicationManager.getApplication().executeOnPooledThread(
+            () -> ApplicationManager.getApplication().runReadAction(
+                () -> {
+                    if (isMigrationFile(event)) {
+                        service.sync();
+                    }
+                }
+            )
+        );
     }
 
     @Override
     public void fileDeleted(@NotNull VirtualFileEvent event) {
-        ApplicationManager.getApplication().invokeLater(service::sync);
+        ApplicationManager.getApplication().executeOnPooledThread(service::sync);
     }
 
     @Override
