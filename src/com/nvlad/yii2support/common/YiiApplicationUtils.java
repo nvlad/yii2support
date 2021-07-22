@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.nvlad.yii2support.utils.Yii2SupportSettings;
+import com.nvlad.yii2support.views.util.ViewUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +59,13 @@ public class YiiApplicationUtils {
                 return "";
             }
 
-            return fileUrl.substring(yiiRootLength + 1, slashIndex);
+            String appName = fileUrl.substring(yiiRootLength + 1, slashIndex);
+            String moduleName = ViewUtil.getModuleName(fileUrl.substring(yiiRootLength + 1));
+            if(moduleName != null){
+                return moduleName;
+            }
+
+            return appName;
         }
 
         return "app";

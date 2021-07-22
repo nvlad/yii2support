@@ -239,28 +239,51 @@ public class ViewUtil {
         return patterns;
     }
 
+    @Nullable
+    public static String getModuleName(String fileUrl){
+        if(fileUrl.startsWith("/")){
+            fileUrl = fileUrl.substring(1);
+        }
+        if(fileUrl.contains("/views")){
+            int idx = fileUrl.indexOf("/views");
+            return fileUrl.substring(0, idx);
+        }else if(fileUrl.contains("/controllers")){
+            int idx = fileUrl.indexOf("/controllers");
+            return fileUrl.substring(0, idx);
+        }
+        return null;
+    }
+
     @NotNull
     private static ViewResolve resolveViewFromController(PhpClass clazz, String value) {
         ViewResolve result = new ViewResolve(ViewResolveFrom.Controller);
         final String classFQN = clazz.getFQN().replace('\\', '/');
         StringBuilder key = new StringBuilder("@app");
         String path = deletePathPart(classFQN);
-        if (path.startsWith("/modules/")) {
-            key.append("/modules");
+
+        String moduleName = getModuleName(classFQN);
+        int controllersIdx = classFQN.indexOf("/controllers");
+        if(moduleName != null && controllersIdx > -1){
+            result.application = moduleName;
+            path = classFQN.substring(controllersIdx+12);
+        }else {
+            if (path.startsWith("/modules/")) {
+                key.append("/modules");
+                path = deletePathPart(path);
+            }
+            int controllersPathPartPosition = path.indexOf("/controllers/");
+            if (controllersPathPartPosition == -1) {
+                throw new InvalidPathException(path, "Not found \"controllers\" directory.");
+            }
+            result.application = getFirstPathPart(classFQN);
+            if (controllersPathPartPosition > 0) {
+                final String module = path.substring(0, controllersPathPartPosition);
+                key.append(module);
+                path = path.substring(controllersPathPartPosition);
+                result.module = module;
+            }
             path = deletePathPart(path);
         }
-        int controllersPathPartPosition = path.indexOf("/controllers/");
-        if (controllersPathPartPosition == -1) {
-            throw new InvalidPathException(path, "Not found \"controllers\" directory.");
-        }
-        result.application = getFirstPathPart(classFQN);
-        if (controllersPathPartPosition > 0) {
-            final String module = path.substring(0, controllersPathPartPosition);
-            key.append(module);
-            path = path.substring(controllersPathPartPosition);
-            result.module = module;
-        }
-        path = deletePathPart(path);
         key.append("/views");
         if (value.startsWith("/")) {
             result.key = normalizePath(key + value);
@@ -341,7 +364,7 @@ public class ViewUtil {
     private static String getFirstPathPart(String path) {
         int start = path.startsWith("/") ? 1 : 0;
         int end = path.indexOf('/', start) - 1;
-        return end == -1 ? path : path.substring(start, end);
+        return end == -1 ? path : path.substring(start, end+1);
     }
 
     private static String normalizePath(String path) {
