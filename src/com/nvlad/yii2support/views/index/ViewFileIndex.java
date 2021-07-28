@@ -60,7 +60,7 @@ public class ViewFileIndex extends FileBasedIndexExtension<String, ViewInfo> {
 
     @Override
     public int getVersion() {
-        return 32;
+        return 33;
     }
 
     @NotNull
