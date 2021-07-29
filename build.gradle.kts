@@ -31,7 +31,7 @@ platformPluginsAssociation["2019.1.4"] = "com.jetbrains.php:191.8026.56, org.jet
 platformPluginsAssociation["2020.2.3"] = "com.jetbrains.php:202.7660.42, org.jetbrains.plugins.phpstorm-remote-interpreter:202.6397.59, com.jetbrains.twig:202.6397.21"
 platformPluginsAssociation["2020.3.3"] = "com.jetbrains.php:203.7717.11, org.jetbrains.plugins.phpstorm-remote-interpreter:203.5981.155, com.jetbrains.twig:203.6682.75"
 platformPluginsAssociation["2021.1"] = "com.jetbrains.php:211.6693.120, org.jetbrains.plugins.phpstorm-remote-interpreter:211.6693.65, com.jetbrains.twig:211.6693.44, PsiViewer:211-SNAPSHOT"
-platformPluginsAssociation["212-EAP-SNAPSHOT"] = "com.jetbrains.php:212.4746.52, org.jetbrains.plugins.phpstorm-remote-interpreter:212.4746.52, com.jetbrains.twig:212.4746.57, PsiViewer:212-SNAPSHOT"
+platformPluginsAssociation["2021.2"] = "com.jetbrains.php:212.4746.92, org.jetbrains.plugins.phpstorm-remote-interpreter:212.4746.52, com.jetbrains.twig:212.4746.57, PsiViewer:212-SNAPSHOT"
 val bundledPlugins = "DatabaseTools, webDeployment, CSS, terminal, coverage, java-i18n, remote-run, properties"
 
 val platformPlugins = platformPluginsAssociation[platformVersion] + ", $bundledPlugins"

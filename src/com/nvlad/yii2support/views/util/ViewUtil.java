@@ -45,7 +45,7 @@ public class ViewUtil {
         }
 
         String path = absolutePath.substring(projectBaseDirLength);
-        if (!path.startsWith("/vendor/")) {
+        //if (!path.startsWith("/vendor/")) {
             ViewResolve result = new ViewResolve();
             result.application = YiiApplicationUtils.getApplicationName(virtualFile, project);
             result.theme = "";
@@ -80,9 +80,9 @@ public class ViewUtil {
             result.key = path;
 
             return result;
-        }
+        //}
 
-        return null;
+        //return null;
     }
 
     @Nullable
