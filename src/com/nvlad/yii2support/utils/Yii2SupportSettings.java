@@ -26,6 +26,7 @@ public class Yii2SupportSettings implements PersistentStateComponent<Yii2Support
     // Database Settings
     public String tablePrefix = "";
     public boolean insertWithTablePrefix = false;
+    public String dataSourceId = "";
 
     // View Settings
     public String defaultViewExtension = "php";
