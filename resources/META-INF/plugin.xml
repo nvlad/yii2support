@@ -31,7 +31,7 @@
     <depends optional="true" config-file="phpstorm-remote-interpreter.xml">org.jetbrains.plugins.phpstorm-remote-interpreter</depends>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
-        <typeProvider3 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
+        <typeProvider4 implementation="com.nvlad.yii2support.typeprovider.YiiTypeProvider"/>
         <typeProvider4 implementation="com.nvlad.yii2support.typeprovider.ActiveRecordTypeProvider"/>
     </extensions>
 
@@ -123,8 +123,17 @@
                              parentId="Yii2Support.SettingsForm" order="first"
                              nonDefaultProject="true"/>
 
+        <!-- Yii Configurations -->
+        <fileBasedIndex implementation="com.nvlad.yii2support.configurations.ComponentsIndex" id="components-index"/>
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.configurations.YiiAppCompletionContributor"/>
+
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.widgetsconfig.WidgetConfigCompletionContributor"/>
+
         <!-- Validation -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.validation.ValidationCompletionContributor"/>
+
+        <!-- AttributeLabels -->
+        <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.attributeLabels.AttributeLabelCompletionContributor"/>
 
         <!-- Url -->
         <completion.contributor language="PHP" implementationClass="com.nvlad.yii2support.url.UrlCompletionContributor"/>

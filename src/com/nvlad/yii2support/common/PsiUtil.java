@@ -1,8 +1,10 @@
 package com.nvlad.yii2support.common;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiWhiteSpace;
-import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
+import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.impl.VariableImpl;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -101,6 +103,43 @@ public class PsiUtil {
                 curElement = curElement.getParent();
             }
             limit--;
+        }
+        return null;
+    }
+
+    public static ArrayCreationExpression getArrayCreationChild(PsiElement element) {
+        int limit = 10;
+        PsiElement curElement = element;
+        while (limit > 0) {
+            if(curElement instanceof GroupStatement || curElement instanceof PhpReturn){
+                curElement = curElement.getFirstChild();
+            }else if (curElement instanceof ArrayCreationExpression) {
+                return (ArrayCreationExpression) curElement;
+            } else {
+                if(curElement == null){
+                    break;
+                }
+                curElement = curElement.getNextSibling();
+            }
+            limit--;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String getYiiAppField(FieldReference element) {
+        String signature = element.getSignature();
+        int appIndex = signature.indexOf("Yii.app.");
+        if(appIndex != -1){
+            String origSign = signature.substring(appIndex);
+            int endIndex = origSign.indexOf("|");
+            if(endIndex != -1) {
+                origSign = origSign.substring(0, endIndex);
+            }
+            int fieldIndex = origSign.lastIndexOf(".");
+            if(origSign.substring(0,fieldIndex).equals("Yii.app")){
+                return origSign.substring(fieldIndex+1);
+            }
         }
         return null;
     }

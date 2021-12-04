@@ -6,6 +6,7 @@ import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocProperty;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.jetbrains.php.lang.psi.elements.impl.PhpDefineImpl;
@@ -186,7 +187,11 @@ public class ClassUtils {
 
     public static String getAsPropertyName(Method method) {
         String methodName = method.getName();
-        String propertyName = methodName.substring(3);
+        int trimLen = 3;
+        if(methodName.startsWith("as")){
+            trimLen = 2;
+        }
+        String propertyName = methodName.substring(trimLen);
         propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
 
         return propertyName;
@@ -201,6 +206,21 @@ public class ClassUtils {
             int pCount = method.getParameters().length;
             if (methodName.length() > 3 && methodName.startsWith("set") && pCount == 1 &&
                     Character.isUpperCase(methodName.charAt(3))) {
+                result.add(method);
+            }
+        }
+
+        return result;
+    }
+
+    public static Collection<Method> getFormatterAsMethods(PhpClass phpClass) {
+        final HashSet<Method> result = new HashSet<>();
+        final Collection<Method> methods = phpClass.getMethods();
+
+        for (Method method : methods) {
+            String methodName = method.getName();
+            if (methodName.length() > 2 && methodName.startsWith("as") &&
+                    Character.isUpperCase(methodName.charAt(2))) {
                 result.add(method);
             }
         }
@@ -407,6 +427,11 @@ public class ClassUtils {
 
     @Nullable
     public static PhpClass getElementType(PhpNamedElement param) {
+        return getElementType(param, true);
+    }
+
+    @Nullable
+    public static PhpClass getElementType(PhpNamedElement param, boolean onlyFirst) {
         Set<String> types = param.getType().getTypes();
         PhpClass resultClass;
         for (String type : types) {
@@ -422,7 +447,7 @@ public class ClassUtils {
                         try {
                             int index = Integer.parseInt(parts[2]);
                             if (method != null && method.getParameters().length > index) {
-                                return getElementType(method.getParameters()[index]);
+                                return getElementType(method.getParameters()[index], true);
                             }
                         } catch (NumberFormatException ex) {
                             // pass
@@ -431,6 +456,9 @@ public class ClassUtils {
                 }
             } else {
                 resultClass = getClass(PhpIndex.getInstance(param.getProject()), type);
+                if(resultClass == null && !onlyFirst){
+                    continue;
+                }
 
                 return resultClass;
             }
@@ -487,5 +515,35 @@ public class ClassUtils {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public static PhpClass getClassIfInMethod(PsiElement position, String methodName) {
+        PsiElement elem = position.getParent();
+        Method currentMethod = null;
+        PhpClass phpClass = null;
+        while (true) {
+            if (elem instanceof Method)
+                currentMethod = (Method) elem;
+            else if (elem instanceof PhpClass) {
+                phpClass = (PhpClass) elem;
+                break;
+            } else if (elem instanceof PhpFile)
+                break;
+            else if (elem == null) {
+                break;
+            }
+            elem = elem.getParent();
+        }
+        if (currentMethod != null && phpClass != null) {
+            if (ClassUtils.isClassInherit(phpClass, "\\yii\\base\\Model", PhpIndex.getInstance(position.getProject())) &&
+                    currentMethod.getName().equals(methodName)) {
+                return phpClass;
+            } else
+                return null;
+
+        } else {
+            return null;
+        }
     }
 }

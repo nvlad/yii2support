@@ -1,5 +1,6 @@
 package com.nvlad.yii2support.migrations.services;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -54,6 +55,10 @@ public class MigrationService {
     }
 
     public void sync() {
+        ApplicationManager.getApplication().runReadAction(this::_sync);
+    }
+
+    public void _sync() {
         Collection<PhpClass> migrations;
         try {
             migrations = myPhpIndex.getAllSubclasses("\\yii\\db\\MigrationInterface");

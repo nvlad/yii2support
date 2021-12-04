@@ -4,6 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.model.DasObject;
 import com.intellij.database.model.DasTable;
+import com.intellij.database.model.RawConnectionConfig;
 import com.intellij.database.psi.*;
 import com.intellij.ide.TypePresentationService;
 import com.intellij.openapi.editor.Document;
@@ -349,11 +350,27 @@ public class DatabaseUtils {
         final ArrayList<VirtualProperty> result = new ArrayList<>();
         if (table == null)
             return result;
+        String preferredDataSourceId = Yii2SupportSettings.getInstance(project).dataSourceId;
         for (DbDataSource source : dataSources) {
-            for (Object item : source.getModel().traverser().filter(DasTable.class)) {
+            if(!preferredDataSourceId.isEmpty() && !preferredDataSourceId.equals(source.getUniqueId())){
+                continue;
+            }
+            for (DasTable item : source.getModel().traverser().filter(DasTable.class)) {
                 table = ClassUtils.removeQuotes(table);
-                if (item instanceof DasTable && ((DasTable) item).getName().equals(table)) {
-                    TableInfo tableInfo = new TableInfo((DasTable) item);
+                if (item != null && item.getName().equals(table)) {
+
+                    // In some cases Idea give tables from another databases. Extracting database name from URL and comparing with actual one.
+                    DasObject db = item.getDasParent();
+                    if(db != null && source.getConnectionConfig() != null){
+                        String dbUrl = source.getConnectionConfig().getUrl();
+                        if(!dbUrl.endsWith("/")
+                                && !dbUrl.substring(dbUrl.lastIndexOf('/')+1).equals(db.getName()))
+                        {
+                            continue;
+                        }
+                    }
+
+                    TableInfo tableInfo = new TableInfo(item);
 
                     for (DasColumn column : tableInfo.getColumns()) {
                         boolean found = false;
